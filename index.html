@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Zettbos Dental Exam Portal</title>
+  <title>Axa Dental Exam</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CDN Dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
     :root { --bg-dark: #090c10; --glass-bg: rgba(20, 25, 30, 0.6); --glass-border: rgba(255, 255, 255, 0.08); --neon-green: #39ff14; --neon-glow: 0 0 15px rgba(57, 255, 20, 0.4); --text-main: #f0f6fc; --text-muted: #8b949e; --danger: #ff4444; }
@@ -42,9 +45,10 @@
     .tab-btn:hover:not(.active) { border-color: var(--neon-green); color: var(--neon-green); }
     #toast { position: fixed; top: 20px; right: 20px; z-index: 10000; background: rgba(255,0,0,0.9); padding: 15px 25px; border-radius: 8px; color: white; font-weight: bold; border-left: 5px solid white; transform: translateX(150%); transition: transform 0.3s ease; }
     
-    /* Custom Pop-up Broadcast untuk Mahasiswa */
-    #broadcast-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 11000; display: flex; justify-content: center; align-items: center; }
-    .broadcast-content { background: var(--danger); padding: 30px; border-radius: 15px; text-align: center; max-width: 500px; box-shadow: 0 0 30px rgba(255,68,68,0.5); }
+    /* Pop-up Modals */
+    .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 11000; display: flex; justify-content: center; align-items: center; }
+    .modal-content { background: var(--bg-dark); border: 1px solid var(--glass-border); padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; box-shadow: 0 0 30px rgba(0,0,0,0.8); max-height: 80vh; overflow-y: auto; }
+    .broadcast-content { background: var(--danger); text-align: center; box-shadow: 0 0 30px rgba(255,68,68,0.5); }
     
     /* Detail Table Admin */
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
@@ -53,6 +57,13 @@
     .audio-bar { height: 10px; background: #333; border-radius: 5px; overflow: hidden; width: 100px; }
     .audio-level { height: 100%; background: var(--neon-green); transition: width 0.5s; }
     .noise-high { background: var(--danger); }
+    .btn-play { background: #333; color: #fff; border: 1px solid var(--glass-border); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+    .btn-play:hover { background: var(--neon-green); color: #000; }
+    
+    .star-rating { direction: rtl; display: inline-block; font-size: 2rem; }
+    .star-rating input { display: none; }
+    .star-rating label { color: var(--text-muted); cursor: pointer; padding: 0 5px; }
+    .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #ffd700; }
   </style>
 </head>
 <body>
@@ -60,11 +71,21 @@
   <div id="watermark-layer" class="hidden"></div>
   <div id="toast">Notifikasi!</div>
   
-  <div id="broadcast-modal" class="hidden">
-    <div class="broadcast-content">
+  <!-- Modal Broadcast -->
+  <div id="broadcast-modal" class="fullscreen-modal hidden">
+    <div class="modal-content broadcast-content">
       <h2 style="color: white; font-size: 2rem;">PENGUMUMAN PENTING</h2>
       <p id="broadcast-text" style="color: white; font-size: 1.2rem; margin: 20px 0;"></p>
       <button class="btn-neon" style="border-color: white; color: white;" onclick="document.getElementById('broadcast-modal').classList.add('hidden')">SAYA MENGERTI</button>
+    </div>
+  </div>
+
+  <!-- Modal Detail Jawaban -->
+  <div id="detail-jawaban-modal" class="fullscreen-modal hidden">
+    <div class="modal-content">
+      <h3 id="det-nama" style="color: var(--neon-green); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-bottom: 20px;">Detail Jawaban</h3>
+      <div id="det-list" style="font-size: 0.95rem; line-height: 1.6;"></div>
+      <button class="btn-neon" style="margin-top: 20px;" onclick="document.getElementById('detail-jawaban-modal').classList.add('hidden')">Tutup Detail</button>
     </div>
   </div>
 
@@ -73,8 +94,8 @@
     <!-- 1. LOGIN VIEW -->
     <div id="login-view" class="glass-panel" style="max-width: 400px; margin: 10vh auto;">
       <div style="text-align: center; margin-bottom: 2rem;">
-        <h2 id="portal-title" style="color: var(--neon-green);">ZETTBOS</h2>
-        <p id="portal-subtitle">Dental Secure Portal</p>
+        <h2 id="portal-title" style="color: var(--neon-green);">AXA XYZ</h2>
+        <p id="portal-subtitle">Axa Dental Exam Portal</p>
       </div>
       <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
         <div class="input-group"><label>ID Pengguna (NIM/Admin)</label><input type="text" id="in-nim" class="input-glass" required autocomplete="off"></div>
@@ -106,10 +127,28 @@
       <div style="text-align: right; margin-top: 2rem;"><button class="btn-neon" style="width: auto; padding: 12px 40px;" onclick="forceSubmitExam()">Submit Jawaban</button></div>
     </div>
 
-    <!-- 4. ADMIN DASHBOARD -->
+    <!-- 4. FEEDBACK / LOGOUT VIEW -->
+    <div id="feedback-view" class="glass-panel hidden" style="max-width: 500px; margin: 10vh auto; text-align: center;">
+      <h2 style="color: var(--neon-green);">Ujian Berakhir</h2>
+      <p id="feedback-message" style="font-weight: bold; margin-bottom: 2rem;"></p>
+      <p>Silakan isi rating kendala teknis pengalaman Anda.</p>
+      <form onsubmit="event.preventDefault(); submitFeedback();">
+        <div class="star-rating">
+          <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
+          <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+          <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+          <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+          <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+        </div>
+        <textarea id="feed-comment" class="input-glass" rows="4" placeholder="Komentar tambahan (opsional)..." style="margin-top: 1rem; resize: none;"></textarea>
+        <button type="submit" class="btn-neon" style="margin-top: 1rem;">Kirim & Keluar</button>
+      </form>
+    </div>
+
+    <!-- 5. ADMIN DASHBOARD -->
     <div id="admin-view" class="hidden">
       <div class="exam-header">
-        <h2>Dashboard Admin - Zettbos</h2>
+        <h2>Dashboard Admin - Axa Xyz</h2>
         <div>
           <!-- Pilihan Filter Departemen Global untuk Admin -->
           <select id="global-dept-filter" class="input-glass" style="width: auto; display: inline-block; margin-right: 15px;" onchange="fetchAdminData()">
@@ -154,14 +193,14 @@
         </div>
       </div>
 
-      <!-- TAB 2: MANAJEMEN USER (DENGAN CSV UPLOAD) -->
+      <!-- TAB 2: MANAJEMEN USER (EXCEL/CSV UPLOAD) -->
       <div id="admin-users" class="hidden">
         <div class="dashboard-grid">
           <div class="glass-panel">
-            <h3>Upload Bulk (CSV)</h3>
-            <p>Format CSV: NIM,Nama Lengkap (Tanpa Header). Pastikan ekstensi .csv</p>
+            <h3>Upload Bulk (Excel / CSV)</h3>
+            <p>Sistem membaca format file <b>.xlsx, .xls, .csv</b>. <br><span style="color:var(--danger)">Format Dokumen Word (.docx) atau PDF ditolak karena tidak terstruktur tabel.</span> <br>Kolom A = NIM, Kolom B = Nama Lengkap (Tanpa Header).</p>
             <div class="input-group">
-              <input type="file" id="csv-file" accept=".csv" class="input-glass">
+              <input type="file" id="bulk-file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="input-glass">
             </div>
             <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
               <input type="checkbox" id="chk-univ-pass" onchange="document.getElementById('add-bulk-pass').classList.toggle('hidden')" checked> 
@@ -184,7 +223,7 @@
                 <option value="Oral and Maxillofacial Surgery">Oral & Maxillo Surgery</option>
               </select>
             </div>
-            <button class="btn-neon" onclick="uploadCSV()">Upload CSV</button>
+            <button class="btn-neon" onclick="uploadBulkFile()">Upload File</button>
           </div>
           <div class="glass-panel">
             <h3>Tambah User Manual</h3>
@@ -237,15 +276,11 @@
       <div id="admin-jawaban" class="hidden">
         <div class="glass-panel">
           <h3>Detail Jawaban Siswa Selesai (<span class="lbl-dept">ALL</span>)</h3>
-          <p>Klik pada baris nama untuk melihat detail jawaban.</p>
+          <p>Memantau waktu kumpul dan opsi jawaban.</p>
           <table id="tbl-jawaban">
-            <thead><tr><th>NIM</th><th>Nama Siswa</th><th>Nilai</th><th>Aksi</th></tr></thead>
+            <thead><tr><th>NIM</th><th>Nama Siswa</th><th>Waktu Submit</th><th>Nilai</th><th>Aksi</th></tr></thead>
             <tbody><!-- Diisi JS --></tbody>
           </table>
-          <div id="detail-jawaban-box" style="margin-top:20px; border-top:1px solid var(--neon-green); padding-top:15px; display:none;">
-            <h4 id="det-nama" style="color:var(--neon-green);"></h4>
-            <div id="det-list" style="font-size:0.9rem;"></div>
-          </div>
         </div>
       </div>
 
@@ -253,9 +288,9 @@
       <div id="admin-audio" class="hidden">
         <div class="glass-panel">
           <h3>Live Audio & Session Radar (<span class="lbl-dept">ALL</span>)</h3>
-          <p>Memantau kebisingan ruangan peserta (Refresh setiap 10 detik).</p>
+          <p>Memantau indikator kebisingan ruangan peserta secara real-time.</p>
           <table id="tbl-audio">
-            <thead><tr><th>NIM & Nama</th><th>Status</th><th>Tingkat Bising</th><th>Terakhir Update</th></tr></thead>
+            <thead><tr><th>NIM & Nama</th><th>Status</th><th>Tingkat Bising (Radar)</th><th>Aksi Audio</th></tr></thead>
             <tbody><!-- Diisi JS --></tbody>
           </table>
         </div>
@@ -275,13 +310,9 @@
     let timerInterval, adminInterval, pingInterval, broadcastInterval;
     let audioContext, micStream, lastBroadcastId = "0";
 
-    // MOCK DATA (Safety Fallback)
-    const MOCK = { status:'success', user:{nim:'admin',name:'Admin',role:'Admin',dept:'ALL'} };
-
     document.addEventListener("DOMContentLoaded", () => {
       const page = new URLSearchParams(window.location.search).get('page');
       
-      // Auto-Routing Sesi (Vercel)
       const savedUser = sessionStorage.getItem('zettbos_session');
       if (savedUser) {
           currentUser = JSON.parse(savedUser);
@@ -289,11 +320,9 @@
           else if(page === 'exam') {
             document.getElementById('student-name').innerText = currentUser.name;
             switchView('student-portal-view');
-          } else {
-             location.href = '?page=exam'; // Redirect student if accessing root
-          }
+          } else location.href = '?page=exam'; 
       } else {
-         if (page === 'admin') { document.getElementById('portal-title').innerText = "PORTAL ADMIN"; }
+         if (page === 'admin') document.getElementById('portal-title').innerText = "PORTAL ADMIN";
       }
     });
 
@@ -303,7 +332,6 @@
     }
 
     async function runServer(funcName, argsArray, onSuccess) {
-      if (GAS_API_URL === "URL_ANDA" || typeof google !== 'undefined') return onSuccess(MOCK); // Canvas mode
       try {
         const response = await fetch(GAS_API_URL, {
           method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -315,7 +343,7 @@
 
     // --- STUDENT LOGIC ---
     function switchView(viewId) {
-      ['login-view', 'student-portal-view', 'exam-view', 'admin-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['login-view', 'student-portal-view', 'exam-view', 'feedback-view', 'admin-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(viewId).classList.remove('hidden');
     }
 
@@ -327,12 +355,13 @@
         if (res.status === 'success') {
           sessionStorage.setItem('zettbos_session', JSON.stringify(res.user));
           location.href = res.user.role === 'Admin' ? '?page=admin' : '?page=exam';
-        } else alert(res.message);
+        } else showToast(res.message);
       });
     }
 
     function startExamSequence() {
       if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+      
       runServer('getStudentExam', [currentUser.dept], (res) => {
         if (res.status === 'success') {
           currentExam = res.exam; examQuestions = res.questions;
@@ -343,12 +372,15 @@
           
           initAudioSensor(); renderQuestions(); startTimer(currentExam.duration);
           
-          // Mulai Polling Broadcast & Session Ping
-          broadcastInterval = setInterval(pollBroadcast, 15000);
+          // INIT BROADCAST SILENTLY (Agar tidak muncul pesan lama)
+          runServer('getInitBroadcast', [], (bRes) => {
+             if(bRes.status === 'success') lastBroadcastId = bRes.msgId;
+             broadcastInterval = setInterval(pollBroadcast, 15000);
+          });
+
           pingInterval = setInterval(() => sendPing('Online'), 10000);
-          
           switchView('exam-view');
-        } else alert(res.message);
+        } else showToast(res.message);
       });
     }
 
@@ -367,11 +399,22 @@
       timeRemaining = m * 60;
       timerInterval = setInterval(() => {
         document.getElementById('timer-display').innerText = `${Math.floor(timeRemaining/60).toString().padStart(2,'0')}:${(timeRemaining%60).toString().padStart(2,'0')}`;
-        if(timeRemaining <= 0) forceSubmitExam(); timeRemaining--;
+        
+        // Peringatan 10 & 5 Menit
+        if (timeRemaining === 600) showToast("⚠️ PERINGATAN: Sisa Waktu Ujian 10 Menit!");
+        if (timeRemaining === 300) {
+            showToast("⚠️ PERINGATAN: Sisa Waktu Ujian 5 Menit!");
+            document.getElementById('timer-display').style.color = "var(--danger)";
+        }
+        
+        if(timeRemaining <= 0) {
+            showToast("Waktu Ujian Habis! Sistem mengumpulkan otomatis...");
+            forceSubmitExam();
+        }
+        timeRemaining--;
       }, 1000);
     }
 
-    // NEW: Real-time Audio Polling & Session Keep-alive
     let currentNoise = 0;
     async function initAudioSensor() {
       try {
@@ -406,8 +449,26 @@
     function forceSubmitExam() {
       clearInterval(timerInterval); clearInterval(broadcastInterval); clearInterval(pingInterval);
       if(micStream) micStream.getTracks().forEach(t=>t.stop());
+      document.getElementById('watermark-layer').classList.add('hidden');
+      if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+
       runServer('submitExamResult', [{ examId: currentExam.examId, nim: currentUser.nim, answers: studentAnswers, violationCount: violationCount }], (res) => {
-        alert("Ujian Selesai! Skor: " + res.score); logout();
+        if(res.status === 'success') {
+           if (res.score === 'HIDDEN') {
+               document.getElementById('feedback-message').innerText = "Data berhasil diamankan. Nilai akan diumumkan oleh Admin nanti.";
+           } else {
+               document.getElementById('feedback-message').innerText = "Skor Anda: " + res.score;
+           }
+           switchView('feedback-view');
+        }
+      });
+    }
+
+    function submitFeedback() {
+      const rating = document.querySelector('input[name="rating"]:checked')?.value || 5;
+      const comment = document.getElementById('feed-comment').value.trim();
+      runServer('submitFeedback', [{ nim: currentUser.nim, examId: currentExam.examId, rating: rating, comment: comment }], () => {
+        logout(); // Selesai
       });
     }
 
@@ -420,83 +481,109 @@
 
     function initAdminDashboard() {
       switchView('admin-view'); fetchAdminData();
-      adminInterval = setInterval(fetchAdminData, 15000); // Radar Refresh 15 detik
+      adminInterval = setInterval(fetchAdminData, 10000); // Polling Admin 10 Detik
     }
 
     function fetchAdminData() {
       const dept = document.getElementById('global-dept-filter').value;
       document.querySelectorAll('.lbl-dept').forEach(el => el.innerText = dept);
       
-      // Fetch Stats & Audio
       runServer('getAdminDashboardData', [dept], (res) => {
         if (res.status === 'success') {
           document.getElementById('stat-peserta').innerText = res.stats.totalPeserta;
           document.getElementById('stat-avg').innerText = res.stats.rataRataGlobal;
           
+          let logH = ''; res.recentLogs.forEach(l => { logH += `<div style="padding: 8px; border-bottom: 1px solid #333;"><strong style="color:var(--danger)">${l[2]}</strong>: ${l[3]} <em>(${l[5]})</em></div>`; });
+          document.getElementById('admin-logs').innerHTML = logH;
+
           let audioHtml = '';
           res.liveSessions.forEach(s => {
             let width = s.noise > 0 ? (s.noise > 100 ? 100 : s.noise) : 0;
             let c = width > 80 ? 'noise-high' : '';
-            audioHtml += `<tr><td>${s.nim} - ${s.name}</td><td>${s.status}</td><td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td><td>${s.time}</td></tr>`;
+            audioHtml += `<tr><td>${s.nim} - ${s.name}</td><td>${s.status}</td><td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td><td><button class="btn-play" onclick="playAudioWarning()">▶ Listen</button></td></tr>`;
           });
           document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml || '<tr><td colspan="4">Tidak ada sesi aktif</td></tr>';
         }
       });
 
-      // Fetch Detail Jawaban
       runServer('getMonitoringJawaban', [dept], (res) => {
          if (res.status === 'success') {
            let jwbHtml = '';
            res.data.forEach(d => {
-             jwbHtml += `<tr><td>${d.nim}</td><td><a href="javascript:void(0)" onclick='tampilDetail(${JSON.stringify(d).replace(/'/g, "&apos;")})' style="color:var(--neon-green)">${d.name}</a></td><td>${d.score}</td><td><button onclick='tampilDetail(${JSON.stringify(d).replace(/'/g, "&apos;")})' style="background:var(--bg-dark); color:#fff; border:1px solid #fff; padding:5px; border-radius:4px; cursor:pointer;">Lihat Detail</button></td></tr>`;
+             jwbHtml += `<tr><td>${d.nim}</td><td>${d.name}</td><td>${d.timeSubmit}</td><td>${d.score}</td><td><button onclick='tampilDetail(${JSON.stringify(d).replace(/'/g, "&apos;")})' class="btn-play" style="background:transparent; border-color:var(--neon-green); color:var(--neon-green)">Lihat Detail</button></td></tr>`;
            });
-           document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = jwbHtml || '<tr><td colspan="4">Tidak ada data penyelesaian</td></tr>';
+           document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = jwbHtml || '<tr><td colspan="5">Belum ada siswa yang mengumpulkan</td></tr>';
          }
       });
     }
 
+    function playAudioWarning() {
+       showToast("INFO: Fitur Live Streaming Audio Vokal Otentik memerlukan integrasi WebRTC (Node.js/Socket). Sistem Serverless ini mengandalkan Radar Grafik Desibel (dB) Audio untuk memantau kebisingan.");
+    }
+
     function tampilDetail(d) {
-      document.getElementById('detail-jawaban-box').style.display = 'block';
+      document.getElementById('detail-jawaban-modal').classList.remove('hidden');
       document.getElementById('det-nama').innerText = `Detail Jawaban: ${d.name} (Skor: ${d.score})`;
       let h = '';
       d.details.forEach((det, i) => {
          let clr = det.isCorrect ? '#39ff14' : '#ff4444';
          let sym = det.isCorrect ? '✔' : '✘';
-         h += `<div style="margin-bottom:10px;"><strong>Q${i+1}: ${det.q}</strong><br><span style="color:${clr}">${sym} Menjawab: ${det.a || 'Tidak Dijawab'}</span></div>`;
+         h += `<div style="margin-bottom:15px; padding:10px; background:rgba(255,255,255,0.02); border-radius:8px; border:1px solid rgba(255,255,255,0.05);"><strong>Q${i+1}: ${det.q}</strong><br><span style="color:${clr}; margin-top:5px; display:inline-block;">${sym} Jawaban Siswa: ${det.a || 'Kosong / Tidak Dijawab'}</span></div>`;
       });
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // CSV Bulk Upload
-    function uploadCSV() {
-      const file = document.getElementById('csv-file').files[0];
-      if(!file) return alert("Pilih file CSV dulu!");
+    // EXCEL / CSV Bulk Upload via SheetJS
+    function uploadBulkFile() {
+      const file = document.getElementById('bulk-file').files[0];
+      if(!file) return showToast("Pilih file terlebih dahulu!");
+      
+      const fileName = file.name.toLowerCase();
+      if(fileName.endsWith('.pdf') || fileName.endsWith('.docx')) {
+          return alert("PERINGATAN! File dokumen (PDF/DOCX) ditolak. Silakan gunakan format Excel Tabel (.xlsx, .xls) atau .csv agar format database selaras.");
+      }
+
       const pass = document.getElementById('add-bulk-pass').value;
       const dept = document.getElementById('add-bulk-dept').value;
       
       const reader = new FileReader();
       reader.onload = function(e) {
-        const rows = e.target.result.split('\n');
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1}); // Output Array
+
         let users = [];
         rows.forEach(r => {
-           let cols = r.split(',');
-           if(cols.length >= 2 && cols[0].trim() !== '') users.push({ nim: cols[0].trim(), name: cols[1].trim() });
+           if(r.length >= 2 && r[0]) users.push({ nim: String(r[0]).trim(), name: String(r[1]).trim() });
         });
         if(users.length > 0) {
-           runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => alert(res.message));
+           runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => showToast(res.message));
+        } else {
+           alert("Format Kosong/Salah. Pastikan Kolom A = NIM, Kolom B = Nama Lengkap.");
         }
       };
-      reader.readAsText(file);
+      reader.readAsArrayBuffer(file);
     }
 
     function sendBroadcast() {
       const msg = document.getElementById('in-broadcast').value;
-      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; alert("Broadcast Terkirim ke semua ujian online!"); });
+      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim!"); });
     }
     
+    function submitNewUser() {
+      const p = { nim: document.getElementById('add-nim').value, name: document.getElementById('add-name').value, password: document.getElementById('add-pass').value, role: document.getElementById('add-role').value, dept: document.getElementById('add-dept').value };
+      runServer('addAdminUser', [p], (res) => { showToast(res.message); document.querySelector('#admin-users form').reset(); });
+    }
+
     function submitNewQuestion() {
       const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, correct: document.getElementById('add-q-correct').value };
-      runServer('addAdminQuestion', [p], (res) => { alert(res.message); document.querySelector('#admin-questions form').reset(); });
+      runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); });
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
+      setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
     }
   </script>
 </body>
