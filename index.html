@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Axa Dental Exam</title>
   
-  <!-- Point 7: Favicon dan Meta Tags Profesional -->
   <link rel="icon" href="axalogo.png" type="image/png">
   <meta name="description" content="Axa Dental Exam - Portal Ujian Computer Based Test (CBT) Terintegrasi.">
   <meta name="author" content="Axa Xyz">
@@ -40,7 +39,7 @@
     #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; flex-direction: column; }
     @media print { html, body { display: none !important; } }
 
-    /* UI UJIAN CBT PROFESIONAL (Point 2) */
+    /* UI UJIAN CBT PROFESIONAL */
     .cbt-container { display: flex; gap: 20px; align-items: flex-start; }
     @media (max-width: 768px) { .cbt-container { flex-direction: column; } }
     .cbt-main { flex: 3; width: 100%; }
@@ -87,9 +86,6 @@
     .star-rating input { display: none; }
     .star-rating label { color: var(--text-muted); cursor: pointer; padding: 0 5px; }
     .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #ffd700; }
-    
-    /* 11 Departments Array String (Reusable) */
-    .dept-options option {}
   </style>
 </head>
 <body>
@@ -207,19 +203,8 @@
       <div class="exam-header">
         <h2>Dashboard Admin - Axa Xyz</h2>
         <div>
-          <select id="global-dept-filter" class="input-glass" style="width: auto; display: inline-block; margin-right: 15px;" onchange="fetchAdminData()">
+          <select id="global-dept-filter" class="input-glass dept-options" style="width: auto; display: inline-block; margin-right: 15px;" onchange="fetchAdminData()">
             <option value="ALL">Semua Departemen</option>
-            <option value="Biologi Oral">Biologi Oral</option>
-            <option value="Ilmu Bahan dan Teknologi">Ilmu Bahan dan Teknologi</option>
-            <option value="Ilmu Kedokteran Gigi Anak">Ilmu Kedokteran Gigi Anak</option>
-            <option value="Ilmu Kedokteran Gigi Masyarakat - Pencegahan">Ilmu Kedok Gigi Masy. Pencegahan</option>
-            <option value="Ilmu Penyakit Mulut">Ilmu Penyakit Mulut</option>
-            <option value="Konservasi Gigi">Konservasi Gigi</option>
-            <option value="Oral and Maxillofacial Radiology">Oral & Maxillo Radiology</option>
-            <option value="Ortodonti">Ortodonti</option>
-            <option value="Periodonsia">Periodonsia</option>
-            <option value="Prostodonsia">Prostodonsia</option>
-            <option value="Oral and Maxillofacial Surgery">Oral & Maxillo Surgery</option>
           </select>
           <button class="btn-neon btn-danger" style="width: auto; border:none;" onclick="logout()">Logout</button>
         </div>
@@ -256,7 +241,7 @@
         </div>
       </div>
 
-      <!-- TAB 1.5: MANAJEMEN EXAMS (Baru) -->
+      <!-- TAB 1.5: MANAJEMEN EXAMS -->
       <div id="admin-exams" class="hidden">
         <div class="glass-panel">
           <h3>Daftar Ujian Aktif (Exam Configuration)</h3>
@@ -271,7 +256,7 @@
         </div>
       </div>
 
-      <!-- TAB 2: MANAJEMEN USER (UPGRADED PDF/DOCX/XLSX) -->
+      <!-- TAB 2: MANAJEMEN USER -->
       <div id="admin-users" class="hidden">
         <div class="dashboard-grid">
           <div class="glass-panel">
@@ -284,9 +269,7 @@
             <div class="input-group"><input type="text" id="add-bulk-pass" class="input-glass" placeholder="Password Batch" required></div>
             <div class="input-group">
               <label>Pilih Departemen untuk Batch</label>
-              <select id="add-bulk-dept" class="input-glass dept-options" style="background: var(--bg-dark);">
-                 <!-- JS akan isi ini -->
-              </select>
+              <select id="add-bulk-dept" class="input-glass dept-options" style="background: var(--bg-dark);"></select>
             </div>
             <button class="btn-neon" onclick="processBulkUsers()">Upload Users</button>
             <p id="bulk-u-status" style="margin-top:10px; font-size:0.8rem; color:var(--neon-green);"></p>
@@ -307,12 +290,12 @@
         </div>
       </div>
 
-      <!-- TAB 3: MANAJEMEN SOAL (DENGAN OPT_E & DAFTAR EDIT) -->
+      <!-- TAB 3: MANAJEMEN SOAL -->
       <div id="admin-questions" class="hidden">
         <div class="dashboard-grid">
           <div class="glass-panel" style="grid-column: span 1;">
-            <h3>Upload Bulk Soal (.xlsx, .csv, .docx, .pdf)</h3>
-            <p>Sistem mem-parsing dokumen dengan struktur teks: <br><span style="font-size:0.8rem; color:#888;">Soal: [teks]<br>A: [opsi] <br>B: [opsi] <br>C: [opsi] <br>D: [opsi] <br>E: [opsi]<br>Kunci: [teks jawaban benar persis]</span></p>
+            <h3>Upload Bulk Soal Cerdas (.xlsx, .csv, .docx, .pdf)</h3>
+            <p>Sistem mem-parsing dokumen dengan struktur teks: <br><span style="font-size:0.8rem; color:#888;">1. [teks soal]<br>A. [opsi] <br>B. [opsi] <br>C. [opsi] <br>D. [opsi] <br>E. [opsi]<br>Kunci: A</span></p>
             <div class="input-group">
               <label>Departemen Ujian</label>
               <select id="bulk-q-dept" class="input-glass dept-options" style="background: var(--bg-dark);"></select>
@@ -335,7 +318,10 @@
                 <div class="input-group"><input type="text" id="add-q-d" class="input-glass" placeholder="Opsi D" required></div>
                 <div class="input-group"><input type="text" id="add-q-e" class="input-glass" placeholder="Opsi E (Opsional)"></div>
               </div>
-              <div class="input-group"><label>Kunci (Ketik Persis Opsi)</label><input type="text" id="add-q-correct" class="input-glass" required></div>
+              <div class="input-group">
+                 <label>Kunci Jawaban (Ketik A/B/C/D/E atau ketik teks persis opsi)</label>
+                 <input type="text" id="add-q-correct" class="input-glass" required placeholder="Contoh: B">
+              </div>
               <button type="submit" class="btn-neon" style="width: 200px;">Simpan Soal</button>
             </form>
           </div>
@@ -394,6 +380,8 @@
         "Konservasi Gigi", "Oral and Maxillofacial Radiology", "Ortodonti", 
         "Periodonsia", "Prostodonsia", "Oral and Maxillofacial Surgery"
     ];
+    
+    // Inject 11 Depts to all select elements with class 'dept-options'
     document.querySelectorAll('.dept-options').forEach(select => {
         DEPARTMENTS.forEach(d => { select.innerHTML += `<option value="${d}">${d}</option>`; });
     });
@@ -438,15 +426,13 @@
       } catch (err) { console.error(err); }
     }
 
-    // --- DRM ANTI-SCREENSHOT (Point 4) ---
-    // 1. Tangkap Key Keyboard Standar
+    // --- DRM ANTI-SCREENSHOT ---
     document.addEventListener('keyup', (e) => { if(e.key === 'PrintScreen' || e.keyCode === 44) triggerAntiSS(); });
     document.addEventListener('keydown', (e) => {
        if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === 's' || e.key === 'S')) triggerAntiSS();
        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); triggerAntiSS(); }
     });
-    // 2. Tangkap Window Lose Focus (Ini menangkap Snipping Tool Windows & Mac Cmd+Shift+4)
     window.addEventListener('blur', () => {
        if(!document.getElementById('exam-view').classList.contains('hidden') && !isSubmitting) triggerAntiSS();
     });
@@ -500,7 +486,7 @@
       });
     }
 
-    // CBT PROFESIONAL LOGIC (POINT 2)
+    // CBT PROFESIONAL LOGIC
     function buildCBTPalette() {
         let html = '';
         examQuestions.forEach((_, i) => { html += `<button id="pal-${i}" onclick="goToQ(${i})" class="btn-q">${i+1}</button>`; });
@@ -546,7 +532,7 @@
        updatePaletteStyles();
     }
 
-    // Timer Point 5 (Lebih presisi)
+    // Timer Realistis
     function startRealTimer(m) {
       let endTime = Date.now() + (m * 60000);
       isSubmitting = false;
@@ -568,7 +554,7 @@
             showToast("Waktu Ujian Habis! Sistem mengumpulkan otomatis...");
             forceSubmitExam();
         }
-      }, 1000);
+      }, 1000); // Eksekusi UI detik, namun akurasi berdasar Date.now()
     }
 
     let currentNoise = 0;
@@ -610,10 +596,8 @@
 
     function manualSubmitBtn() {
        if(isSubmitting) return;
-       // Cek apakah ada soal belum dijawab
        let blm = examQuestions.length - Object.keys(studentAnswers).length;
        let msg = blm > 0 ? `Masih ada ${blm} soal yang BELUM dijawab. Yakin ingin Submit?` : `Apakah Anda yakin ingin submit jawaban sekarang?`;
-       
        if(confirm(msg)) { isSubmitting = true; forceSubmitExam(); }
     }
 
@@ -706,7 +690,7 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // --- MANAJEMEN EXAMS (Point 6) ---
+    // --- MANAJEMEN EXAMS ---
     function loadAdminExams() {
       document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
       runServer('getAdminExams', [], (res) => {
@@ -738,7 +722,7 @@
        runServer('updateAdminExam', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
     }
 
-    // --- MANAJEMEN QUESTIONS (Point 6) ---
+    // --- MANAJEMEN QUESTIONS ---
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
@@ -777,7 +761,6 @@
     }
 
     // --- BULK PARSERS ---
-    // POINT 7: UNIVERSAL BULK PARSER (.xlsx, .csv, .pdf, .docx)
     async function extractTextFromFile(file, stElement) {
         let ext = file.name.split('.').pop().toLowerCase();
         if (ext === 'docx') {
@@ -796,7 +779,7 @@
         } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
              const arrayBuffer = await file.arrayBuffer();
              const wb = XLSX.read(arrayBuffer, {type: 'array'});
-             return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); // Returns Array
+             return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
         }
         throw new Error("Format tidak didukung");
     }
@@ -813,13 +796,13 @@
          const data = await extractTextFromFile(file, st);
          let users = [];
          
-         if(Array.isArray(data)) { // Excel/CSV
+         if(Array.isArray(data)) { 
              data.forEach(r => { if(r.length >= 2 && r[0]) users.push({ nim: String(r[0]).trim(), name: String(r[1]).trim() }); });
-         } else { // PDF/DOCX (Format NIM[spasi]NAMA)
+         } else { 
              st.innerText = "Memparsing Teks Dokumen...";
              let lines = data.split('\n');
              lines.forEach(l => {
-                 let parts = l.trim().split(/\s+(.*)/); // Split at first space
+                 let parts = l.trim().split(/\s+(.*)/); 
                  if(parts.length >= 2 && !isNaN(parts[0])) users.push({ nim: parts[0], name: parts[1] });
              });
          }
@@ -827,6 +810,16 @@
          if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; });
          else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA (Atau tiap baris NIM[spasi]NAMA di PDF).";
       } catch(e) { st.innerText = e; }
+    }
+
+    // --- MAPPING KUNCI (A/B/C/D/E) LOGIC ---
+    function mapKeyToText(keyStr, a, b, c, d, e) {
+        let k = keyStr.trim();
+        if(k.length === 1) {
+             const map = { 'A': a, 'B': b, 'C': c, 'D': d, 'E': e };
+             if(map[k.toUpperCase()]) return map[k.toUpperCase()];
+        }
+        return k; 
     }
 
     async function processBulkQuestions() {
@@ -843,24 +836,61 @@
           if(Array.isArray(data)) { // Excel/CSV
              data.forEach(r => {
                  if(r.length >= 6 && r[0]) {
-                     parsedQuestions.push({ text: r[0], optA: r[1], optB: r[2], optC: r[3], optD: r[4], optE: r[5] || '', correct: r[r.length-1] });
+                     let cor = r[r.length-1] ? String(r[r.length-1]) : '';
+                     parsedQuestions.push({ 
+                         text: r[0], optA: r[1], optB: r[2], optC: r[3], optD: r[4], optE: r[5] || '', 
+                         correct: mapKeyToText(cor, r[1], r[2], r[3], r[4], r[5]||'') 
+                     });
                  }
              });
-          } else { // PDF/DOCX
-              st.innerText = "Memparsing Pola Teks... (Pastikan format: Soal:, A:, B:, C:, D:, E: (opsional), Kunci:)";
-              // Update Regex untuk mencakup E opsional
-              const qRegex = /Soal:([\s\S]*?)A:([\s\S]*?)B:([\s\S]*?)C:([\s\S]*?)D:([\s\S]*?)(?:E:([\s\S]*?))?Kunci:([^\n]*)/gi;
-              let match;
-              while ((match = qRegex.exec(data)) !== null) {
-                  parsedQuestions.push({
-                      text: match[1].trim(), optA: match[2].trim(), optB: match[3].trim(), 
-                      optC: match[4].trim(), optD: match[5].trim(), optE: match[6] ? match[6].trim() : '', correct: match[7].trim()
-                  });
+          } else { // ADVANCED TEXT PARSER (PDF/DOCX)
+              st.innerText = "Memparsing Pola Teks... (Pastikan format: 1. Soal, A. opsi, Kunci: A)";
+              let lines = data.split('\n');
+              let currentQ = null;
+
+              for(let i=0; i<lines.length; i++) {
+                  let line = lines[i].trim();
+                  if(!line) continue;
+
+                  // 1. Match Soal: "1. Soal..." atau "1- Soal..." atau "Soal: ..."
+                  let qMatch = line.match(/^(\d+)[\.\-\)]\s+(.*)/i) || line.match(/^Soal:\s*(.*)/i);
+                  if(qMatch) {
+                      if(currentQ && currentQ.text && currentQ.correct) parsedQuestions.push(currentQ);
+                      currentQ = { text: qMatch[1] ? (isNaN(qMatch[1]) ? qMatch[1] : qMatch[2]) : line, optA:'', optB:'', optC:'', optD:'', optE:'', correct:'' };
+                      if (!isNaN(qMatch[1]) && qMatch[2]) currentQ.text = qMatch[2];
+                      continue;
+                  }
+
+                  if(!currentQ) continue;
+
+                  // 2. Match Opsi: "A. opsi..." atau "a- opsi..."
+                  let optMatch = line.match(/^([a-eA-E])[\.\-\)]\s+(.*)/);
+                  if(optMatch) {
+                      let letter = optMatch[1].toUpperCase();
+                      let text = optMatch[2].trim();
+                      if(letter === 'A') currentQ.optA = text;
+                      else if(letter === 'B') currentQ.optB = text;
+                      else if(letter === 'C') currentQ.optC = text;
+                      else if(letter === 'D') currentQ.optD = text;
+                      else if(letter === 'E') currentQ.optE = text;
+                      continue;
+                  }
+
+                  // 3. Match Kunci: "Kunci: A" atau "Jawaban: A"
+                  let keyMatch = line.match(/^Kunci\s*:\s*(.*)/i) || line.match(/^Jawaban\s*:\s*(.*)/i);
+                  if(keyMatch) {
+                      currentQ.correct = mapKeyToText(keyMatch[1], currentQ.optA, currentQ.optB, currentQ.optC, currentQ.optD, currentQ.optE);
+                      continue;
+                  }
+
+                  // Jika line bukan opsi/kunci, gabung ke teks soal
+                  if(currentQ && !currentQ.optA) currentQ.text += " " + line;
               }
+              if(currentQ && currentQ.text && currentQ.correct) parsedQuestions.push(currentQ);
           }
 
           if(parsedQuestions.length > 0) runServer('bulkAddQuestions', [{dept: dept, questions: parsedQuestions}], (res) => { st.innerText = res.message; });
-          else st.innerText = "Gagal parsing. Pola tidak cocok. Direkomendasikan pakai .CSV/.XLSX";
+          else st.innerText = "Gagal parsing. Pola tidak cocok. Direkomendasikan pakai .CSV/.XLSX dengan format tabel (Soal, A, B, C, D, E, Kunci).";
       } catch (err) { st.innerText = "Error membaca file: " + err; }
     }
 
@@ -875,7 +905,10 @@
     }
 
     function submitNewQuestion() {
-      const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, correct: document.getElementById('add-q-correct').value };
+      let keyInput = document.getElementById('add-q-correct').value;
+      let realCorrect = mapKeyToText(keyInput, document.getElementById('add-q-a').value, document.getElementById('add-q-b').value, document.getElementById('add-q-c').value, document.getElementById('add-q-d').value, document.getElementById('add-q-e').value);
+      
+      const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, correct: realCorrect };
       runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); });
     }
 
