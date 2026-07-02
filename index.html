@@ -27,10 +27,17 @@
     .input-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
     .input-glass { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px; outline: none; transition: 0.3s; }
     .input-glass:focus { border-color: var(--neon-green); box-shadow: var(--neon-glow); }
-    .btn-neon { width: 100%; padding: 12px; font-weight: 600; font-size: 1rem; background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
+    
+    /* Tombol Default */
+    .btn-neon { width: 100%; padding: 12px; font-weight: 600; font-size: 1rem; background: rgba(0,0,0,0.4); color: var(--neon-green); border: 1px solid var(--neon-green); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; outline: none; appearance: none; -webkit-appearance: none; }
     .btn-neon:hover { background: var(--neon-green); color: #000; box-shadow: var(--neon-glow); }
     .btn-danger { border-color: var(--danger); color: var(--danger); }
     .btn-danger:hover { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(255,68,68,0.4); }
+    
+    /* UPGRADE POINT 1: Tombol Start Exam Premium CSS3 */
+    .btn-start-exam { width: 100%; padding: 18px; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #fff; background: linear-gradient(90deg, #1f4037 0%, #99f2c8 100%); border: 2px solid var(--neon-green); border-radius: 12px; cursor: pointer; box-shadow: 0 8px 32px rgba(57, 255, 20, 0.4); transition: all 0.3s ease; appearance: none; -webkit-appearance: none; outline: none; margin-top: 15px; }
+    .btn-start-exam:hover { background: linear-gradient(90deg, #99f2c8 0%, #1f4037 100%); box-shadow: 0 12px 40px rgba(57, 255, 20, 0.6); transform: translateY(-2px); color: #000; }
+
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; position: relative; z-index: 50; }
     .hidden { display: none !important; }
     #watermark-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; font-size: 2rem; font-weight: bold; color: #fff; transform: rotate(-30deg); }
@@ -117,7 +124,7 @@
     </div>
   </div>
   
-  <!-- Modal Edit Exam / Edit Soal -->
+  <!-- Modal Edit Umum (Exam/Soal/User) -->
   <div id="edit-modal" class="fullscreen-modal hidden">
     <div class="modal-content" id="edit-modal-body">
       <!-- Diisi oleh JS -->
@@ -149,7 +156,8 @@
         <li>Print Screen, Snipping Tool, & Fitur Screenshot Sistem akan membekukan layar dan terekam di Log Kecurangan.</li>
         <li>Berpindah tab/menutup jendela otomatis memicu peringatan.</li>
       </ul>
-      <button class="btn-neon" onclick="startExamSequence()">Mulai Ujian & Izinkan Sensor</button>
+      <!-- UPGRADE POINT 1: UI Tombol Premium Start Exam -->
+      <button class="btn-start-exam" onclick="startExamSequence()">Mulai Ujian & Izinkan Sensor</button>
     </div>
 
     <!-- 3. EXAM RUNNING (PROFESSIONAL CBT UI) -->
@@ -213,8 +221,8 @@
       <div class="admin-tabs">
         <button class="tab-btn active" onclick="switchAdminTab('admin-stats')">Analytics & Live</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-exams')">Manajemen Exams</button>
-        <button class="tab-btn" onclick="switchAdminTab('admin-questions')">Manajemen Soal</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-users')">Manajemen User</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-questions')">Manajemen Soal</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-jawaban')">Monitoring Jawaban</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-audio')">Radar Suara (Audio)</button>
       </div>
@@ -246,6 +254,7 @@
         <div class="glass-panel">
           <h3>Daftar Ujian Aktif (Exam Configuration)</h3>
           <p>Ubah status ujian, batas waktu, dan visibilitas hasil secara langsung.</p>
+          <!-- Tombol manual dipertahankan, namun load otomatis via tab click aktif -->
           <button class="btn-neon" style="width:auto; margin-bottom:15px;" onclick="loadAdminExams()">🔄 Muat Ulang Data</button>
           <div style="overflow-x:auto;">
              <table id="tbl-exams">
@@ -287,6 +296,21 @@
               <button type="submit" class="btn-neon" style="width: 200px;">Simpan Manual</button>
             </form>
           </div>
+        </div>
+        <!-- UPGRADE POINT 2: FITUR EDIT USER DATABASE -->
+        <div class="glass-panel" style="margin-top: 20px;">
+           <h3>Daftar User Database (Edit)</h3>
+           <div class="input-group">
+              <select id="filter-u-dept" class="input-glass dept-options" style="width: auto; background: var(--bg-dark);" onchange="loadAdminUsers()">
+                 <option value="ALL">Semua Departemen</option>
+              </select>
+           </div>
+           <div style="overflow-x:auto;">
+              <table id="tbl-users">
+                <thead><tr><th>NIM</th><th>Nama</th><th>Password</th><th>Role</th><th>Departemen</th><th>Aksi</th></tr></thead>
+                <tbody><!-- JS --></tbody>
+              </table>
+           </div>
         </div>
       </div>
 
@@ -624,14 +648,21 @@
     }
 
     // --- ADMIN LOGIC ---
+    // UPGRADE POINT 2: Auto Load Tab Logic
     function switchAdminTab(t) {
       ['admin-stats', 'admin-exams', 'admin-users', 'admin-questions', 'admin-jawaban', 'admin-audio'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(t).classList.remove('hidden');
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active');
+
+      if(t === 'admin-exams') loadAdminExams();
+      if(t === 'admin-users') loadAdminUsers();
+      if(t === 'admin-questions') loadAdminQuestions();
     }
 
     function initAdminDashboard() {
-      switchView('admin-view'); fetchAdminData();
+      switchView('admin-view'); 
+      switchAdminTab('admin-stats');
+      fetchAdminData();
       adminInterval = setInterval(fetchAdminData, 10000); 
     }
 
@@ -723,6 +754,48 @@
        runServer('updateAdminExam', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
     }
 
+    // --- MANAJEMEN USERS (EDIT DB) ---
+    function loadAdminUsers() {
+      document.getElementById('tbl-users').querySelector('tbody').innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
+      runServer('getAdminUsers', [], (res) => {
+        if(res.status === 'success') {
+           let h = '';
+           let filterDept = document.getElementById('filter-u-dept').value;
+           res.data.forEach(u => {
+              if (filterDept === 'ALL' || u.dept === filterDept) {
+                  h += `<tr><td>${u.nim}</td><td>${u.name}</td><td>${u.password}</td><td>${u.role}</td><td>${u.dept}</td>
+                        <td><button class="btn-play" onclick='openEditUser(${JSON.stringify(u).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
+              }
+           });
+           document.getElementById('tbl-users').querySelector('tbody').innerHTML = h || '<tr><td colspan="6">Tidak ada user ditemukan.</td></tr>';
+        }
+      });
+    }
+
+    function openEditUser(u) {
+       let h = `<h3>Edit User: ${u.nim}</h3>
+        <div class="input-group"><label>Nama Lengkap</label><input type="text" id="ed-u-name" class="input-glass" value="${u.name}"></div>
+        <div class="input-group"><label>Password</label><input type="text" id="ed-u-pass" class="input-glass" value="${u.password}"></div>
+        <div class="input-group"><label>Role</label><select id="ed-u-role" class="input-glass" style="background:var(--bg-dark);"><option value="Student" ${u.role=='Student'?'selected':''}>Student</option><option value="Admin" ${u.role=='Admin'?'selected':''}>Admin</option></select></div>
+        <div class="input-group"><label>Departemen</label><select id="ed-u-dept" class="input-glass dept-options" style="background:var(--bg-dark);"></select></div>
+        <button class="btn-neon" onclick="saveEditUser('${u.nim}')">Simpan Perubahan</button>
+        <button class="btn-neon btn-danger" style="margin-top:10px;" onclick="document.getElementById('edit-modal').classList.add('hidden')">Batal</button>`;
+       document.getElementById('edit-modal-body').innerHTML = h;
+
+       let deptSelect = document.getElementById('ed-u-dept');
+       DEPARTMENTS.forEach(d => {
+           let sel = (u.dept === d) ? 'selected' : '';
+           deptSelect.innerHTML += `<option value="${d}" ${sel}>${d}</option>`;
+       });
+
+       document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function saveEditUser(nim) {
+       let p = { nim: nim, name: document.getElementById('ed-u-name').value, password: document.getElementById('ed-u-pass').value, role: document.getElementById('ed-u-role').value, dept: document.getElementById('ed-u-dept').value };
+       runServer('updateAdminUser', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
+    }
+
     // --- MANAJEMEN QUESTIONS ---
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
@@ -808,7 +881,7 @@
              });
          }
          
-         if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; });
+         if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; loadAdminUsers(); });
          else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA (Atau tiap baris NIM[spasi]NAMA di PDF).";
       } catch(e) { st.innerText = e; }
     }
@@ -890,7 +963,7 @@
               if(currentQ && currentQ.text && currentQ.correct) parsedQuestions.push(currentQ);
           }
 
-          if(parsedQuestions.length > 0) runServer('bulkAddQuestions', [{dept: dept, questions: parsedQuestions}], (res) => { st.innerText = res.message; });
+          if(parsedQuestions.length > 0) runServer('bulkAddQuestions', [{dept: dept, questions: parsedQuestions}], (res) => { st.innerText = res.message; loadAdminQuestions(); });
           else st.innerText = "Gagal parsing. Pola tidak cocok. Direkomendasikan pakai .CSV/.XLSX dengan format tabel (Soal, A, B, C, D, E, Kunci).";
       } catch (err) { st.innerText = "Error membaca file: " + err; }
     }
@@ -902,7 +975,7 @@
     
     function submitNewUser() {
       const p = { nim: document.getElementById('add-nim').value, name: document.getElementById('add-name').value, password: document.getElementById('add-pass').value, role: document.getElementById('add-role').value, dept: document.getElementById('add-dept').value };
-      runServer('addAdminUser', [p], (res) => { showToast(res.message); document.querySelector('#admin-users form').reset(); });
+      runServer('addAdminUser', [p], (res) => { showToast(res.message); document.querySelector('#admin-users form').reset(); loadAdminUsers(); });
     }
 
     function submitNewQuestion() {
@@ -910,7 +983,7 @@
       let realCorrect = mapKeyToText(keyInput, document.getElementById('add-q-a').value, document.getElementById('add-q-b').value, document.getElementById('add-q-c').value, document.getElementById('add-q-d').value, document.getElementById('add-q-e').value);
       
       const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, correct: realCorrect };
-      runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); });
+      runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
 
     function showToast(msg) {
