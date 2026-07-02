@@ -17,7 +17,8 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V13 (Smart Auto-Backup & Dynamic Limits)
+       SUPER BIG UPGRADE CSS3 - V13 (Ultimate DRM)
+       (Mobile & Desktop Friendly Command Center)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -34,7 +35,12 @@
     
     * { 
       box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; 
-      user-select: none; -webkit-user-select: none; -ms-user-select: none; -moz-user-select: none; -webkit-touch-callout: none; 
+      /* FITUR 1: ANTI-BLOCK CSS UNIVERSAL */
+      user-select: none; 
+      -webkit-user-select: none; 
+      -ms-user-select: none; 
+      -moz-user-select: none; 
+      -webkit-touch-callout: none; 
     }
     
     body { 
@@ -79,6 +85,7 @@
       background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); 
       color: #fff; border-radius: 12px; outline: none; transition: 0.3s; 
       font-size: 1rem; font-weight: 500; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+      /* Izinkan seleksi teks hanyak pada input/textarea form Admin */
       user-select: text; -webkit-user-select: text; 
     }
     .input-glass:focus { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2), inset 0 2px 5px rgba(0,0,0,0.5); background: rgba(0,0,0,0.8); }
@@ -232,16 +239,6 @@
     <button class="btn-start-exam" style="max-width: 350px; padding: 15px;" onclick="returnToFullScreen()">KEMBALI KE UJIAN (FULLSCREEN)</button>
   </div>
   
-  <!-- POPUP PERINGATAN PELANGGARAN CERDAS -->
-  <div id="violation-modal" class="fullscreen-modal hidden" style="z-index: 14000;">
-    <div class="modal-content" style="max-width: 450px; text-align: center; border: 2px solid var(--warning); box-shadow: 0 0 40px rgba(255, 183, 0, 0.4);">
-      <div style="font-size: 4rem; margin-bottom: 10px;">⚠️</div>
-      <h2 style="color: var(--warning); font-size: 1.8rem; margin-bottom: 15px;">SISTEM KEAMANAN</h2>
-      <p id="violation-msg" style="color: #fff; font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; white-space: pre-wrap;"></p>
-      <button class="btn-start-exam" style="margin-top: 0; padding: 12px; background: linear-gradient(135deg, #ffb700 0%, #cc9200 100%); color:#000;" onclick="closeViolationWarning()">SAYA MENGERTI</button>
-    </div>
-  </div>
-
   <div id="broadcast-modal" class="fullscreen-modal hidden" style="z-index: 13000;">
     <div class="modal-content broadcast-content">
       <h2 style="color: white; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px;">PENGUMUMAN PENTING</h2>
@@ -303,7 +300,7 @@
             <li>Layar ujian akan dikunci permanen ke mode <b style="color:#fff;">Full-Screen</b>. Keluar dari mode ini akan membekukan ujian.</li>
             <li>Sistem <b style="color:#fff;">Radar Desibel (dB)</b> memantau tingkat kebisingan ruangan.</li>
             <li>Aplikasi <b style="color:#fff;">Snipping Tool, Print Screen, Blok Teks & Klik Kanan</b> dimatikan secara paksa.</li>
-            <li>Jika ada kendala jaringan/ter-refresh, sistem akan secara otomatis memulihkan sesi (Auto-Resume).</li>
+            <li>Berpindah tab atau meminimize jendela otomatis memicu diskualifikasi.</li>
           </ul>
       </div>
       <button class="btn-start-exam" style="font-size: 1.1rem; padding: 18px;" onclick="startExamSequence()">MULAI UJIAN SEKARANG</button>
@@ -553,7 +550,7 @@
         </div>
       </div>
       
-      <!-- TAB 6: MANAJEMEN WEB & HOTKEYS -->
+      <!-- TAB 6: MANAJEMEN WEB & HOTKEYS (DATABASE CONNECTED) -->
       <div id="admin-web" class="hidden">
         <div class="glass-panel" style="max-width: 700px; margin: 0 auto;">
           <h3 style="color: var(--neon-green);">Konfigurasi Web & Pengawas</h3>
@@ -571,12 +568,6 @@
              <div class="input-group">
                 <label>Teks Footer Khusus</label>
                 <input type="text" id="set-footer-text" class="input-glass" required>
-             </div>
-             <!-- UPGRADE POINT 1: Maksimal Violation Count Setting -->
-             <div class="input-group" style="background: rgba(255, 183, 0, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(255, 183, 0, 0.3);">
-                <label style="color: var(--warning);">Maksimal Toleransi Pelanggaran Peserta (Auto-Submit)</label>
-                <input type="number" id="set-max-violations" class="input-glass" min="1" max="20" required style="max-width: 150px; text-align: center; font-weight: bold; color: var(--warning);">
-                <p style="font-size:0.8rem; margin: 8px 0 0 0; color: #fff;">Tentukan batas peserta dapat melakukan pelanggaran sebelum sistem otomatis menyelesaikan ujian mereka.</p>
              </div>
              <div class="dashboard-grid" style="gap: 1rem; margin-bottom: 1.5rem;">
                 <div class="input-group" style="margin-bottom: 0;">
@@ -608,6 +599,7 @@
     </div>
   </div>
 
+  <!-- FOOTER DINAMIS -->
   <footer class="app-footer" style="text-align: center; padding: 15px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); background: rgba(0,0,0,0.6); margin-top: auto;">
       <span id="footer-text">© 2026 All Right Reserved. SYSTEM BY AXA XYZ</span>
   </footer>
@@ -618,6 +610,7 @@
     // ==========================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyJHkKQh6s3f7idploBQVw62YzWY3oKV0S3l78JfvrKoyW7OyJJrTrAQt3K6duJBg/exec"; 
 
+    // --- REUSABLE DEPARTMENTS ARRAY ---
     const DEPARTMENTS = [
         "Biologi Oral", "Ilmu Bahan dan Teknologi", "Ilmu Kedokteran Gigi Anak", 
         "Ilmu Kedokteran Gigi Masyarakat - Pencegahan", "Ilmu Penyakit Mulut", 
@@ -635,8 +628,7 @@
         Brand_Name: "AXA XYZ",
         Footer_Text: "© 2026 All Right Reserved. SYSTEM BY AXA XYZ",
         Hotkey_Win_Mod: "Alt", Hotkey_Win_Key: "Q",
-        Hotkey_Mac_Mod: "Ctrl", Hotkey_Mac_Key: "Q",
-        Max_Violations: "5" // Default
+        Hotkey_Mac_Mod: "Ctrl", Hotkey_Mac_Key: "Q"
     };
 
     function applyWebSettings() {
@@ -652,7 +644,6 @@
             document.getElementById('set-hotkey-win-key').value = webSettings.Hotkey_Win_Key || "Q";
             document.getElementById('set-hotkey-mac-mod').value = webSettings.Hotkey_Mac_Mod || "Ctrl";
             document.getElementById('set-hotkey-mac-key').value = webSettings.Hotkey_Mac_Key || "Q";
-            document.getElementById('set-max-violations').value = webSettings.Max_Violations || "5";
         }
     }
 
@@ -673,8 +664,7 @@
             Hotkey_Win_Mod: document.getElementById('set-hotkey-win-mod').value,
             Hotkey_Win_Key: document.getElementById('set-hotkey-win-key').value.toUpperCase(),
             Hotkey_Mac_Mod: document.getElementById('set-hotkey-mac-mod').value,
-            Hotkey_Mac_Key: document.getElementById('set-hotkey-mac-key').value.toUpperCase(),
-            Max_Violations: document.getElementById('set-max-violations').value
+            Hotkey_Mac_Key: document.getElementById('set-hotkey-mac-key').value.toUpperCase()
         };
         runServer('updateWebSettings', [payload], (res) => {
             if(res && res.status === 'success') {
@@ -693,7 +683,6 @@
     let isSubmitting = false; 
     let isExamActive = false;
     let proctorBypass = false; 
-    let examEndTime = 0; // State absolut untuk Backup Waktu
 
     let currentQIndex = 0;
     let flaggedQuestions = new Set();
@@ -730,7 +719,7 @@
       } catch (err) { console.error("API Error: ", err); }
     }
 
-    // --- DRM ANTI INSPECT ELEMENT & CONTINUOUS KEY HOLD ---
+    // --- DRM ANTI INSPECT ELEMENT & CONTINUOUS KEY HOLD (FITUR 1) ---
     document.addEventListener('contextmenu', e => e.preventDefault()); 
     
     let drmTimeout;
@@ -750,6 +739,7 @@
            return;
        }
        
+       // FITUR 1: BLANK CONTINUOUS SAAT CMD/CTRL DITAHAN LAMA
        if (isExamActive && !proctorBypass && (e.metaKey || e.ctrlKey || e.key === 'Meta' || e.key === 'Control')) {
            if (!hasLoggedKeyHold) {
                logViolation("Mencoba Shortcut Sistem (Cmd/Ctrl)");
@@ -757,6 +747,7 @@
            }
            clearTimeout(drmTimeout);
            document.getElementById('drm-overlay').classList.remove('hidden');
+           
            if(e.key.toUpperCase() === 'P' || e.key.toUpperCase() === 'S') e.preventDefault();
        }
 
@@ -766,9 +757,12 @@
     });
 
     document.addEventListener('keyup', (e) => {
+       // Melepas penahanan layar blank saat Cmd/Ctrl di lepas
        if (e.key === 'Meta' || e.key === 'Control' || (!e.metaKey && !e.ctrlKey)) {
            hasLoggedKeyHold = false;
-           drmTimeout = setTimeout(() => { document.getElementById('drm-overlay').classList.add('hidden'); }, 1500); 
+           drmTimeout = setTimeout(() => {
+               document.getElementById('drm-overlay').classList.add('hidden');
+           }, 1500); // Tahan 1.5 detik ekstra setelah dilepas untuk keamanan
        }
     });
     
@@ -791,26 +785,37 @@
        drmTimeout = setTimeout(() => { drm.classList.add('hidden'); }, 3500); 
     }
 
-    // --- MOBILE TEXT SELECTION PROTECTION ---
+    // --- MOBILE TEXT SELECTION PROTECTION (FITUR 2) ---
+    // 1. Anti Copy/Select secara Event DOM
     document.addEventListener('selectstart', (e) => {
-        if(isExamActive) { e.preventDefault(); showToast("⚠️ Tindakan memblok teks soal tidak diizinkan!", true); }
+        if(isExamActive) {
+            e.preventDefault();
+            showToast("⚠️ Tindakan memblok teks soal tidak diizinkan!", true);
+        }
     });
     document.addEventListener('copy', (e) => {
-        if(isExamActive) { e.preventDefault(); showToast("⚠️ Fitur Salin/Copy dimatikan!", true); logViolation("Mencoba Menyalin/Memblok Teks"); }
+        if(isExamActive) {
+            e.preventDefault();
+            showToast("⚠️ Fitur Salin/Copy dimatikan!", true);
+            logViolation("Mencoba Menyalin/Memblok Teks");
+        }
     });
 
+    // 2. Active Touch Hold/Long-press trap (untuk Mobile)
     let touchTimer;
     document.addEventListener('touchstart', (e) => {
         if(!isExamActive) return;
+        // Izinkan klik pada tombol dan input agar fungsionalitas ujian tetap bekerja
         if(['BUTTON', 'INPUT', 'LABEL'].includes(e.target.tagName)) return;
+        
         touchTimer = setTimeout(() => {
             showToast("⚠️ Dilarang menahan layar untuk menyeleksi teks soal!", true);
             logViolation("Indikasi Seleksi Teks Mobile (Long Press)");
-        }, 1000); 
+        }, 1000); // Jika ditahan lebih dari 1 detik
     }, {passive: false});
 
     document.addEventListener('touchend', () => clearTimeout(touchTimer));
-    document.addEventListener('touchmove', () => clearTimeout(touchTimer)); 
+    document.addEventListener('touchmove', () => clearTimeout(touchTimer)); // Jika jari geser (scroll), batalkan alarm penahanan
 
     // --- ESC TRAP (Auto Full Screen Return) ---
     document.addEventListener('fullscreenchange', () => {
@@ -823,7 +828,10 @@
     function returnToFullScreen() {
         let elem = document.documentElement;
         let requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen;
-        if (requestFS) requestFS.call(elem).catch(e => console.log(e));
+        
+        if (requestFS) {
+            requestFS.call(elem).catch(e => console.log(e));
+        }
         document.getElementById('force-fs-overlay').classList.add('hidden');
     }
 
@@ -846,68 +854,18 @@
       });
     }
 
-    // --- SMART AUTO-BACKUP: Local Storage System ---
-    function saveLocalBackup() {
-        const state = {
-            answers: studentAnswers,
-            violationCount: violationCount,
-            endTime: examEndTime
-        };
-        localStorage.setItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`, JSON.stringify(state));
-    }
-
-    function clearLocalBackup() {
-        localStorage.removeItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`);
-    }
-
     function startExamSequence() {
       const proceedExam = () => {
-         // Upgrade: Tarik data ujian DAN Cloud Backup jika ada
-         runServer('getStudentExam', [currentUser.examId, currentUser.nim], (res) => {
+         runServer('getStudentExam', [currentUser.examId], (res) => {
            if (res && res.status === 'success') {
              currentExam = res.exam; examQuestions = res.questions;
-             currentQIndex = 0; flaggedQuestions.clear();
+             currentQIndex = 0; flaggedQuestions.clear(); studentAnswers = {};
              isExamActive = true;
-
-             // SMART AUTO-BACKUP RESTORATION LOGIC
-             let localStateRaw = localStorage.getItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`);
-             let restored = false;
-
-             // Prioritas 1: Local Storage (Sangat Cepat & Resisten)
-             if(localStateRaw) {
-                 let localState = JSON.parse(localStateRaw);
-                 if(localState.endTime > Date.now()) { // Pastikan waktu belum habis
-                     studentAnswers = localState.answers || {};
-                     violationCount = localState.violationCount || 0;
-                     examEndTime = localState.endTime;
-                     restored = true;
-                     showToast("Berhasil Memulihkan Sesi Ujian (Local Backup)", true);
-                 }
-             } 
-             // Prioritas 2: Cloud Session Backup dari Database
-             else if(res.backup && res.backup.endTime > Date.now()) {
-                 studentAnswers = JSON.parse(res.backup.answersBackup || '{}');
-                 violationCount = res.backup.violations || 0;
-                 examEndTime = res.backup.endTime;
-                 restored = true;
-                 showToast("Berhasil Memulihkan Sesi Ujian (Cloud Backup)", true);
-             }
-
-             // Jika tidak ada backup valid, inisialisasi sesi baru
-             if(!restored) {
-                 examEndTime = Date.now() + (currentExam.duration * 60000);
-                 studentAnswers = {};
-                 violationCount = 0;
-             }
-
-             // Langsung save kondisi awal
-             saveLocalBackup();
 
              document.getElementById('watermark-layer').innerHTML = Array(80).fill(`${currentUser.nim} - ${currentUser.name}`).join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
              document.getElementById('watermark-layer').classList.remove('hidden');
              
-             initAudioSensor(); buildCBTPalette(); renderSingleQuestion(); 
-             startRealTimer(examEndTime); // Start dengan waktu absolut
+             initAudioSensor(); buildCBTPalette(); renderSingleQuestion(); startRealTimer(currentExam.duration);
              
              runServer('getInitBroadcast', [], (bRes) => {
                 if(bRes && bRes.status === 'success') lastBroadcastId = bRes.msgId;
@@ -978,11 +936,7 @@
         updatePaletteStyles();
     }
 
-    function saveAnswer(qId, val) { 
-        studentAnswers[qId] = val; 
-        saveLocalBackup(); // Backup tiap menjawab
-        renderSingleQuestion(); 
-    }
+    function saveAnswer(qId, val) { studentAnswers[qId] = val; renderSingleQuestion(); }
     function nextQuestion() { if(currentQIndex < examQuestions.length - 1) { currentQIndex++; renderSingleQuestion(); } }
     function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderSingleQuestion(); } }
     function goToQ(idx) { currentQIndex = idx; renderSingleQuestion(); }
@@ -991,7 +945,8 @@
        updatePaletteStyles();
     }
 
-    function startRealTimer(endTime) {
+    function startRealTimer(m) {
+      let endTime = Date.now() + (m * 60000);
       isSubmitting = false;
       timerInterval = setInterval(() => {
         if(isSubmitting) return; 
@@ -1030,15 +985,7 @@
       } catch (e) { currentNoise = -1; }
     }
 
-    function sendPing(status) { 
-        if(!isSubmitting) {
-            runServer('pingSession', [{ 
-                nim: currentUser.nim, name: currentUser.name, dept: currentUser.dept, 
-                status: status, noiseLevel: currentNoise,
-                endTime: examEndTime, answersBackup: JSON.stringify(studentAnswers), violations: violationCount
-            }], ()=>{}); 
-        }
-    }
+    function sendPing(status) { if(!isSubmitting) runServer('pingSession', [{ nim: currentUser.nim, name: currentUser.name, dept: currentUser.dept, status: status, noiseLevel: currentNoise }], ()=>{}); }
 
     function pollBroadcast() {
       if(!isSubmitting) {
@@ -1050,33 +997,13 @@
       }
     }
 
-    function showViolationWarning(msg) {
-        document.getElementById('violation-msg').innerText = msg;
-        document.getElementById('violation-modal').classList.remove('hidden');
-    }
-    function closeViolationWarning() {
-        document.getElementById('violation-modal').classList.add('hidden');
-    }
-
     function logViolation(t) { 
        if(isSubmitting) return;
        violationCount++; 
-       
-       let maxV = parseInt(webSettings.Max_Violations) || 5;
-       saveLocalBackup(); // Backup violation count increment
-       
-       if(violationCount >= maxV) {
-           isSubmitting = true; 
-           showToast("Batas pelanggaran maksimum tercapai. Anda dikeluarkan secara otomatis!", true); 
-           forceSubmitExam(); 
-       } else if (violationCount === maxV - 1) {
-           showViolationWarning(`PERINGATAN TERAKHIR!\n\nAnda telah melakukan pelanggaran ke-${violationCount}. Satu pelanggaran lagi, ujian Anda akan otomatis diselesaikan oleh sistem secara paksa.`);
-       } else {
-           showViolationWarning(`SISTEM MENCATAT PELANGGARAN!\n\nAnda telah melakukan pelanggaran sebanyak ${violationCount} kali dari maksimal ${maxV} kali.`);
+       if(violationCount > 5) {
+           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan otomatis!", true); forceSubmitExam(); 
        }
-       
        runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); 
-       sendPing('Online'); // Force sync state
     }
 
     function manualSubmitBtn() {
@@ -1110,7 +1037,6 @@
 
       runServer('submitExamResult', [{ examId: currentExam.examId, nim: currentUser.nim, answers: studentAnswers, violationCount: violationCount }], (res) => {
         if(res && res.status === 'success') {
-           clearLocalBackup(); // Hapus backup jika sukses disubmit
            if (res.score === 'HIDDEN') document.getElementById('feedback-message').innerText = "Lembar jawaban berhasil diamankan ke server. Nilai menunggu rilis Dekanat.";
            else document.getElementById('feedback-message').innerText = "Skor Anda: " + res.score;
            switchView('feedback-view');
@@ -1486,9 +1412,9 @@
       runServer('addAdminQuestion', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
 
-    // Peringatan disembunyikan untuk user Mobile, KECUALI yang kritis
     function showToast(msg, isCritical = false) {
       if(window.innerWidth <= 768 && !isCritical) return; 
+      
       const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
       setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
     }
