@@ -17,7 +17,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V12
+       SUPER BIG UPGRADE CSS3 - V13 (Ultimate DRM)
        (Mobile & Desktop Friendly Command Center)
        ========================================== */
     :root { 
@@ -33,7 +33,15 @@
       --warning: #ffb700;
     }
     
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; user-select: none; }
+    * { 
+      box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; 
+      /* FITUR 1: ANTI-BLOCK CSS UNIVERSAL */
+      user-select: none; 
+      -webkit-user-select: none; 
+      -ms-user-select: none; 
+      -moz-user-select: none; 
+      -webkit-touch-callout: none; 
+    }
     
     body { 
       background-color: var(--bg-base); 
@@ -77,6 +85,8 @@
       background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); 
       color: #fff; border-radius: 12px; outline: none; transition: 0.3s; 
       font-size: 1rem; font-weight: 500; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+      /* Izinkan seleksi teks hanyak pada input/textarea form Admin */
+      user-select: text; -webkit-user-select: text; 
     }
     .input-glass:focus { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2), inset 0 2px 5px rgba(0,0,0,0.5); background: rgba(0,0,0,0.8); }
     
@@ -110,7 +120,8 @@
     .hidden { display: none !important; }
     #watermark-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.03; display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; font-size: 2.5rem; font-weight: 800; color: #fff; transform: rotate(-30deg); user-select: none; }
     
-    #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; flex-direction: column; transition: opacity 0.3s; }
+    /* ANTI-SCREENSHOT & CONTINUOUS BLANK OVERLAY */
+    #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; flex-direction: column; transition: opacity 0.2s; }
     
     #force-fs-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(15px); z-index: 999998; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; cursor: pointer; }
     
@@ -134,7 +145,6 @@
     @keyframes pulse-neon { 0% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } 50% { box-shadow: inset 0 0 20px rgba(0,255,136,0.5), 0 0 20px rgba(0,255,136,0.5); } 100% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } }
     .timer-box { font-size: 2.2rem; font-weight: 800; color: var(--neon-green); text-shadow: var(--neon-glow); letter-spacing: 3px; background: rgba(0,0,0,0.6); padding: 12px 30px; border-radius: 12px; border: 1px solid rgba(0,255,136,0.4); animation: pulse-neon 2s infinite; }
     
-    /* CUSTOM RADIO BUTTONS */
     .options-grid { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2rem; }
     .option-label { display: flex; align-items: flex-start; padding: 20px 25px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
     .option-label:hover { background: rgba(0, 255, 136, 0.05); border-color: rgba(0, 255, 136, 0.3); transform: translateX(8px); }
@@ -144,9 +154,8 @@
     .option-label.selected .custom-radio::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--neon-green); border-radius: 50%; box-shadow: var(--neon-glow); }
     input[type="radio"] { display: none; } 
     
-    /* DASHBOARD ADMIN UI (COMPACT & DENSE) */
+    /* DASHBOARD ADMIN UI */
     .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-    
     #admin-view .glass-panel { padding: 1.5rem; border-radius: 16px; }
     #admin-view h3 { font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
     #admin-view .stat-card { padding: 1.5rem; border-top: 3px solid var(--neon-green); border-radius: 12px; background: rgba(15, 23, 42, 0.8); transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
@@ -164,12 +173,10 @@
     
     #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 18px 28px; border-radius: 12px; color: white; font-weight: 600; border-left: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
-    /* Pop-up Modals Background */
     .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.92); backdrop-filter: blur(15px); z-index: 11000; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .modal-content { background: var(--bg-base); border: 1px solid rgba(0,255,136,0.3); padding: 30px; border-radius: 20px; width: 100%; max-width: 700px; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,136,0.05); max-height: 90vh; overflow-y: auto; position: relative; }
     .broadcast-content { background: linear-gradient(135deg, #ff2a5f 0%, #990033 100%); text-align: center; border: 1px solid #ffb700; box-shadow: 0 0 60px rgba(255,42,95,0.5); max-width: 500px; }
     
-    /* Responsive Table Wrapper */
     .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-top: 1rem; }
     table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.85rem; }
     th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; text-align: left; white-space: nowrap; }
@@ -213,12 +220,12 @@
   <div id="watermark-layer" class="hidden"></div>
   <div id="toast">Notifikasi!</div>
   
-  <!-- Anti Screenshot / Screen Record Overlay (FIXED CMD KEY) -->
+  <!-- Anti Screenshot / Screen Record Overlay (CONTINUOUS HOLD FIX) -->
   <div id="drm-overlay" class="hidden">
     <div style="font-size: 6rem; margin-bottom: 20px;">🚫</div>
     <div style="letter-spacing: 3px; color: var(--danger);">TINDAKAN DILARANG!</div>
     <span style="font-size: 1.2rem; font-weight: 500; color: #fff; margin-top: 20px; display: block; line-height: 1.6; padding: 0 20px;">
-      Screenshot / Screen Record / Pindah Fokus Layar terdeteksi.<br>Pelanggaran telah dicatat secara real-time oleh sistem server.
+      Screenshot / Screen Record / Seleksi Teks / Pindah Fokus Layar terdeteksi.<br>Pelanggaran telah dicatat secara real-time oleh sistem server.
     </span>
   </div>
   
@@ -292,7 +299,7 @@
           <ul style="margin-left: 20px; color: #e2e8f0; font-size: 0.95rem; line-height: 1.7; font-weight: 400;">
             <li>Layar ujian akan dikunci permanen ke mode <b style="color:#fff;">Full-Screen</b>. Keluar dari mode ini akan membekukan ujian.</li>
             <li>Sistem <b style="color:#fff;">Radar Desibel (dB)</b> memantau tingkat kebisingan ruangan.</li>
-            <li>Aplikasi <b style="color:#fff;">Snipping Tool, Print Screen, & Klik Kanan (Inspect)</b> dimatikan secara paksa.</li>
+            <li>Aplikasi <b style="color:#fff;">Snipping Tool, Print Screen, Blok Teks & Klik Kanan</b> dimatikan secara paksa.</li>
             <li>Berpindah tab atau meminimize jendela otomatis memicu diskualifikasi.</li>
           </ul>
       </div>
@@ -712,9 +719,12 @@
       } catch (err) { console.error("API Error: ", err); }
     }
 
-    // --- DRM ANTI INSPECT ELEMENT & HOTKEY BYPASS ---
+    // --- DRM ANTI INSPECT ELEMENT & CONTINUOUS KEY HOLD (FITUR 1) ---
     document.addEventListener('contextmenu', e => e.preventDefault()); 
     
+    let drmTimeout;
+    let hasLoggedKeyHold = false;
+
     document.addEventListener('keydown', (e) => {
        if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U')) {
            e.preventDefault(); return false;
@@ -729,23 +739,37 @@
            return;
        }
        
-       // FIX 1: Mac Meta Key (Cmd) Trap untuk Anti-Screenshot yang lebih agresif
-       if (e.metaKey && !proctorBypass && isExamActive) {
-           triggerAntiSS();
+       // FITUR 1: BLANK CONTINUOUS SAAT CMD/CTRL DITAHAN LAMA
+       if (isExamActive && !proctorBypass && (e.metaKey || e.ctrlKey || e.key === 'Meta' || e.key === 'Control')) {
+           if (!hasLoggedKeyHold) {
+               logViolation("Mencoba Shortcut Sistem (Cmd/Ctrl)");
+               hasLoggedKeyHold = true;
+           }
+           clearTimeout(drmTimeout);
+           document.getElementById('drm-overlay').classList.remove('hidden');
+           
+           if(e.key.toUpperCase() === 'P' || e.key.toUpperCase() === 'S') e.preventDefault();
        }
 
        if(e.key === 'PrintScreen' || e.keyCode === 44) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === 's' || e.key === 'S')) triggerAntiSS();
-       if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); triggerAntiSS(); }
+    });
+
+    document.addEventListener('keyup', (e) => {
+       // Melepas penahanan layar blank saat Cmd/Ctrl di lepas
+       if (e.key === 'Meta' || e.key === 'Control' || (!e.metaKey && !e.ctrlKey)) {
+           hasLoggedKeyHold = false;
+           drmTimeout = setTimeout(() => {
+               document.getElementById('drm-overlay').classList.add('hidden');
+           }, 1500); // Tahan 1.5 detik ekstra setelah dilepas untuk keamanan
+       }
     });
     
-    // PERBAIKAN BUG 3: ANTI-CHEAT SCROLL MOBILE (Mengganti blur dengan visibilitychange)
     document.addEventListener('visibilitychange', () => {
        if(isExamActive && !isSubmitting && !proctorBypass && document.hidden) triggerAntiSS();
     });
     
-    // Mencegah trigger saat blur biasa (scroll di mobile)
     window.addEventListener('blur', () => {
         if(window.innerWidth > 768 && isExamActive && !isSubmitting && !proctorBypass) {
             triggerAntiSS();
@@ -757,8 +781,41 @@
        const drm = document.getElementById('drm-overlay');
        drm.classList.remove('hidden');
        logViolation("Screenshot/Record/Pindah Tab Window");
-       setTimeout(() => { drm.classList.add('hidden'); }, 3500); 
+       clearTimeout(drmTimeout);
+       drmTimeout = setTimeout(() => { drm.classList.add('hidden'); }, 3500); 
     }
+
+    // --- MOBILE TEXT SELECTION PROTECTION (FITUR 2) ---
+    // 1. Anti Copy/Select secara Event DOM
+    document.addEventListener('selectstart', (e) => {
+        if(isExamActive) {
+            e.preventDefault();
+            showToast("⚠️ Tindakan memblok teks soal tidak diizinkan!", true);
+        }
+    });
+    document.addEventListener('copy', (e) => {
+        if(isExamActive) {
+            e.preventDefault();
+            showToast("⚠️ Fitur Salin/Copy dimatikan!", true);
+            logViolation("Mencoba Menyalin/Memblok Teks");
+        }
+    });
+
+    // 2. Active Touch Hold/Long-press trap (untuk Mobile)
+    let touchTimer;
+    document.addEventListener('touchstart', (e) => {
+        if(!isExamActive) return;
+        // Izinkan klik pada tombol dan input agar fungsionalitas ujian tetap bekerja
+        if(['BUTTON', 'INPUT', 'LABEL'].includes(e.target.tagName)) return;
+        
+        touchTimer = setTimeout(() => {
+            showToast("⚠️ Dilarang menahan layar untuk menyeleksi teks soal!", true);
+            logViolation("Indikasi Seleksi Teks Mobile (Long Press)");
+        }, 1000); // Jika ditahan lebih dari 1 detik
+    }, {passive: false});
+
+    document.addEventListener('touchend', () => clearTimeout(touchTimer));
+    document.addEventListener('touchmove', () => clearTimeout(touchTimer)); // Jika jari geser (scroll), batalkan alarm penahanan
 
     // --- ESC TRAP (Auto Full Screen Return) ---
     document.addEventListener('fullscreenchange', () => {
@@ -994,7 +1051,6 @@
     }
 
     // --- ADMIN LOGIC ---
-    // FIX 2: AUTO SYNC PADA ADMIN TABS
     function switchAdminTab(t) {
       ['admin-stats', 'admin-exams', 'admin-users', 'admin-questions', 'admin-jawaban', 'admin-audio', 'admin-web'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(t).classList.remove('hidden');
@@ -1340,7 +1396,7 @@
 
     function sendBroadcast() {
       const msg = document.getElementById('in-broadcast').value;
-      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim!", true); });
+      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim ke semua peserta aktif!", true); });
     }
     
     function submitNewUser() {
@@ -1356,7 +1412,6 @@
       runServer('addAdminQuestion', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
 
-    // FIX 2: MOBILE NOTIFICATIONS
     function showToast(msg, isCritical = false) {
       if(window.innerWidth <= 768 && !isCritical) return; 
       
