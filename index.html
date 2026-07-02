@@ -466,7 +466,8 @@
     function startExamSequence() {
       if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
       
-      runServer('getStudentExam', [currentUser.dept], (res) => {
+      // UPGRADE: Fetch Ujian Mutlak Berdasarkan Exam_ID milik User (Hasil Auto-Bind)
+      runServer('getStudentExam', [currentUser.examId], (res) => {
         if (res.status === 'success') {
           currentExam = res.exam; examQuestions = res.questions;
           currentQIndex = 0; flaggedQuestions.clear(); studentAnswers = {};
@@ -554,7 +555,7 @@
             showToast("Waktu Ujian Habis! Sistem mengumpulkan otomatis...");
             forceSubmitExam();
         }
-      }, 1000); // Eksekusi UI detik, namun akurasi berdasar Date.now()
+      }, 1000); 
     }
 
     let currentNoise = 0;
