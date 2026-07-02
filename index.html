@@ -17,8 +17,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V13 (Ultimate DRM)
-       (Mobile & Desktop Friendly Command Center)
+       SUPER BIG UPGRADE CSS3 - V14 (Ultimate DRM & Backup System)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -35,12 +34,7 @@
     
     * { 
       box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; 
-      /* FITUR 1: ANTI-BLOCK CSS UNIVERSAL */
-      user-select: none; 
-      -webkit-user-select: none; 
-      -ms-user-select: none; 
-      -moz-user-select: none; 
-      -webkit-touch-callout: none; 
+      user-select: none; -webkit-user-select: none; -ms-user-select: none; -moz-user-select: none; -webkit-touch-callout: none; 
     }
     
     body { 
@@ -85,7 +79,6 @@
       background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); 
       color: #fff; border-radius: 12px; outline: none; transition: 0.3s; 
       font-size: 1rem; font-weight: 500; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-      /* Izinkan seleksi teks hanyak pada input/textarea form Admin */
       user-select: text; -webkit-user-select: text; 
     }
     .input-glass:focus { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2), inset 0 2px 5px rgba(0,0,0,0.5); background: rgba(0,0,0,0.8); }
@@ -154,7 +147,7 @@
     .option-label.selected .custom-radio::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--neon-green); border-radius: 50%; box-shadow: var(--neon-glow); }
     input[type="radio"] { display: none; } 
     
-    /* DASHBOARD ADMIN UI */
+    /* DASHBOARD ADMIN UI (COMPACT & DENSE) */
     .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
     #admin-view .glass-panel { padding: 1.5rem; border-radius: 16px; }
     #admin-view h3 { font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
@@ -173,10 +166,12 @@
     
     #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 18px 28px; border-radius: 12px; color: white; font-weight: 600; border-left: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
+    /* Pop-up Modals Background */
     .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.92); backdrop-filter: blur(15px); z-index: 11000; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .modal-content { background: var(--bg-base); border: 1px solid rgba(0,255,136,0.3); padding: 30px; border-radius: 20px; width: 100%; max-width: 700px; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,136,0.05); max-height: 90vh; overflow-y: auto; position: relative; }
     .broadcast-content { background: linear-gradient(135deg, #ff2a5f 0%, #990033 100%); text-align: center; border: 1px solid #ffb700; box-shadow: 0 0 60px rgba(255,42,95,0.5); max-width: 500px; }
     
+    /* Responsive Table Wrapper */
     .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-top: 1rem; }
     table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.85rem; }
     th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; text-align: left; white-space: nowrap; }
@@ -239,6 +234,16 @@
     <button class="btn-start-exam" style="max-width: 350px; padding: 15px;" onclick="returnToFullScreen()">KEMBALI KE UJIAN (FULLSCREEN)</button>
   </div>
   
+  <!-- POPUP PERINGATAN PELANGGARAN CERDAS -->
+  <div id="violation-modal" class="fullscreen-modal hidden" style="z-index: 14000;">
+    <div class="modal-content" style="max-width: 450px; text-align: center; border: 2px solid var(--warning); box-shadow: 0 0 40px rgba(255, 183, 0, 0.4);">
+      <div style="font-size: 4rem; margin-bottom: 10px;">⚠️</div>
+      <h2 style="color: var(--warning); font-size: 1.8rem; margin-bottom: 15px;">SISTEM KEAMANAN</h2>
+      <p id="violation-msg" style="color: #fff; font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; white-space: pre-wrap;"></p>
+      <button class="btn-start-exam" style="margin-top: 0; padding: 12px; background: linear-gradient(135deg, #ffb700 0%, #cc9200 100%); color:#000;" onclick="closeViolationWarning()">SAYA MENGERTI</button>
+    </div>
+  </div>
+
   <div id="broadcast-modal" class="fullscreen-modal hidden" style="z-index: 13000;">
     <div class="modal-content broadcast-content">
       <h2 style="color: white; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px;">PENGUMUMAN PENTING</h2>
@@ -300,7 +305,7 @@
             <li>Layar ujian akan dikunci permanen ke mode <b style="color:#fff;">Full-Screen</b>. Keluar dari mode ini akan membekukan ujian.</li>
             <li>Sistem <b style="color:#fff;">Radar Desibel (dB)</b> memantau tingkat kebisingan ruangan.</li>
             <li>Aplikasi <b style="color:#fff;">Snipping Tool, Print Screen, Blok Teks & Klik Kanan</b> dimatikan secara paksa.</li>
-            <li>Berpindah tab atau meminimize jendela otomatis memicu diskualifikasi.</li>
+            <li>Jika ada kendala jaringan/ter-refresh, sistem akan secara otomatis memulihkan sesi (Auto-Resume).</li>
           </ul>
       </div>
       <button class="btn-start-exam" style="font-size: 1.1rem; padding: 18px;" onclick="startExamSequence()">MULAI UJIAN SEKARANG</button>
@@ -433,6 +438,7 @@
         <div class="dashboard-grid">
           <div class="glass-panel">
             <h3 style="color:var(--neon-green);">Upload Bulk Users (.xlsx, .csv, .pdf)</h3>
+            <p style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 15px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px;">Format isi file: <b>Kolom A</b> untuk NIM & <b>Kolom B</b> untuk Nama Lengkap.</p>
             <div class="input-group"><input type="file" id="bulk-file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .docx, .pdf" class="input-glass"></div>
             <div class="input-group" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px;">
               <input type="checkbox" id="chk-univ-pass" style="width:16px; height:16px; accent-color:var(--neon-green); cursor: pointer;" onchange="document.getElementById('add-bulk-pass').classList.toggle('hidden')" checked> 
@@ -482,7 +488,8 @@
         <div class="dashboard-grid">
           <div class="glass-panel" style="grid-column: span 1;">
             <h3 style="color:var(--neon-green);">Upload Bulk Soal (.xlsx, .csv, .pdf)</h3>
-            <div class="input-group">
+            <p style="font-size:0.85rem;">Format Isi File / Dokumen Teks: <br><span style="color:#e2e8f0; font-family:monospace; background:rgba(0,0,0,0.6); padding:15px; display:block; border-radius:10px; margin-top:8px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.6;">1. [teks soal]<br>A. [opsi] <br>B. [opsi] <br>C. [opsi] <br>D. [opsi] <br>E. [opsi]<br>Kunci: A</span></p>
+            <div class="input-group" style="margin-top:20px;">
               <label>Departemen Ujian Tujuan</label>
               <select id="bulk-q-dept" class="input-glass dept-options" style="background: var(--bg-base);"></select>
             </div>
@@ -508,7 +515,7 @@
                  <label style="color: var(--neon-green);">Kunci Jawaban (A/B/C/D/E)</label>
                  <input type="text" id="add-q-correct" class="input-glass" required style="text-transform:uppercase; font-weight: bold; width: 100px; text-align: center;">
               </div>
-              <button type="submit" class="btn-neon">SIMPAN SOAL</button>
+              <button type="submit" class="btn-neon">SIM ঐতিহ্য</button>
             </form>
           </div>
         </div>
@@ -550,7 +557,7 @@
         </div>
       </div>
       
-      <!-- TAB 6: MANAJEMEN WEB & HOTKEYS (DATABASE CONNECTED) -->
+      <!-- TAB 6: MANAJEMEN WEB & HOTKEYS -->
       <div id="admin-web" class="hidden">
         <div class="glass-panel" style="max-width: 700px; margin: 0 auto;">
           <h3 style="color: var(--neon-green);">Konfigurasi Web & Pengawas</h3>
@@ -568,6 +575,11 @@
              <div class="input-group">
                 <label>Teks Footer Khusus</label>
                 <input type="text" id="set-footer-text" class="input-glass" required>
+             </div>
+             <div class="input-group" style="background: rgba(255, 183, 0, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(255, 183, 0, 0.3);">
+                <label style="color: var(--warning);">Maksimal Toleransi Pelanggaran Peserta (Auto-Submit)</label>
+                <input type="number" id="set-max-violations" class="input-glass" min="1" max="20" required style="max-width: 150px; text-align: center; font-weight: bold; color: var(--warning);">
+                <p style="font-size:0.8rem; margin: 8px 0 0 0; color: #fff;">Tentukan batas peserta dapat melakukan pelanggaran sebelum sistem otomatis menyelesaikan ujian mereka.</p>
              </div>
              <div class="dashboard-grid" style="gap: 1rem; margin-bottom: 1.5rem;">
                 <div class="input-group" style="margin-bottom: 0;">
@@ -628,7 +640,8 @@
         Brand_Name: "AXA XYZ",
         Footer_Text: "© 2026 All Right Reserved. SYSTEM BY AXA XYZ",
         Hotkey_Win_Mod: "Alt", Hotkey_Win_Key: "Q",
-        Hotkey_Mac_Mod: "Ctrl", Hotkey_Mac_Key: "Q"
+        Hotkey_Mac_Mod: "Ctrl", Hotkey_Mac_Key: "Q",
+        Max_Violations: "5" 
     };
 
     function applyWebSettings() {
@@ -644,6 +657,7 @@
             document.getElementById('set-hotkey-win-key').value = webSettings.Hotkey_Win_Key || "Q";
             document.getElementById('set-hotkey-mac-mod').value = webSettings.Hotkey_Mac_Mod || "Ctrl";
             document.getElementById('set-hotkey-mac-key').value = webSettings.Hotkey_Mac_Key || "Q";
+            document.getElementById('set-max-violations').value = webSettings.Max_Violations || "5";
         }
     }
 
@@ -664,7 +678,8 @@
             Hotkey_Win_Mod: document.getElementById('set-hotkey-win-mod').value,
             Hotkey_Win_Key: document.getElementById('set-hotkey-win-key').value.toUpperCase(),
             Hotkey_Mac_Mod: document.getElementById('set-hotkey-mac-mod').value,
-            Hotkey_Mac_Key: document.getElementById('set-hotkey-mac-key').value.toUpperCase()
+            Hotkey_Mac_Key: document.getElementById('set-hotkey-mac-key').value.toUpperCase(),
+            Max_Violations: document.getElementById('set-max-violations').value
         };
         runServer('updateWebSettings', [payload], (res) => {
             if(res && res.status === 'success') {
@@ -683,6 +698,7 @@
     let isSubmitting = false; 
     let isExamActive = false;
     let proctorBypass = false; 
+    let examEndTime = 0; 
 
     let currentQIndex = 0;
     let flaggedQuestions = new Set();
@@ -719,7 +735,7 @@
       } catch (err) { console.error("API Error: ", err); }
     }
 
-    // --- DRM ANTI INSPECT ELEMENT & CONTINUOUS KEY HOLD (FITUR 1) ---
+    // --- DRM ANTI INSPECT ELEMENT & CONTINUOUS KEY HOLD ---
     document.addEventListener('contextmenu', e => e.preventDefault()); 
     
     let drmTimeout;
@@ -739,7 +755,6 @@
            return;
        }
        
-       // FITUR 1: BLANK CONTINUOUS SAAT CMD/CTRL DITAHAN LAMA
        if (isExamActive && !proctorBypass && (e.metaKey || e.ctrlKey || e.key === 'Meta' || e.key === 'Control')) {
            if (!hasLoggedKeyHold) {
                logViolation("Mencoba Shortcut Sistem (Cmd/Ctrl)");
@@ -747,7 +762,6 @@
            }
            clearTimeout(drmTimeout);
            document.getElementById('drm-overlay').classList.remove('hidden');
-           
            if(e.key.toUpperCase() === 'P' || e.key.toUpperCase() === 'S') e.preventDefault();
        }
 
@@ -757,20 +771,19 @@
     });
 
     document.addEventListener('keyup', (e) => {
-       // Melepas penahanan layar blank saat Cmd/Ctrl di lepas
        if (e.key === 'Meta' || e.key === 'Control' || (!e.metaKey && !e.ctrlKey)) {
            hasLoggedKeyHold = false;
-           drmTimeout = setTimeout(() => {
-               document.getElementById('drm-overlay').classList.add('hidden');
-           }, 1500); // Tahan 1.5 detik ekstra setelah dilepas untuk keamanan
+           drmTimeout = setTimeout(() => { document.getElementById('drm-overlay').classList.add('hidden'); }, 1500); 
        }
     });
     
+    // Mencegah trigger false-positive dari scroll address bar di Mobile
     document.addEventListener('visibilitychange', () => {
        if(isExamActive && !isSubmitting && !proctorBypass && document.hidden) triggerAntiSS();
     });
     
     window.addEventListener('blur', () => {
+        // Hanya trigger blur (pindah jendela) di layar Desktop/Tablet besar
         if(window.innerWidth > 768 && isExamActive && !isSubmitting && !proctorBypass) {
             triggerAntiSS();
         }
@@ -785,37 +798,26 @@
        drmTimeout = setTimeout(() => { drm.classList.add('hidden'); }, 3500); 
     }
 
-    // --- MOBILE TEXT SELECTION PROTECTION (FITUR 2) ---
-    // 1. Anti Copy/Select secara Event DOM
+    // --- MOBILE TEXT SELECTION PROTECTION ---
     document.addEventListener('selectstart', (e) => {
-        if(isExamActive) {
-            e.preventDefault();
-            showToast("⚠️ Tindakan memblok teks soal tidak diizinkan!", true);
-        }
+        if(isExamActive) { e.preventDefault(); showToast("⚠️ Tindakan memblok teks soal tidak diizinkan!", true); }
     });
     document.addEventListener('copy', (e) => {
-        if(isExamActive) {
-            e.preventDefault();
-            showToast("⚠️ Fitur Salin/Copy dimatikan!", true);
-            logViolation("Mencoba Menyalin/Memblok Teks");
-        }
+        if(isExamActive) { e.preventDefault(); showToast("⚠️ Fitur Salin/Copy dimatikan!", true); logViolation("Mencoba Menyalin/Memblok Teks"); }
     });
 
-    // 2. Active Touch Hold/Long-press trap (untuk Mobile)
     let touchTimer;
     document.addEventListener('touchstart', (e) => {
         if(!isExamActive) return;
-        // Izinkan klik pada tombol dan input agar fungsionalitas ujian tetap bekerja
         if(['BUTTON', 'INPUT', 'LABEL'].includes(e.target.tagName)) return;
-        
         touchTimer = setTimeout(() => {
             showToast("⚠️ Dilarang menahan layar untuk menyeleksi teks soal!", true);
             logViolation("Indikasi Seleksi Teks Mobile (Long Press)");
-        }, 1000); // Jika ditahan lebih dari 1 detik
+        }, 1000); 
     }, {passive: false});
 
     document.addEventListener('touchend', () => clearTimeout(touchTimer));
-    document.addEventListener('touchmove', () => clearTimeout(touchTimer)); // Jika jari geser (scroll), batalkan alarm penahanan
+    document.addEventListener('touchmove', () => clearTimeout(touchTimer)); 
 
     // --- ESC TRAP (Auto Full Screen Return) ---
     document.addEventListener('fullscreenchange', () => {
@@ -854,18 +856,57 @@
       });
     }
 
+    // --- SMART AUTO-BACKUP: Local Storage System ---
+    function saveLocalBackup() {
+        const state = { answers: studentAnswers, violationCount: violationCount, endTime: examEndTime };
+        localStorage.setItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`, JSON.stringify(state));
+    }
+
+    function clearLocalBackup() {
+        localStorage.removeItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`);
+    }
+
     function startExamSequence() {
       const proceedExam = () => {
-         runServer('getStudentExam', [currentUser.examId], (res) => {
+         runServer('getStudentExam', [currentUser.examId, currentUser.nim], (res) => {
            if (res && res.status === 'success') {
              currentExam = res.exam; examQuestions = res.questions;
-             currentQIndex = 0; flaggedQuestions.clear(); studentAnswers = {};
+             currentQIndex = 0; flaggedQuestions.clear();
              isExamActive = true;
+
+             let localStateRaw = localStorage.getItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`);
+             let restored = false;
+
+             if(localStateRaw) {
+                 let localState = JSON.parse(localStateRaw);
+                 if(localState.endTime > Date.now()) { 
+                     studentAnswers = localState.answers || {};
+                     violationCount = localState.violationCount || 0;
+                     examEndTime = localState.endTime;
+                     restored = true;
+                     showToast("Berhasil Memulihkan Sesi Ujian (Local Backup)", true);
+                 }
+             } 
+             else if(res.backup && res.backup.endTime > Date.now()) {
+                 studentAnswers = JSON.parse(res.backup.answersBackup || '{}');
+                 violationCount = res.backup.violations || 0;
+                 examEndTime = res.backup.endTime;
+                 restored = true;
+                 showToast("Berhasil Memulihkan Sesi Ujian (Cloud Backup)", true);
+             }
+
+             if(!restored) {
+                 examEndTime = Date.now() + (currentExam.duration * 60000);
+                 studentAnswers = {};
+                 violationCount = 0;
+             }
+             saveLocalBackup();
 
              document.getElementById('watermark-layer').innerHTML = Array(80).fill(`${currentUser.nim} - ${currentUser.name}`).join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
              document.getElementById('watermark-layer').classList.remove('hidden');
              
-             initAudioSensor(); buildCBTPalette(); renderSingleQuestion(); startRealTimer(currentExam.duration);
+             initAudioSensor(); buildCBTPalette(); renderSingleQuestion(); 
+             startRealTimer(examEndTime); 
              
              runServer('getInitBroadcast', [], (bRes) => {
                 if(bRes && bRes.status === 'success') lastBroadcastId = bRes.msgId;
@@ -936,17 +977,23 @@
         updatePaletteStyles();
     }
 
-    function saveAnswer(qId, val) { studentAnswers[qId] = val; renderSingleQuestion(); }
-    function nextQuestion() { if(currentQIndex < examQuestions.length - 1) { currentQIndex++; renderSingleQuestion(); } }
-    function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderSingleQuestion(); } }
-    function goToQ(idx) { currentQIndex = idx; renderSingleQuestion(); }
+    function saveAnswer(qId, val) { 
+        studentAnswers[qId] = val; 
+        saveLocalBackup(); 
+        renderSingleQuestion(); 
+    }
+    
+    // Sinkronisasi Cloud setiap pindah soal
+    function nextQuestion() { if(currentQIndex < examQuestions.length - 1) { currentQIndex++; renderSingleQuestion(); sendPing('Online'); } }
+    function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderSingleQuestion(); sendPing('Online'); } }
+    function goToQ(idx) { currentQIndex = idx; renderSingleQuestion(); sendPing('Online'); }
+    
     function toggleFlagQuestion() {
        if(flaggedQuestions.has(currentQIndex)) flaggedQuestions.delete(currentQIndex); else flaggedQuestions.add(currentQIndex);
        updatePaletteStyles();
     }
 
-    function startRealTimer(m) {
-      let endTime = Date.now() + (m * 60000);
+    function startRealTimer(endTime) {
       isSubmitting = false;
       timerInterval = setInterval(() => {
         if(isSubmitting) return; 
@@ -985,7 +1032,15 @@
       } catch (e) { currentNoise = -1; }
     }
 
-    function sendPing(status) { if(!isSubmitting) runServer('pingSession', [{ nim: currentUser.nim, name: currentUser.name, dept: currentUser.dept, status: status, noiseLevel: currentNoise }], ()=>{}); }
+    function sendPing(status) { 
+        if(!isSubmitting) {
+            runServer('pingSession', [{ 
+                nim: currentUser.nim, name: currentUser.name, examId: currentExam.examId, deptName: currentUser.dept, 
+                status: status, noiseLevel: currentNoise,
+                endTime: examEndTime, answersBackup: JSON.stringify(studentAnswers), violations: violationCount
+            }], ()=>{}); 
+        }
+    }
 
     function pollBroadcast() {
       if(!isSubmitting) {
@@ -997,13 +1052,33 @@
       }
     }
 
+    function showViolationWarning(msg) {
+        document.getElementById('violation-msg').innerText = msg;
+        document.getElementById('violation-modal').classList.remove('hidden');
+    }
+    function closeViolationWarning() {
+        document.getElementById('violation-modal').classList.add('hidden');
+    }
+
     function logViolation(t) { 
        if(isSubmitting) return;
        violationCount++; 
-       if(violationCount > 5) {
-           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan otomatis!", true); forceSubmitExam(); 
+       
+       let maxV = parseInt(webSettings.Max_Violations) || 5;
+       saveLocalBackup(); 
+       
+       if(violationCount >= maxV) {
+           isSubmitting = true; 
+           showToast("Batas pelanggaran maksimum tercapai. Anda dikeluarkan secara otomatis!", true); 
+           forceSubmitExam(); 
+       } else if (violationCount === maxV - 1) {
+           showViolationWarning(`PERINGATAN TERAKHIR!\n\nAnda telah melakukan pelanggaran ke-${violationCount}. Satu pelanggaran lagi, ujian Anda akan otomatis diselesaikan oleh sistem secara paksa.`);
+       } else {
+           showViolationWarning(`SISTEM MENCATAT PELANGGARAN!\n\nAnda telah melakukan pelanggaran sebanyak ${violationCount} kali dari maksimal ${maxV} kali.`);
        }
+       
        runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); 
+       sendPing('Online'); 
     }
 
     function manualSubmitBtn() {
@@ -1037,6 +1112,7 @@
 
       runServer('submitExamResult', [{ examId: currentExam.examId, nim: currentUser.nim, answers: studentAnswers, violationCount: violationCount }], (res) => {
         if(res && res.status === 'success') {
+           clearLocalBackup(); 
            if (res.score === 'HIDDEN') document.getElementById('feedback-message').innerText = "Lembar jawaban berhasil diamankan ke server. Nilai menunggu rilis Dekanat.";
            else document.getElementById('feedback-message').innerText = "Skor Anda: " + res.score;
            switchView('feedback-view');
@@ -1314,7 +1390,7 @@
          }
          
          if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; loadAdminUsers(); });
-         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA.";
+         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA (Atau tiap baris NIM[spasi]NAMA di PDF).";
       } catch(e) { st.innerText = e; }
     }
 
@@ -1414,7 +1490,6 @@
 
     function showToast(msg, isCritical = false) {
       if(window.innerWidth <= 768 && !isCritical) return; 
-      
       const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
       setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
     }
