@@ -10,10 +10,14 @@
   <meta name="author" content="Axa Xyz">
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Dependensi Modul via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <!-- UPGRADE: Modul JS-Cookie untuk Auto Login -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 
   <style>
     /* ==========================================
@@ -704,10 +708,16 @@
       loadWebSettings(); 
       
       const page = new URLSearchParams(window.location.search).get('page');
-      const savedUser = sessionStorage.getItem('zettbos_session');
+      
+      // AUTO LOGIN MENGGUNAKAN COOKIES
+      const savedUser = Cookies.get('axa_admin_session'); 
+      
       if (savedUser) {
           currentUser = JSON.parse(savedUser);
-          if (currentUser.role === 'Admin') initAdminDashboard();
+          if (currentUser.role === 'Admin') {
+              initAdminDashboard();
+              if(page !== 'admin') history.pushState(null, '', '?page=admin');
+          }
           else if(page === 'exam') {
             document.getElementById('student-name').innerText = currentUser.name;
             switchView('student-portal-view');
@@ -718,7 +728,7 @@
     });
 
     function logout() {
-      sessionStorage.removeItem('zettbos_session');
+      Cookies.remove('axa_admin_session', { path: '' });
       location.href = window.location.pathname;
     }
 
@@ -840,7 +850,10 @@
       runServer('authenticateUser', [n, p], (res) => {
         b.innerText = "MASUK SISTEM";
         if (res && res.status === 'success') {
-          sessionStorage.setItem('zettbos_session', JSON.stringify(res.user));
+          // AUTO LOGIN COOKIE SETTING (7 Hari Admin, 1 Hari Mahasiswa)
+          let expireDays = res.user.role === 'Admin' ? 7 : 1;
+          Cookies.set('axa_admin_session', JSON.stringify(res.user), { expires: expireDays, path: '' });
+          
           location.href = res.user.role === 'Admin' ? '?page=admin' : '?page=exam';
         } else {
           showToast(res ? res.message : "Koneksi Gagal.", true);
@@ -848,7 +861,7 @@
       });
     }
 
-    // --- SMART AUTO-BACKUP (Cloud Sync Update) ---
+    // --- SMART AUTO-BACKUP ---
     function saveLocalBackup() {
         const state = { answers: studentAnswers, violationCount: violationCount, endTime: examEndTime };
         localStorage.setItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`, JSON.stringify(state));
@@ -969,11 +982,10 @@
         updatePaletteStyles();
     }
 
-    // UPGRADE POINT 1: TRIGGER PING (CLOUD SYNC) SETIAP KALI PINDAH SOAL ATAU MENJAWAB
     function saveAnswer(qId, val) { 
         studentAnswers[qId] = val; 
         saveLocalBackup(); 
-        sendPing('Online'); // Cloud Sync
+        sendPing('Online'); 
         renderSingleQuestion(); 
     }
     
@@ -1395,7 +1407,7 @@
          }
          
          if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; loadAdminUsers(); });
-         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA (Atau tiap baris NIM[spasi]NAMA di PDF).";
+         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA.";
       } catch(e) { st.innerText = e; }
     }
 
@@ -1493,10 +1505,8 @@
       runServer('addAdminQuestion', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
 
-    // POINT 2: Peringatan disembunyikan untuk user Mobile, KECUALI yang kritis
     function showToast(msg, isCritical = false) {
       if(window.innerWidth <= 768 && !isCritical) return; 
-      
       const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
       setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
     }
