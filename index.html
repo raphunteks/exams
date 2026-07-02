@@ -17,15 +17,15 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - FUTURISTIC UI V4
+       SUPER BIG UPGRADE CSS3 - V10
        (Mobile & Desktop Friendly Command Center)
        ========================================== */
     :root { 
       --bg-base: #020617; 
-      --glass-bg: rgba(10, 15, 30, 0.7); 
+      --glass-bg: rgba(10, 15, 30, 0.75); 
       --glass-border: rgba(0, 255, 136, 0.2); 
       --neon-green: #00ff88; 
-      --neon-glow: 0 0 20px rgba(0, 255, 136, 0.3); 
+      --neon-glow: 0 0 20px rgba(0, 255, 136, 0.4); 
       --neon-blue: #0ea5e9;
       --text-main: #f8fafc; 
       --text-muted: #94a3b8; 
@@ -40,8 +40,8 @@
       background-image: 
         radial-gradient(circle at 80% 0%, rgba(0, 255, 136, 0.08), transparent 40%), 
         radial-gradient(circle at 20% 100%, rgba(14, 165, 233, 0.08), transparent 50%),
-        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
-        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
       color: var(--text-main); 
       min-height: 100vh; 
@@ -63,7 +63,7 @@
       border: 1px solid var(--glass-border); 
       border-radius: 20px; 
       padding: 2.5rem; 
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.02); 
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.03); 
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
     }
     
@@ -110,7 +110,6 @@
     .hidden { display: none !important; }
     #watermark-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.03; display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; font-size: 2.5rem; font-weight: 800; color: #fff; transform: rotate(-30deg); user-select: none; }
     
-    /* ANTI-SCREENSHOT & FORCE FULLSCREEN DRM */
     #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; flex-direction: column; }
     
     #force-fs-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(15px); z-index: 999998; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; cursor: pointer; }
@@ -130,13 +129,11 @@
     .btn-q.active { border: 2px solid #fff; transform: scale(1.15); z-index: 2; box-shadow: 0 0 20px rgba(255,255,255,0.5); }
     
     .cbt-nav-btns { display: flex; justify-content: space-between; margin-top: 35px; gap: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; }
-    
     .exam-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 2.5rem;}
     
     @keyframes pulse-neon { 0% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } 50% { box-shadow: inset 0 0 20px rgba(0,255,136,0.5), 0 0 20px rgba(0,255,136,0.5); } 100% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } }
     .timer-box { font-size: 2.2rem; font-weight: 800; color: var(--neon-green); text-shadow: var(--neon-glow); letter-spacing: 3px; background: rgba(0,0,0,0.6); padding: 12px 30px; border-radius: 12px; border: 1px solid rgba(0,255,136,0.4); animation: pulse-neon 2s infinite; }
     
-    /* CUSTOM RADIO BUTTONS */
     .options-grid { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2rem; }
     .option-label { display: flex; align-items: flex-start; padding: 20px 25px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
     .option-label:hover { background: rgba(0, 255, 136, 0.05); border-color: rgba(0, 255, 136, 0.3); transform: translateX(8px); }
@@ -161,17 +158,15 @@
     
     .admin-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); scroll-behavior: smooth; }
     .tab-btn { padding: 12px 20px; background: rgba(0,0,0,0.2); border: 1px solid transparent; color: var(--text-muted); cursor: pointer; border-radius: 8px 8px 0 0; transition: 0.3s; white-space: nowrap; font-weight: 700; font-size: 0.9rem; }
-    .tab-btn.active { background: rgba(0, 255, 136, 0.1); color: var(--neon-green); border-bottom: 3px solid var(--neon-green); text-shadow: 0 0 10px rgba(0,255,136,0.4); }
+    .tab-btn.active { background: rgba(0, 255, 136, 0.1); color: var(--neon-green); border-bottom: 3px solid var(--neon-green); text-shadow: 0 0 10px rgba(0,255,136,0.4); border-color: rgba(0,255,136,0.2) rgba(0,255,136,0.2) transparent rgba(0,255,136,0.2); }
     .tab-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.05); }
     
-    #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 16px 24px; border-radius: 10px; color: white; font-weight: 600; border-left: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 18px 28px; border-radius: 12px; color: white; font-weight: 600; border-left: 6px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
-    /* Pop-up Modals Background */
     .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.92); backdrop-filter: blur(15px); z-index: 11000; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .modal-content { background: var(--bg-base); border: 1px solid rgba(0,255,136,0.3); padding: 30px; border-radius: 20px; width: 100%; max-width: 700px; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,136,0.05); max-height: 90vh; overflow-y: auto; position: relative; }
     .broadcast-content { background: linear-gradient(135deg, #ff2a5f 0%, #990033 100%); text-align: center; border: 1px solid #ffb700; box-shadow: 0 0 60px rgba(255,42,95,0.5); max-width: 500px; }
     
-    /* Responsive Table Wrapper */
     .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-top: 1rem; }
     table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.85rem; }
     th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; text-align: left; white-space: nowrap; }
@@ -192,17 +187,7 @@
     .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px; }
 
     /* FOOTER STYLES */
-    .app-footer {
-      text-align: center;
-      padding: 15px;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      border-top: 1px solid rgba(255,255,255,0.05);
-      font-weight: 500;
-      margin-top: auto;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(10px);
-    }
+    .app-footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); font-weight: 500; margin-top: auto; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
     .app-footer span.brand { color: var(--neon-green); font-weight: 700; letter-spacing: 1px; }
 
     /* MOBILE RESPONSIVENESS */
@@ -225,7 +210,6 @@
   <div id="watermark-layer" class="hidden"></div>
   <div id="toast">Notifikasi!</div>
   
-  <!-- Anti Screenshot / Screen Record Overlay -->
   <div id="drm-overlay" class="hidden">
     <div style="font-size: 6rem; margin-bottom: 20px;">🚫</div>
     <div style="letter-spacing: 3px; color: var(--danger);">TINDAKAN DILARANG!</div>
@@ -242,7 +226,6 @@
     <button class="btn-start-exam" style="max-width: 350px; padding: 15px;" onclick="returnToFullScreen()">KEMBALI KE UJIAN (FULLSCREEN)</button>
   </div>
   
-  <!-- Modal Broadcast -->
   <div id="broadcast-modal" class="fullscreen-modal hidden" style="z-index: 13000;">
     <div class="modal-content broadcast-content">
       <h2 style="color: white; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px;">PENGUMUMAN PENTING</h2>
@@ -251,7 +234,6 @@
     </div>
   </div>
 
-  <!-- Modal Konfirmasi Submit Custom -->
   <div id="custom-confirm-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 450px; text-align: center;">
       <h2 style="color: var(--text-main); font-size: 1.8rem; margin-bottom: 15px;">Konfirmasi Ujian</h2>
@@ -263,7 +245,6 @@
     </div>
   </div>
 
-  <!-- Modal Detail Jawaban -->
   <div id="detail-jawaban-modal" class="fullscreen-modal hidden">
     <div class="modal-content">
       <h3 id="det-nama" style="color: var(--neon-green); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; font-size: 1.6rem;">Detail Jawaban</h3>
@@ -272,11 +253,8 @@
     </div>
   </div>
   
-  <!-- Modal Edit Umum (Exam/Soal/User) -->
   <div id="edit-modal" class="fullscreen-modal hidden">
-    <div class="modal-content" id="edit-modal-body">
-      <!-- Diisi oleh JS -->
-    </div>
+    <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
   <div class="container">
@@ -315,7 +293,7 @@
       <button class="btn-start-exam" style="font-size: 1.1rem; padding: 18px;" onclick="startExamSequence()">MULAI UJIAN SEKARANG</button>
     </div>
 
-    <!-- 3. EXAM RUNNING (PROFESSIONAL CBT UI) -->
+    <!-- 3. EXAM RUNNING -->
     <div id="exam-view" class="hidden">
       <div class="glass-panel exam-header" style="padding: 1.5rem 2rem;">
         <div>
@@ -327,9 +305,7 @@
       
       <div class="cbt-container">
           <div class="cbt-main glass-panel" style="padding: 2.5rem;">
-             <div id="question-render-area">
-                <!-- Soal Muncul 1 per 1 di sini -->
-             </div>
+             <div id="question-render-area"></div>
              <div class="cbt-nav-btns">
                  <button class="btn-neon" style="width: auto; color: #fff; border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);" onclick="prevQuestion()">◄ SEBELUMNYA</button>
                  <button class="btn-neon btn-warning" style="width: auto;" onclick="toggleFlagQuestion()">⚑ RAGU-RAGU</button>
@@ -338,9 +314,7 @@
           </div>
           <div class="cbt-sidebar">
              <h3 style="font-size: 1.1rem; text-align: center;">Navigasi Soal</h3>
-             <div id="question-palette" class="q-palette">
-                <!-- Palet Nomor Muncul di sini -->
-             </div>
+             <div id="question-palette" class="q-palette"></div>
              <div style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 10px; padding: 12px; background: rgba(0,0,0,0.4); border-radius: 10px;">
                  <div style="display:flex; align-items:center; gap:10px; font-weight:500;"><span style="width:14px; height:14px; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); display:inline-block; border-radius:4px;"></span> Belum Dijawab</div>
                  <div style="display:flex; align-items:center; gap:10px; font-weight:600; color:#fff;"><span style="width:14px; height:14px; background:var(--neon-green); display:inline-block; border-radius:4px; box-shadow:0 0 8px var(--neon-green);"></span> Sudah Dijawab</div>
@@ -395,7 +369,6 @@
         <button class="tab-btn" onclick="switchAdminTab('admin-web')">⚙️ Settings</button>
       </div>
 
-      <!-- TAB 1: ANALYTICS -->
       <div id="admin-stats">
         <div class="dashboard-grid">
           <div class="glass-panel stat-card">
@@ -431,7 +404,6 @@
         </div>
       </div>
 
-      <!-- TAB 1.5: MANAJEMEN EXAMS -->
       <div id="admin-exams" class="hidden">
         <div class="glass-panel">
           <h3>Daftar Konfigurasi Ujian (Exams)</h3>
@@ -444,7 +416,6 @@
         </div>
       </div>
 
-      <!-- TAB 2: MANAJEMEN USER -->
       <div id="admin-users" class="hidden">
         <div class="dashboard-grid">
           <div class="glass-panel">
@@ -494,7 +465,6 @@
         </div>
       </div>
 
-      <!-- TAB 3: MANAJEMEN SOAL -->
       <div id="admin-questions" class="hidden">
         <div class="dashboard-grid">
           <div class="glass-panel" style="grid-column: span 1;">
@@ -543,7 +513,6 @@
         </div>
       </div>
 
-      <!-- TAB 4: MONITORING JAWABAN -->
       <div id="admin-jawaban" class="hidden">
         <div class="glass-panel">
           <h3>Detail Evaluasi Jawaban (<span class="lbl-dept">ALL</span>)</h3>
@@ -556,7 +525,6 @@
         </div>
       </div>
 
-      <!-- TAB 5: RADAR SUARA (LIVE AUDIO) -->
       <div id="admin-audio" class="hidden">
         <div class="glass-panel">
           <h3>Live Audio & Session Radar (<span class="lbl-dept">ALL</span>)</h3>
@@ -569,7 +537,6 @@
         </div>
       </div>
       
-      <!-- TAB 6: MANAJEMEN WEB & HOTKEYS (DATABASE CONNECTED) -->
       <div id="admin-web" class="hidden">
         <div class="glass-panel" style="max-width: 700px; margin: 0 auto;">
           <h3 style="color: var(--neon-green);">Konfigurasi Web & Pengawas</h3>
@@ -629,7 +596,6 @@
     // ==========================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyJHkKQh6s3f7idploBQVw62YzWY3oKV0S3l78JfvrKoyW7OyJJrTrAQt3K6duJBg/exec"; 
 
-    // --- REUSABLE DEPARTMENTS ARRAY ---
     const DEPARTMENTS = [
         "Biologi Oral", "Ilmu Bahan dan Teknologi", "Ilmu Kedokteran Gigi Anak", 
         "Ilmu Kedokteran Gigi Masyarakat - Pencegahan", "Ilmu Penyakit Mulut", 
@@ -641,7 +607,6 @@
         DEPARTMENTS.forEach(d => { select.innerHTML += `<option value="${d}">${d}</option>`; });
     });
 
-    // --- MANAJEMEN WEB DARI DATABASE (Poin 3) ---
     let webSettings = {
         Web_Title: "Axa Dental Exam",
         Brand_Name: "AXA XYZ",
@@ -686,8 +651,12 @@
             Hotkey_Mac_Key: document.getElementById('set-hotkey-mac-key').value.toUpperCase()
         };
         runServer('updateWebSettings', [payload], (res) => {
-            showToast(res.message);
-            loadWebSettings();
+            if(res && res.status === 'success') {
+                showToast(res.message, true);
+                loadWebSettings();
+            } else {
+                showToast("Gagal menyimpan pengaturan.");
+            }
         });
     }
 
@@ -703,7 +672,7 @@
     let flaggedQuestions = new Set();
 
     document.addEventListener("DOMContentLoaded", () => {
-      loadWebSettings(); // Ambil dari DB saat load
+      loadWebSettings(); 
       
       const page = new URLSearchParams(window.location.search).get('page');
       const savedUser = sessionStorage.getItem('zettbos_session');
@@ -734,50 +703,43 @@
       } catch (err) { console.error("API Error: ", err); }
     }
 
-    // --- DRM ANTI INSPECT ELEMENT & HOTKEY BYPASS (Poin 2 & Poin 1) ---
+    // --- DRM ANTI INSPECT ELEMENT & HOTKEY BYPASS ---
     document.addEventListener('contextmenu', e => e.preventDefault()); 
     
     document.addEventListener('keydown', (e) => {
-       // Block Inspect Element
        if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U')) {
            e.preventDefault(); return false;
        }
 
-       // Proctor Bypass Hotkeys dari Database Setting
        let isWinBypass = (e[webSettings.Hotkey_Win_Mod.toLowerCase() + 'Key'] && e.key.toUpperCase() === webSettings.Hotkey_Win_Key);
        let isMacBypass = (e[webSettings.Hotkey_Mac_Mod === 'Cmd' ? 'metaKey' : 'ctrlKey'] && e.key.toUpperCase() === webSettings.Hotkey_Mac_Key);
        
        if(isExamActive && (isWinBypass || isMacBypass)) {
            proctorBypass = !proctorBypass;
-           showToast(proctorBypass ? "🔓 PROCTOR BYPASS AKTIF (Aman keluar dari Fullscreen)" : "🔒 LAYAR TERKUNCI KEMBALI.");
+           showToast(proctorBypass ? "🔓 PROCTOR BYPASS AKTIF" : "🔒 LAYAR TERKUNCI KEMBALI.", true);
            return;
        }
 
-       // Anti SS
        if(e.key === 'PrintScreen' || e.keyCode === 44) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === 's' || e.key === 'S')) triggerAntiSS();
        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); triggerAntiSS(); }
-       
-       // Force Fullscreen klik sembarang
-       if (!document.getElementById('force-fs-overlay').classList.contains('hidden')) {
-           returnToFullScreen();
-       }
     });
     
-    window.addEventListener('blur', () => {
-       if(isExamActive && !isSubmitting && !proctorBypass) triggerAntiSS();
+    // PERBAIKAN BUG 3: ANTI-CHEAT SCROLL MOBILE (Mengganti blur dengan visibilitychange)
+    document.addEventListener('visibilitychange', () => {
+       if(isExamActive && !isSubmitting && !proctorBypass && document.hidden) triggerAntiSS();
     });
     
     function triggerAntiSS() {
        if(!isExamActive || isSubmitting || proctorBypass) return;
        const drm = document.getElementById('drm-overlay');
        drm.classList.remove('hidden');
-       logViolation("Screenshot/Record/Pindah Fokus Window");
+       logViolation("Screenshot/Record/Pindah Tab Window");
        setTimeout(() => { drm.classList.add('hidden'); }, 3500); 
     }
 
-    // --- ESC TRAP (Poin 1) ---
+    // --- ESC TRAP ---
     document.addEventListener('fullscreenchange', () => {
        if (!document.fullscreenElement && isExamActive && !isSubmitting && !proctorBypass) {
            document.getElementById('force-fs-overlay').classList.remove('hidden');
@@ -786,12 +748,15 @@
     });
 
     function returnToFullScreen() {
-        document.documentElement.requestFullscreen().then(() => {
-            document.getElementById('force-fs-overlay').classList.add('hidden');
-        }).catch(e => { showToast("Gagal masuk fullscreen."); });
+        let elem = document.documentElement;
+        let requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen;
+        
+        if (requestFS) {
+            requestFS.call(elem).catch(e => console.log(e));
+        }
+        document.getElementById('force-fs-overlay').classList.add('hidden');
     }
 
-    // --- STUDENT LOGIC ---
     function switchView(viewId) {
       ['login-view', 'student-portal-view', 'exam-view', 'feedback-view', 'admin-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(viewId).classList.remove('hidden');
@@ -802,17 +767,20 @@
       const b = document.getElementById('btn-login'); b.innerText = "Memproses...";
       runServer('authenticateUser', [n, p], (res) => {
         b.innerText = "MASUK SISTEM";
-        if (res.status === 'success') {
+        if (res && res.status === 'success') {
           sessionStorage.setItem('zettbos_session', JSON.stringify(res.user));
           location.href = res.user.role === 'Admin' ? '?page=admin' : '?page=exam';
-        } else showToast(res.message);
+        } else {
+          showToast(res ? res.message : "Koneksi Gagal.", true);
+        }
       });
     }
 
+    // PERBAIKAN BUG 1: BYPASS FULLSCREEN JIKA DITOLAK BROWSER MOBILE / IOS
     function startExamSequence() {
-      document.documentElement.requestFullscreen().then(() => {
+      const proceedExam = () => {
          runServer('getStudentExam', [currentUser.examId], (res) => {
-           if (res.status === 'success') {
+           if (res && res.status === 'success') {
              currentExam = res.exam; examQuestions = res.questions;
              currentQIndex = 0; flaggedQuestions.clear(); studentAnswers = {};
              isExamActive = true;
@@ -828,14 +796,25 @@
              });
              pingInterval = setInterval(() => sendPing('Online'), 10000);
              switchView('exam-view');
-           } else showToast(res.message);
+           } else {
+             showToast(res ? res.message : "Gagal memuat ujian.", true);
+           }
          });
-      }).catch(() => {
-         showToast("Anda harus mengizinkan mode Layar Penuh untuk memulai ujian.");
-      });
+      };
+
+      let elem = document.documentElement;
+      let requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen;
+
+      if (requestFS) {
+          requestFS.call(elem).then(proceedExam).catch(err => {
+              console.warn("Fullscreen diblokir browser, bypass untuk mobile...", err);
+              proceedExam(); // BYPASS untuk Mobile Safari/Chrome yang memblokir
+          });
+      } else {
+          proceedExam(); // BYPASS untuk iOS iPhone yang tidak dukung sama sekali
+      }
     }
 
-    // CBT PROFESIONAL LOGIC
     function buildCBTPalette() {
         let html = '';
         examQuestions.forEach((_, i) => { html += `<button id="pal-${i}" onclick="goToQ(${i})" class="btn-q">${i+1}</button>`; });
@@ -901,13 +880,13 @@
         let sec = timeRemaining % 60;
         document.getElementById('timer-display').innerText = `${hr.toString().padStart(2,'0')}:${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
         
-        if (timeRemaining === 600) showToast("⚠️ PERINGATAN: Sisa Waktu 10 Menit!");
-        if (timeRemaining === 300) { showToast("⚠️ PERINGATAN: Sisa Waktu 5 Menit!"); document.getElementById('timer-display').style.color = "var(--danger)"; document.getElementById('timer-display').style.borderColor = "var(--danger)"; }
+        if (timeRemaining === 600) showToast("⚠️ PERINGATAN: Sisa Waktu 10 Menit!", true);
+        if (timeRemaining === 300) { showToast("⚠️ PERINGATAN: Sisa Waktu 5 Menit!", true); document.getElementById('timer-display').style.color = "var(--danger)"; document.getElementById('timer-display').style.borderColor = "var(--danger)"; }
         
         if(timeRemaining <= 0) {
             isSubmitting = true; 
             clearInterval(timerInterval);
-            showToast("Waktu Ujian Habis! Sistem mengumpulkan otomatis...");
+            showToast("Waktu Ujian Habis! Sistem mengumpulkan otomatis...", true);
             forceSubmitExam();
         }
       }, 1000); 
@@ -945,7 +924,7 @@
        if(isSubmitting) return;
        violationCount++; 
        if(violationCount > 5) {
-           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan secara otomatis!"); forceSubmitExam(); 
+           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan secara otomatis!", true); forceSubmitExam(); 
        }
        runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); 
     }
@@ -974,14 +953,17 @@
       if(micStream) micStream.getTracks().forEach(t=>t.stop());
       document.getElementById('watermark-layer').classList.add('hidden');
       isExamActive = false; 
-      if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+      
+      let elem = document.documentElement;
+      let exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+      if (exitFS && document.fullscreenElement) exitFS.call(document).catch(()=>{});
 
       runServer('submitExamResult', [{ examId: currentExam.examId, nim: currentUser.nim, answers: studentAnswers, violationCount: violationCount }], (res) => {
         if(res && res.status === 'success') {
            if (res.score === 'HIDDEN') document.getElementById('feedback-message').innerText = "Lembar jawaban berhasil diamankan ke server. Nilai menunggu rilis Dekanat.";
            else document.getElementById('feedback-message').innerText = "Skor Anda: " + res.score;
            switchView('feedback-view');
-        } else { showToast("Gagal submit ke server."); }
+        } else { showToast("Gagal submit ke server.", true); }
       });
     }
 
@@ -1074,7 +1056,7 @@
       });
     }
 
-    function playAudioWarning() { showToast("Sistem Anti-Nyontek berjalan aktif via Radar Desibel (dB) Real-time di background."); }
+    function playAudioWarning() { showToast("Radar Desibel (dB) Real-time aktif di background.", true); }
 
     function tampilDetail(d) {
       document.getElementById('detail-jawaban-modal').classList.remove('hidden');
@@ -1123,7 +1105,7 @@
 
     function saveEditExam(id) {
        let p = { id: id, title: document.getElementById('ed-ex-title').value, duration: document.getElementById('ed-ex-dur').value, status: document.getElementById('ed-ex-stat').value, vis: document.getElementById('ed-ex-vis').value };
-       runServer('updateAdminExam', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
+       runServer('updateAdminExam', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
     }
 
     function loadAdminUsers() {
@@ -1164,7 +1146,7 @@
 
     function saveEditUser(nim) {
        let p = { nim: nim, name: document.getElementById('ed-u-name').value, password: document.getElementById('ed-u-pass').value, role: document.getElementById('ed-u-role').value, dept: document.getElementById('ed-u-dept').value };
-       runServer('updateAdminUser', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
+       runServer('updateAdminUser', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
     }
 
     function loadAdminQuestions() {
@@ -1205,7 +1187,7 @@
 
     function saveEditQuestion(id) {
        let p = { id: id, text: document.getElementById('ed-q-text').value, a: document.getElementById('ed-q-a').value, b: document.getElementById('ed-q-b').value, c: document.getElementById('ed-q-c').value, d: document.getElementById('ed-q-d').value, e: document.getElementById('ed-q-e').value, correct: document.getElementById('ed-q-cor').value };
-       runServer('updateAdminQuestion', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminQuestions(); });
+       runServer('updateAdminQuestion', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminQuestions(); });
     }
 
     async function extractTextFromFile(file, stElement) {
@@ -1233,7 +1215,7 @@
 
     async function processBulkUsers() {
       const file = document.getElementById('bulk-file').files[0];
-      if(!file) return showToast("Pilih file terlebih dahulu!");
+      if(!file) return showToast("Pilih file terlebih dahulu!", true);
       const pass = document.getElementById('add-bulk-pass').value;
       const dept = document.getElementById('add-bulk-dept').value;
       const st = document.getElementById('bulk-u-status');
@@ -1272,7 +1254,7 @@
       const file = document.getElementById('bulk-q-file').files[0];
       const dept = document.getElementById('bulk-q-dept').value;
       const st = document.getElementById('bulk-q-status');
-      if(!file) return showToast("Pilih file soal terlebih dahulu.");
+      if(!file) return showToast("Pilih file soal terlebih dahulu.", true);
       st.innerText = "Mengekstrak Teks Soal...";
 
       try {
@@ -1337,12 +1319,12 @@
 
     function sendBroadcast() {
       const msg = document.getElementById('in-broadcast').value;
-      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim ke semua peserta aktif!"); });
+      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim!", true); });
     }
     
     function submitNewUser() {
       const p = { nim: document.getElementById('add-nim').value, name: document.getElementById('add-name').value, password: document.getElementById('add-pass').value, role: document.getElementById('add-role').value, dept: document.getElementById('add-dept').value };
-      runServer('addAdminUser', [p], (res) => { showToast(res.message); document.querySelector('#admin-users form').reset(); loadAdminUsers(); });
+      runServer('addAdminUser', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-users form').reset(); loadAdminUsers(); });
     }
 
     function submitNewQuestion() {
@@ -1350,10 +1332,13 @@
       let realCorrect = mapKeyToText(keyInput, document.getElementById('add-q-a').value, document.getElementById('add-q-b').value, document.getElementById('add-q-c').value, document.getElementById('add-q-d').value, document.getElementById('add-q-e').value);
       
       const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, correct: realCorrect };
-      runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
+      runServer('addAdminQuestion', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
 
-    function showToast(msg) {
+    // PERBAIKAN BUG 3: HIDE NOTIFIKASI DI MOBILE KECUALI PENTING
+    function showToast(msg, isCritical = false) {
+      if(window.innerWidth <= 768 && !isCritical) return; // Pada HP, notifikasi tidak penting akan di-hide
+      
       const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
       setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
     }
