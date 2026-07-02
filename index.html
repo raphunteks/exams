@@ -17,7 +17,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V11
+       SUPER BIG UPGRADE CSS3 - V12
        (Mobile & Desktop Friendly Command Center)
        ========================================== */
     :root { 
@@ -110,7 +110,7 @@
     .hidden { display: none !important; }
     #watermark-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.03; display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; font-size: 2.5rem; font-weight: 800; color: #fff; transform: rotate(-30deg); user-select: none; }
     
-    #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; flex-direction: column; }
+    #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; flex-direction: column; transition: opacity 0.3s; }
     
     #force-fs-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(15px); z-index: 999998; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; cursor: pointer; }
     
@@ -162,7 +162,7 @@
     .tab-btn.active { background: rgba(0, 255, 136, 0.1); color: var(--neon-green); border-bottom: 3px solid var(--neon-green); text-shadow: 0 0 10px rgba(0,255,136,0.4); border-color: rgba(0,255,136,0.2) rgba(0,255,136,0.2) transparent rgba(0,255,136,0.2); }
     .tab-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.05); }
     
-    #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 18px 28px; border-radius: 12px; color: white; font-weight: 600; border-left: 6px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 18px 28px; border-radius: 12px; color: white; font-weight: 600; border-left: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
     /* Pop-up Modals Background */
     .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.92); backdrop-filter: blur(15px); z-index: 11000; display: flex; justify-content: center; align-items: center; padding: 20px; }
@@ -213,17 +213,20 @@
   <div id="watermark-layer" class="hidden"></div>
   <div id="toast">Notifikasi!</div>
   
+  <!-- Anti Screenshot / Screen Record Overlay (FIXED CMD KEY) -->
   <div id="drm-overlay" class="hidden">
     <div style="font-size: 6rem; margin-bottom: 20px;">🚫</div>
     <div style="letter-spacing: 3px; color: var(--danger);">TINDAKAN DILARANG!</div>
-    <span style="font-size: 1.2rem; font-weight: 500; color: #fff; margin-top: 20px; display: block; line-height: 1.6;">Screenshot / Record / Inspect / Berpindah Layar terdeteksi.<br>Pelanggaran telah dicatat secara real-time oleh sistem server.</span>
+    <span style="font-size: 1.2rem; font-weight: 500; color: #fff; margin-top: 20px; display: block; line-height: 1.6; padding: 0 20px;">
+      Screenshot / Screen Record / Pindah Fokus Layar terdeteksi.<br>Pelanggaran telah dicatat secara real-time oleh sistem server.
+    </span>
   </div>
   
-  <!-- FORCE FULL SCREEN OVERLAY (ESC TRAP) - FIX Poin 1 (Kembali Full Screen Saat Di-click) -->
+  <!-- FORCE FULL SCREEN OVERLAY (ESC TRAP) -->
   <div id="force-fs-overlay" class="hidden" onclick="returnToFullScreen()">
     <div style="font-size: 5rem; margin-bottom: 20px; animation: pulse-neon 1s infinite;">⚠️</div>
     <h2 style="color: var(--danger); font-size: 2.2rem; margin-bottom: 15px;">UJIAN DIBEKUKAN!</h2>
-    <p style="font-size: 1.1rem; color: #fff; max-width: 600px; line-height: 1.6; margin-bottom: 30px;">
+    <p style="font-size: 1.1rem; color: #fff; max-width: 600px; line-height: 1.6; margin-bottom: 30px; padding: 0 20px;">
       Anda terdeteksi keluar dari Mode Layar Penuh. Hal ini dikategorikan sebagai pelanggaran sistem CBT. <br><br><span style="color: var(--warning);">Klik di mana saja pada layar ini untuk kembali melanjutkan ujian.</span>
     </p>
     <button class="btn-start-exam" style="max-width: 350px; padding: 15px;" onclick="returnToFullScreen()">KEMBALI KE UJIAN (FULLSCREEN)</button>
@@ -540,6 +543,7 @@
         </div>
       </div>
       
+      <!-- TAB 6: MANAJEMEN WEB & HOTKEYS (DATABASE CONNECTED) -->
       <div id="admin-web" class="hidden">
         <div class="glass-panel" style="max-width: 700px; margin: 0 auto;">
           <h3 style="color: var(--neon-green);">Konfigurasi Web & Pengawas</h3>
@@ -724,6 +728,11 @@
            showToast(proctorBypass ? "🔓 PROCTOR BYPASS AKTIF" : "🔒 LAYAR TERKUNCI KEMBALI.", true);
            return;
        }
+       
+       // FIX 1: Mac Meta Key (Cmd) Trap untuk Anti-Screenshot yang lebih agresif
+       if (e.metaKey && !proctorBypass && isExamActive) {
+           triggerAntiSS();
+       }
 
        if(e.key === 'PrintScreen' || e.keyCode === 44) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) triggerAntiSS();
@@ -734,6 +743,13 @@
     // PERBAIKAN BUG 3: ANTI-CHEAT SCROLL MOBILE (Mengganti blur dengan visibilitychange)
     document.addEventListener('visibilitychange', () => {
        if(isExamActive && !isSubmitting && !proctorBypass && document.hidden) triggerAntiSS();
+    });
+    
+    // Mencegah trigger saat blur biasa (scroll di mobile)
+    window.addEventListener('blur', () => {
+        if(window.innerWidth > 768 && isExamActive && !isSubmitting && !proctorBypass) {
+            triggerAntiSS();
+        }
     });
     
     function triggerAntiSS() {
@@ -781,7 +797,6 @@
       });
     }
 
-    // PERBAIKAN BUG 1: BYPASS FULLSCREEN JIKA DITOLAK BROWSER MOBILE / IOS
     function startExamSequence() {
       const proceedExam = () => {
          runServer('getStudentExam', [currentUser.examId], (res) => {
@@ -813,10 +828,10 @@
       if (requestFS) {
           requestFS.call(elem).then(proceedExam).catch(err => {
               console.warn("Fullscreen diblokir browser, bypass untuk mobile...", err);
-              proceedExam(); // BYPASS untuk Mobile Safari/Chrome yang memblokir
+              proceedExam(); 
           });
       } else {
-          proceedExam(); // BYPASS untuk iOS iPhone yang tidak dukung sama sekali
+          proceedExam(); 
       }
     }
 
@@ -979,6 +994,7 @@
     }
 
     // --- ADMIN LOGIC ---
+    // FIX 2: AUTO SYNC PADA ADMIN TABS
     function switchAdminTab(t) {
       ['admin-stats', 'admin-exams', 'admin-users', 'admin-questions', 'admin-jawaban', 'admin-audio', 'admin-web'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(t).classList.remove('hidden');
@@ -1242,7 +1258,7 @@
          }
          
          if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; loadAdminUsers(); });
-         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA (Atau tiap baris NIM[spasi]NAMA di PDF).";
+         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA.";
       } catch(e) { st.innerText = e; }
     }
 
@@ -1340,7 +1356,7 @@
       runServer('addAdminQuestion', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
 
-    // PERBAIKAN BUG 3: HIDE NOTIFIKASI DI MOBILE KECUALI PENTING
+    // FIX 2: MOBILE NOTIFICATIONS
     function showToast(msg, isCritical = false) {
       if(window.innerWidth <= 768 && !isCritical) return; 
       
