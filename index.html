@@ -6,9 +6,11 @@
   <title>Axa Dental Exam</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   
-  <!-- CDN Dependencies -->
+  <!-- CDN Dependencies untuk Pengolahan Bulk Upload & Charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
   <style>
     :root { --bg-dark: #090c10; --glass-bg: rgba(20, 25, 30, 0.6); --glass-border: rgba(255, 255, 255, 0.08); --neon-green: #39ff14; --neon-glow: 0 0 15px rgba(57, 255, 20, 0.4); --text-main: #f0f6fc; --text-muted: #8b949e; --danger: #ff4444; }
@@ -29,6 +31,11 @@
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; position: relative; z-index: 50; }
     .hidden { display: none !important; }
     #watermark-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; font-size: 2rem; font-weight: bold; color: #fff; transform: rotate(-30deg); }
+    
+    /* ANTI-SCREENSHOT DRM CSS Overlay & Print Lock */
+    #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; }
+    @media print { html, body { display: none !important; } }
+
     .exam-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border); margin-bottom: 2rem;}
     .timer-box { font-size: 1.5rem; font-weight: bold; color: var(--neon-green); text-shadow: var(--neon-glow); }
     .question-card { margin-bottom: 2rem; }
@@ -71,6 +78,11 @@
   <div id="watermark-layer" class="hidden"></div>
   <div id="toast">Notifikasi!</div>
   
+  <!-- Anti Screenshot / Screen Record Overlay -->
+  <div id="drm-overlay" class="hidden">
+    TINDAKAN SCREENSHOT DILARANG!<br>PELANGGARAN TELAH TERCATAT DI SERVER.
+  </div>
+  
   <!-- Modal Broadcast -->
   <div id="broadcast-modal" class="fullscreen-modal hidden">
     <div class="modal-content broadcast-content">
@@ -109,10 +121,10 @@
       <h2>Selamat Datang, <span id="student-name"></span></h2>
       <p style="color: var(--danger); font-weight: bold;">⚠️ PERHATIAN: SISTEM ANTI-NYONTEK AKTIF</p>
       <ul style="margin-left: 20px; color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">
-        <li>Mode Layar Penuh wajib diaktifkan & Popup Broadcast aktif.</li>
-        <li>Mikrofon merekam kebisingan untuk Live Proctoring Admin.</li>
-        <li>Berpindah tab/aplikasi otomatis memicu peringatan ke server.</li>
-        <li>Copy, Paste, & Klik Kanan dinonaktifkan.</li>
+        <li>Mode Layar Penuh wajib diaktifkan.</li>
+        <li>Mikrofon merekam kebisingan (Radar Live).</li>
+        <li>Print Screen & Fitur Screenshot Sistem akan membekukan layar dan terekam di Log Kecurangan.</li>
+        <li>Berpindah tab otomatis memicu peringatan.</li>
       </ul>
       <button class="btn-neon" onclick="startExamSequence()">Mulai Ujian & Izinkan Sensor</button>
     </div>
@@ -124,7 +136,7 @@
         <div class="timer-box" id="timer-display">00:00</div>
       </div>
       <div id="questions-container"></div>
-      <div style="text-align: right; margin-top: 2rem;"><button class="btn-neon" style="width: auto; padding: 12px 40px;" onclick="forceSubmitExam()">Submit Jawaban</button></div>
+      <div style="text-align: right; margin-top: 2rem;"><button class="btn-neon" style="width: auto; padding: 12px 40px;" onclick="manualSubmitBtn()">Submit Jawaban</button></div>
     </div>
 
     <!-- 4. FEEDBACK / LOGOUT VIEW -->
@@ -150,7 +162,6 @@
       <div class="exam-header">
         <h2>Dashboard Admin - Axa Xyz</h2>
         <div>
-          <!-- Pilihan Filter Departemen Global untuk Admin -->
           <select id="global-dept-filter" class="input-glass" style="width: auto; display: inline-block; margin-right: 15px;" onchange="fetchAdminData()">
             <option value="ALL">Semua Departemen</option>
             <option value="Biologi Oral">Biologi Oral</option>
@@ -180,31 +191,34 @@
       <!-- TAB 1: ANALYTICS -->
       <div id="admin-stats">
         <div class="dashboard-grid">
-          <div class="glass-panel stat-card"><p>Total Peserta (<span class="lbl-dept">ALL</span>)</p><div class="stat-number" id="stat-peserta">0</div></div>
+          <div class="glass-panel stat-card"><p>Total Peserta Online (Sedang Ujian)</p><div class="stat-number" id="stat-online">0</div></div>
+          <div class="glass-panel stat-card"><p>Total Selesai Submit (<span class="lbl-dept">ALL</span>)</p><div class="stat-number" id="stat-selesai">0</div></div>
           <div class="glass-panel stat-card"><p>Rata-rata Nilai</p><div class="stat-number" id="stat-avg">0</div></div>
         </div>
         <div class="dashboard-grid" style="margin-top: 2rem;">
-          <div class="glass-panel">
+          <div class="glass-panel" style="grid-column: span 1;">
              <h3>Global Broadcast</h3>
              <div class="input-group"><input type="text" id="in-broadcast" class="input-glass" placeholder="Pesan Pop-up ke semua peserta..."><button class="btn-neon" style="margin-top: 10px;" onclick="sendBroadcast()">Kirim Peringatan Layar</button></div>
              <hr style="border-color: var(--glass-border); margin: 15px 0;">
-             <h4>Log Kecurangan</h4><div id="admin-logs" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;"></div>
+             <h4>Log Kecurangan (<span class="lbl-dept">ALL</span>)</h4>
+             <div id="admin-logs" style="font-size: 0.8rem; max-height: 250px; overflow-y: auto;"></div>
+          </div>
+          <div class="glass-panel" style="grid-column: span 1;">
+             <h3>Grafik Nilai Departemen</h3>
+             <canvas id="myChart"></canvas>
           </div>
         </div>
       </div>
 
-      <!-- TAB 2: MANAJEMEN USER (EXCEL/CSV UPLOAD) -->
+      <!-- TAB 2: MANAJEMEN USER -->
       <div id="admin-users" class="hidden">
         <div class="dashboard-grid">
           <div class="glass-panel">
-            <h3>Upload Bulk (Excel / CSV)</h3>
-            <p>Sistem membaca format file <b>.xlsx, .xls, .csv</b>. <br><span style="color:var(--danger)">Format Dokumen Word (.docx) atau PDF ditolak karena tidak terstruktur tabel.</span> <br>Kolom A = NIM, Kolom B = Nama Lengkap (Tanpa Header).</p>
-            <div class="input-group">
-              <input type="file" id="bulk-file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="input-glass">
-            </div>
+            <h3>Upload Bulk Users (Excel / CSV)</h3>
+            <p>Sistem membaca <b>.xlsx, .xls, .csv</b>.<br>Kolom A = NIM, Kolom B = Nama Lengkap.</p>
+            <div class="input-group"><input type="file" id="bulk-file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="input-glass"></div>
             <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
-              <input type="checkbox" id="chk-univ-pass" onchange="document.getElementById('add-bulk-pass').classList.toggle('hidden')" checked> 
-              <label style="margin:0;">Gunakan 1 Password untuk batch ini</label>
+              <input type="checkbox" id="chk-univ-pass" onchange="document.getElementById('add-bulk-pass').classList.toggle('hidden')" checked> <label style="margin:0;">Gunakan 1 Password untuk batch ini</label>
             </div>
             <div class="input-group"><input type="text" id="add-bulk-pass" class="input-glass" placeholder="Password Batch" required></div>
             <div class="input-group">
@@ -223,7 +237,7 @@
                 <option value="Oral and Maxillofacial Surgery">Oral & Maxillo Surgery</option>
               </select>
             </div>
-            <button class="btn-neon" onclick="uploadBulkFile()">Upload File</button>
+            <button class="btn-neon" onclick="uploadBulkFile()">Upload Users</button>
           </div>
           <div class="glass-panel">
             <h3>Tambah User Manual</h3>
@@ -238,14 +252,15 @@
         </div>
       </div>
 
-      <!-- TAB 3: MANAJEMEN SOAL -->
+      <!-- TAB 3: MANAJEMEN SOAL (DENGAN UPLOAD DOC/PDF) -->
       <div id="admin-questions" class="hidden">
-        <div class="glass-panel">
-          <h3>Upload Pertanyaan Berdasarkan Departemen</h3>
-          <form onsubmit="event.preventDefault(); submitNewQuestion();">
+        <div class="dashboard-grid">
+          <div class="glass-panel" style="grid-column: span 1;">
+            <h3>Upload Bulk Soal (.xlsx, .csv, .docx, .pdf)</h3>
+            <p>Sistem mem-parsing dokumen dengan struktur teks: <br><span style="font-size:0.8rem; color:#888;">Soal: [teks]<br>A: [opsi] <br>B: [opsi] <br>C: [opsi] <br>D: [opsi] <br>Kunci: [teks jawaban benar]</span></p>
             <div class="input-group">
-              <label>Pilih Departemen Ujian (Otomatis masuk ke Exam ID yang aktif)</label>
-              <select id="add-q-dept" class="input-glass" required style="background: var(--bg-dark);">
+              <label>Departemen Ujian</label>
+              <select id="bulk-q-dept" class="input-glass" style="background: var(--bg-dark);">
                 <option value="Biologi Oral">Biologi Oral</option>
                 <option value="Ilmu Bahan dan Teknologi">Ilmu Bahan dan Teknologi</option>
                 <option value="Ilmu Kedokteran Gigi Anak">Ilmu Kedokteran Gigi Anak</option>
@@ -259,16 +274,30 @@
                 <option value="Oral and Maxillofacial Surgery">Oral & Maxillo Surgery</option>
               </select>
             </div>
-            <div class="input-group"><label>Teks Pertanyaan</label><textarea id="add-q-text" class="input-glass" rows="3" required></textarea></div>
-            <div class="dashboard-grid" style="margin-bottom: 1rem;">
-              <div class="input-group"><label>Opsi A</label><input type="text" id="add-q-a" class="input-glass" required></div>
-              <div class="input-group"><label>Opsi B</label><input type="text" id="add-q-b" class="input-glass" required></div>
-              <div class="input-group"><label>Opsi C</label><input type="text" id="add-q-c" class="input-glass" required></div>
-              <div class="input-group"><label>Opsi D</label><input type="text" id="add-q-d" class="input-glass" required></div>
-            </div>
-            <div class="input-group"><label>Kunci Jawaban Benar (Ketik Persis Sesuai Opsi)</label><input type="text" id="add-q-correct" class="input-glass" required></div>
-            <button type="submit" class="btn-neon" style="width: 200px;">Simpan Soal</button>
-          </form>
+            <div class="input-group"><input type="file" id="bulk-q-file" accept=".csv, .xlsx, .xls, .docx, .pdf" class="input-glass"></div>
+            <button class="btn-neon" onclick="processBulkQuestions()">Upload File Soal</button>
+            <p id="bulk-q-status" style="margin-top:10px; font-size:0.8rem; color:var(--neon-green);"></p>
+          </div>
+          <div class="glass-panel" style="grid-column: span 1;">
+            <h3>Input Soal Manual</h3>
+            <form onsubmit="event.preventDefault(); submitNewQuestion();">
+              <div class="input-group">
+                <select id="add-q-dept" class="input-glass" required style="background: var(--bg-dark);">
+                  <option value="Konservasi Gigi">Konservasi Gigi (Demo)</option>
+                  <!-- Tambahkan opt departemen manual jika perlu -->
+                </select>
+              </div>
+              <div class="input-group"><label>Teks Pertanyaan</label><textarea id="add-q-text" class="input-glass" rows="2" required></textarea></div>
+              <div class="dashboard-grid" style="margin-bottom: 1rem; gap: 0.5rem;">
+                <div class="input-group"><input type="text" id="add-q-a" class="input-glass" placeholder="Opsi A" required></div>
+                <div class="input-group"><input type="text" id="add-q-b" class="input-glass" placeholder="Opsi B" required></div>
+                <div class="input-group"><input type="text" id="add-q-c" class="input-glass" placeholder="Opsi C" required></div>
+                <div class="input-group"><input type="text" id="add-q-d" class="input-glass" placeholder="Opsi D" required></div>
+              </div>
+              <div class="input-group"><label>Kunci (Ketik Persis Opsi)</label><input type="text" id="add-q-correct" class="input-glass" required></div>
+              <button type="submit" class="btn-neon" style="width: 200px;">Simpan Soal</button>
+            </form>
+          </div>
         </div>
       </div>
 
@@ -276,7 +305,7 @@
       <div id="admin-jawaban" class="hidden">
         <div class="glass-panel">
           <h3>Detail Jawaban Siswa Selesai (<span class="lbl-dept">ALL</span>)</h3>
-          <p>Memantau waktu kumpul dan opsi jawaban.</p>
+          <p>Memantau waktu kumpul dan detail opsi jawaban.</p>
           <table id="tbl-jawaban">
             <thead><tr><th>NIM</th><th>Nama Siswa</th><th>Waktu Submit</th><th>Nilai</th><th>Aksi</th></tr></thead>
             <tbody><!-- Diisi JS --></tbody>
@@ -309,6 +338,7 @@
     let studentAnswers = {}, violationCount = 0, timeRemaining = 0;
     let timerInterval, adminInterval, pingInterval, broadcastInterval;
     let audioContext, micStream, lastBroadcastId = "0";
+    let isSubmitting = false; // Fix Auto-Submit Spam Bug
 
     document.addEventListener("DOMContentLoaded", () => {
       const page = new URLSearchParams(window.location.search).get('page');
@@ -339,6 +369,27 @@
         });
         onSuccess(await response.json());
       } catch (err) { console.error(err); }
+    }
+
+    // --- DRM ANTI-SCREENSHOT (Point 6) ---
+    document.addEventListener('keyup', (e) => {
+       if(e.key === 'PrintScreen' || e.keyCode === 44) triggerAntiSS();
+    });
+    document.addEventListener('keydown', (e) => {
+       // Mac CMD+Shift+3/4/5
+       if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) triggerAntiSS();
+       // Windows Win+Shift+S
+       if (e.metaKey && e.shiftKey && (e.key === 's' || e.key === 'S')) triggerAntiSS();
+       // Ctrl+P / Cmd+P
+       if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); triggerAntiSS(); }
+    });
+    
+    function triggerAntiSS() {
+       if(document.getElementById('exam-view').classList.contains('hidden') || isSubmitting) return;
+       const drm = document.getElementById('drm-overlay');
+       drm.classList.remove('hidden');
+       logViolation("Screenshot/Record Attempt");
+       setTimeout(() => { drm.classList.add('hidden'); }, 3000); // Tahan layar blank 3 detik
     }
 
     // --- STUDENT LOGIC ---
@@ -372,7 +423,6 @@
           
           initAudioSensor(); renderQuestions(); startTimer(currentExam.duration);
           
-          // INIT BROADCAST SILENTLY (Agar tidak muncul pesan lama)
           runServer('getInitBroadcast', [], (bRes) => {
              if(bRes.status === 'success') lastBroadcastId = bRes.msgId;
              broadcastInterval = setInterval(pollBroadcast, 15000);
@@ -397,10 +447,12 @@
 
     function startTimer(m) {
       timeRemaining = m * 60;
+      isSubmitting = false;
       timerInterval = setInterval(() => {
+        if(isSubmitting) return; // Prevent Spam Submit Bug
         document.getElementById('timer-display').innerText = `${Math.floor(timeRemaining/60).toString().padStart(2,'0')}:${(timeRemaining%60).toString().padStart(2,'0')}`;
         
-        // Peringatan 10 & 5 Menit
+        // Peringatan Poin 4
         if (timeRemaining === 600) showToast("⚠️ PERINGATAN: Sisa Waktu Ujian 10 Menit!");
         if (timeRemaining === 300) {
             showToast("⚠️ PERINGATAN: Sisa Waktu Ujian 5 Menit!");
@@ -408,6 +460,8 @@
         }
         
         if(timeRemaining <= 0) {
+            isSubmitting = true; // Kunci eksekusi
+            clearInterval(timerInterval);
             showToast("Waktu Ujian Habis! Sistem mengumpulkan otomatis...");
             forceSubmitExam();
         }
@@ -423,28 +477,48 @@
         const a = audioContext.createAnalyser(); audioContext.createMediaStreamSource(micStream).connect(a);
         const data = new Uint8Array(a.frequencyBinCount);
         setInterval(() => {
+          if(isSubmitting) return;
           a.getByteFrequencyData(data);
           let sum=0; data.forEach(v=>sum+=v); currentNoise = Math.round(sum/data.length);
-          if(currentNoise > 80) logViolation("Bising!");
+          if(currentNoise > 80) logViolation("Bising Ruangan");
         }, 2000);
       } catch (e) { currentNoise = -1; }
     }
 
     function sendPing(status) {
-      runServer('pingSession', [{ nim: currentUser.nim, name: currentUser.name, dept: currentUser.dept, status: status, noiseLevel: currentNoise }], ()=>{});
+      if(!isSubmitting) runServer('pingSession', [{ nim: currentUser.nim, name: currentUser.name, dept: currentUser.dept, status: status, noiseLevel: currentNoise }], ()=>{});
     }
 
     function pollBroadcast() {
-      runServer('checkBroadcast', [lastBroadcastId], (res) => {
-        if(res.status === 'success') {
-          lastBroadcastId = res.msgId;
-          document.getElementById('broadcast-text').innerText = res.message;
-          document.getElementById('broadcast-modal').classList.remove('hidden');
-        }
-      });
+      if(!isSubmitting) {
+        runServer('checkBroadcast', [lastBroadcastId], (res) => {
+          if(res.status === 'success') {
+            lastBroadcastId = res.msgId;
+            document.getElementById('broadcast-text').innerText = res.message;
+            document.getElementById('broadcast-modal').classList.remove('hidden');
+          }
+        });
+      }
     }
 
-    function logViolation(t) { violationCount++; if(violationCount>5) forceSubmitExam(); runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); }
+    function logViolation(t) { 
+       if(isSubmitting) return;
+       violationCount++; 
+       if(violationCount > 5) {
+           isSubmitting = true;
+           showToast("Batas pelanggaran terlampaui. Anda dikeluarkan!");
+           forceSubmitExam(); 
+       }
+       runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); 
+    }
+
+    function manualSubmitBtn() {
+       if(isSubmitting) return;
+       if(confirm("Apakah Anda yakin ingin submit jawaban sekarang?")) {
+           isSubmitting = true;
+           forceSubmitExam();
+       }
+    }
 
     function forceSubmitExam() {
       clearInterval(timerInterval); clearInterval(broadcastInterval); clearInterval(pingInterval);
@@ -455,7 +529,7 @@
       runServer('submitExamResult', [{ examId: currentExam.examId, nim: currentUser.nim, answers: studentAnswers, violationCount: violationCount }], (res) => {
         if(res.status === 'success') {
            if (res.score === 'HIDDEN') {
-               document.getElementById('feedback-message').innerText = "Data berhasil diamankan. Nilai akan diumumkan oleh Admin nanti.";
+               document.getElementById('feedback-message').innerText = "Data diamankan. Nilai menunggu persetujuan Admin.";
            } else {
                document.getElementById('feedback-message').innerText = "Skor Anda: " + res.score;
            }
@@ -468,7 +542,7 @@
       const rating = document.querySelector('input[name="rating"]:checked')?.value || 5;
       const comment = document.getElementById('feed-comment').value.trim();
       runServer('submitFeedback', [{ nim: currentUser.nim, examId: currentExam.examId, rating: rating, comment: comment }], () => {
-        logout(); // Selesai
+        logout(); 
       });
     }
 
@@ -481,7 +555,7 @@
 
     function initAdminDashboard() {
       switchView('admin-view'); fetchAdminData();
-      adminInterval = setInterval(fetchAdminData, 10000); // Polling Admin 10 Detik
+      adminInterval = setInterval(fetchAdminData, 10000); 
     }
 
     function fetchAdminData() {
@@ -490,19 +564,42 @@
       
       runServer('getAdminDashboardData', [dept], (res) => {
         if (res.status === 'success') {
-          document.getElementById('stat-peserta').innerText = res.stats.totalPeserta;
+          // Point 4: Peserta Online vs Selesai
+          document.getElementById('stat-online').innerText = res.stats.totalOnline;
+          document.getElementById('stat-selesai').innerText = res.stats.totalSelesai;
           document.getElementById('stat-avg').innerText = res.stats.rataRataGlobal;
           
-          let logH = ''; res.recentLogs.forEach(l => { logH += `<div style="padding: 8px; border-bottom: 1px solid #333;"><strong style="color:var(--danger)">${l[2]}</strong>: ${l[3]} <em>(${l[5]})</em></div>`; });
-          document.getElementById('admin-logs').innerHTML = logH;
+          // Chart Updates (Point 5)
+          if(window.adminChart) {
+             window.adminChart.data.labels = res.chartLabels;
+             window.adminChart.data.datasets[0].data = res.chartData;
+             window.adminChart.update();
+          } else {
+             const ctx = document.getElementById('myChart');
+             window.adminChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: res.chartLabels,
+                  datasets: [{ label: 'Rata-Rata Nilai', data: res.chartData, backgroundColor: 'rgba(57, 255, 20, 0.2)', borderColor: '#39ff14', borderWidth: 1 }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { labels: { color: '#fff' } } } }
+             });
+          }
+
+          // Format Log Kecurangan (Point 1)
+          let logH = ''; 
+          res.recentLogs.forEach(l => { 
+            logH += `<div style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">[${l.examId}] <b>${l.nim} - ${l.name}</b> <span style="color:var(--danger)">(${l.type})</span> - ${l.time}</div>`; 
+          });
+          document.getElementById('admin-logs').innerHTML = logH || '<p>Aman</p>';
 
           let audioHtml = '';
           res.liveSessions.forEach(s => {
             let width = s.noise > 0 ? (s.noise > 100 ? 100 : s.noise) : 0;
             let c = width > 80 ? 'noise-high' : '';
-            audioHtml += `<tr><td>${s.nim} - ${s.name}</td><td>${s.status}</td><td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td><td><button class="btn-play" onclick="playAudioWarning()">▶ Listen</button></td></tr>`;
+            audioHtml += `<tr><td>${s.nim} - ${s.name}</td><td>${s.status}</td><td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td><td><button class="btn-play" onclick="playAudioWarning()">▶ Play</button></td></tr>`;
           });
-          document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml || '<tr><td colspan="4">Tidak ada sesi aktif</td></tr>';
+          document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml || '<tr><td colspan="4">Tidak ada sesi aktif di departemen ini</td></tr>';
         }
       });
 
@@ -518,7 +615,7 @@
     }
 
     function playAudioWarning() {
-       showToast("INFO: Fitur Live Streaming Audio Vokal Otentik memerlukan integrasi WebRTC (Node.js/Socket). Sistem Serverless ini mengandalkan Radar Grafik Desibel (dB) Audio untuk memantau kebisingan.");
+       showToast("INFO: Integrasi Streaming Mic ke Admin belum diaktifkan (Membutuhkan WebRTC Server/Firebase). Anda saat ini memantau aktivitas suara melalui Radar (dB).");
     }
 
     function tampilDetail(d) {
@@ -533,16 +630,10 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // EXCEL / CSV Bulk Upload via SheetJS
+    // --- BULK PARSERS ---
     function uploadBulkFile() {
       const file = document.getElementById('bulk-file').files[0];
       if(!file) return showToast("Pilih file terlebih dahulu!");
-      
-      const fileName = file.name.toLowerCase();
-      if(fileName.endsWith('.pdf') || fileName.endsWith('.docx')) {
-          return alert("PERINGATAN! File dokumen (PDF/DOCX) ditolak. Silakan gunakan format Excel Tabel (.xlsx, .xls) atau .csv agar format database selaras.");
-      }
-
       const pass = document.getElementById('add-bulk-pass').value;
       const dept = document.getElementById('add-bulk-dept').value;
       
@@ -550,20 +641,75 @@
       reader.onload = function(e) {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, {type: 'array'});
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1}); // Output Array
-
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1}); 
         let users = [];
-        rows.forEach(r => {
-           if(r.length >= 2 && r[0]) users.push({ nim: String(r[0]).trim(), name: String(r[1]).trim() });
-        });
-        if(users.length > 0) {
-           runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => showToast(res.message));
-        } else {
-           alert("Format Kosong/Salah. Pastikan Kolom A = NIM, Kolom B = Nama Lengkap.");
-        }
+        rows.forEach(r => { if(r.length >= 2 && r[0]) users.push({ nim: String(r[0]).trim(), name: String(r[1]).trim() }); });
+        if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => showToast(res.message));
       };
       reader.readAsArrayBuffer(file);
+    }
+
+    // POINT 7: BULK QUESTIONS DOCX/PDF
+    async function processBulkQuestions() {
+      const file = document.getElementById('bulk-q-file').files[0];
+      const dept = document.getElementById('bulk-q-dept').value;
+      const st = document.getElementById('bulk-q-status');
+      
+      if(!file) return showToast("Pilih file soal (.docx, .pdf, .xlsx, .csv)");
+      st.innerText = "Mengekstrak Teks... Mohon tunggu.";
+      
+      let ext = file.name.split('.').pop().toLowerCase();
+      let rawText = "";
+
+      try {
+          if (ext === 'docx') {
+             const arrayBuffer = await file.arrayBuffer();
+             const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+             rawText = result.value;
+          } else if (ext === 'pdf') {
+             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+             const arrayBuffer = await file.arrayBuffer();
+             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+             for (let i = 1; i <= pdf.numPages; i++) {
+                 const page = await pdf.getPage(i);
+                 const textContent = await page.getTextContent();
+                 rawText += textContent.items.map(s => s.str).join(' ') + "\n";
+             }
+          } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
+             st.innerText = "Menggunakan Parser XLSX/CSV. Format: Soal, A, B, C, D, Kunci";
+             const arrayBuffer = await file.arrayBuffer();
+             const wb = XLSX.read(arrayBuffer, {type: 'array'});
+             const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1});
+             let questions = [];
+             rows.forEach(r => {
+                 if(r.length >= 6 && r[0]) {
+                     questions.push({ text: r[0], optA: r[1], optB: r[2], optC: r[3], optD: r[4], correct: r[5] });
+                 }
+             });
+             return runServer('bulkAddQuestions', [{dept: dept, questions: questions}], (res) => { st.innerText = res.message; });
+          } else {
+             return st.innerText = "Ekstensi tidak didukung.";
+          }
+
+          // Heuristic Regex Parser (Docx/PDF text)
+          st.innerText = "Memparsing Pola Teks... (Pastikan format: Soal:, A:, B:, C:, D:, Kunci:)";
+          const qRegex = /Soal:([\s\S]*?)A:([\s\S]*?)B:([\s\S]*?)C:([\s\S]*?)D:([\s\S]*?)Kunci:([^\n]*)/gi;
+          let match;
+          let parsedQuestions = [];
+          
+          while ((match = qRegex.exec(rawText)) !== null) {
+              parsedQuestions.push({
+                  text: match[1].trim(), optA: match[2].trim(), optB: match[3].trim(), 
+                  optC: match[4].trim(), optD: match[5].trim(), correct: match[6].trim()
+              });
+          }
+
+          if(parsedQuestions.length > 0) {
+             runServer('bulkAddQuestions', [{dept: dept, questions: parsedQuestions}], (res) => { st.innerText = res.message; });
+          } else {
+             st.innerText = "Gagal parsing Doc/PDF. Pola Teks tidak ditemukan (Pastikan memakai format 'Soal:, A:, B:, dll'). Direkomendasikan pakai .CSV";
+          }
+      } catch (err) { st.innerText = "Error membaca file: " + err; }
     }
 
     function sendBroadcast() {
@@ -571,16 +717,6 @@
       runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim!"); });
     }
     
-    function submitNewUser() {
-      const p = { nim: document.getElementById('add-nim').value, name: document.getElementById('add-name').value, password: document.getElementById('add-pass').value, role: document.getElementById('add-role').value, dept: document.getElementById('add-dept').value };
-      runServer('addAdminUser', [p], (res) => { showToast(res.message); document.querySelector('#admin-users form').reset(); });
-    }
-
-    function submitNewQuestion() {
-      const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, correct: document.getElementById('add-q-correct').value };
-      runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); });
-    }
-
     function showToast(msg) {
       const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
       setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
