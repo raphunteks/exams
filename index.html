@@ -17,7 +17,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V10
+       SUPER BIG UPGRADE CSS3 - V11
        (Mobile & Desktop Friendly Command Center)
        ========================================== */
     :root { 
@@ -134,6 +134,7 @@
     @keyframes pulse-neon { 0% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } 50% { box-shadow: inset 0 0 20px rgba(0,255,136,0.5), 0 0 20px rgba(0,255,136,0.5); } 100% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } }
     .timer-box { font-size: 2.2rem; font-weight: 800; color: var(--neon-green); text-shadow: var(--neon-glow); letter-spacing: 3px; background: rgba(0,0,0,0.6); padding: 12px 30px; border-radius: 12px; border: 1px solid rgba(0,255,136,0.4); animation: pulse-neon 2s infinite; }
     
+    /* CUSTOM RADIO BUTTONS */
     .options-grid { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2rem; }
     .option-label { display: flex; align-items: flex-start; padding: 20px 25px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
     .option-label:hover { background: rgba(0, 255, 136, 0.05); border-color: rgba(0, 255, 136, 0.3); transform: translateX(8px); }
@@ -163,10 +164,12 @@
     
     #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 18px 28px; border-radius: 12px; color: white; font-weight: 600; border-left: 6px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
+    /* Pop-up Modals Background */
     .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.92); backdrop-filter: blur(15px); z-index: 11000; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .modal-content { background: var(--bg-base); border: 1px solid rgba(0,255,136,0.3); padding: 30px; border-radius: 20px; width: 100%; max-width: 700px; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,136,0.05); max-height: 90vh; overflow-y: auto; position: relative; }
     .broadcast-content { background: linear-gradient(135deg, #ff2a5f 0%, #990033 100%); text-align: center; border: 1px solid #ffb700; box-shadow: 0 0 60px rgba(255,42,95,0.5); max-width: 500px; }
     
+    /* Responsive Table Wrapper */
     .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-top: 1rem; }
     table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.85rem; }
     th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; text-align: left; white-space: nowrap; }
@@ -216,7 +219,7 @@
     <span style="font-size: 1.2rem; font-weight: 500; color: #fff; margin-top: 20px; display: block; line-height: 1.6;">Screenshot / Record / Inspect / Berpindah Layar terdeteksi.<br>Pelanggaran telah dicatat secara real-time oleh sistem server.</span>
   </div>
   
-  <!-- FORCE FULL SCREEN OVERLAY (ESC TRAP) -->
+  <!-- FORCE FULL SCREEN OVERLAY (ESC TRAP) - FIX Poin 1 (Kembali Full Screen Saat Di-click) -->
   <div id="force-fs-overlay" class="hidden" onclick="returnToFullScreen()">
     <div style="font-size: 5rem; margin-bottom: 20px; animation: pulse-neon 1s infinite;">⚠️</div>
     <h2 style="color: var(--danger); font-size: 2.2rem; margin-bottom: 15px;">UJIAN DIBEKUKAN!</h2>
@@ -596,6 +599,7 @@
     // ==========================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyJHkKQh6s3f7idploBQVw62YzWY3oKV0S3l78JfvrKoyW7OyJJrTrAQt3K6duJBg/exec"; 
 
+    // --- REUSABLE DEPARTMENTS ARRAY ---
     const DEPARTMENTS = [
         "Biologi Oral", "Ilmu Bahan dan Teknologi", "Ilmu Kedokteran Gigi Anak", 
         "Ilmu Kedokteran Gigi Masyarakat - Pencegahan", "Ilmu Penyakit Mulut", 
@@ -607,6 +611,7 @@
         DEPARTMENTS.forEach(d => { select.innerHTML += `<option value="${d}">${d}</option>`; });
     });
 
+    // --- MANAJEMEN WEB DARI DATABASE ---
     let webSettings = {
         Web_Title: "Axa Dental Exam",
         Brand_Name: "AXA XYZ",
@@ -739,7 +744,7 @@
        setTimeout(() => { drm.classList.add('hidden'); }, 3500); 
     }
 
-    // --- ESC TRAP ---
+    // --- ESC TRAP (Auto Full Screen Return) ---
     document.addEventListener('fullscreenchange', () => {
        if (!document.fullscreenElement && isExamActive && !isSubmitting && !proctorBypass) {
            document.getElementById('force-fs-overlay').classList.remove('hidden');
@@ -924,7 +929,7 @@
        if(isSubmitting) return;
        violationCount++; 
        if(violationCount > 5) {
-           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan secara otomatis!", true); forceSubmitExam(); 
+           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan otomatis!", true); forceSubmitExam(); 
        }
        runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); 
     }
@@ -1237,7 +1242,7 @@
          }
          
          if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; loadAdminUsers(); });
-         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA.";
+         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA (Atau tiap baris NIM[spasi]NAMA di PDF).";
       } catch(e) { st.innerText = e; }
     }
 
@@ -1337,7 +1342,7 @@
 
     // PERBAIKAN BUG 3: HIDE NOTIFIKASI DI MOBILE KECUALI PENTING
     function showToast(msg, isCritical = false) {
-      if(window.innerWidth <= 768 && !isCritical) return; // Pada HP, notifikasi tidak penting akan di-hide
+      if(window.innerWidth <= 768 && !isCritical) return; 
       
       const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
       setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
