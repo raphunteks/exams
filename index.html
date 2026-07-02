@@ -4,116 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Zettbos Dental Exam Portal</title>
-  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    /* ==========================================
-       ZETTBOS THEME: Glassmorphism & Neon Green
-       ========================================== */
-    :root {
-      --bg-dark: #090c10;
-      --glass-bg: rgba(20, 25, 30, 0.6);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --neon-green: #39ff14;
-      --neon-glow: 0 0 15px rgba(57, 255, 20, 0.4);
-      --text-main: #f0f6fc;
-      --text-muted: #8b949e;
-      --danger: #ff4444;
-    }
-
+    :root { --bg-dark: #090c10; --glass-bg: rgba(20, 25, 30, 0.6); --glass-border: rgba(255, 255, 255, 0.08); --neon-green: #39ff14; --neon-glow: 0 0 15px rgba(57, 255, 20, 0.4); --text-main: #f0f6fc; --text-muted: #8b949e; --danger: #ff4444; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; user-select: none; }
-    
-    body {
-      background-color: var(--bg-dark);
-      background-image: radial-gradient(circle at top right, rgba(57, 255, 20, 0.05), transparent 40%),
-                        radial-gradient(circle at bottom left, rgba(20, 25, 30, 1), transparent 40%);
-      color: var(--text-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .bg-animation {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: -10; backdrop-filter: blur(80px);
-    }
-
-    .glass-panel {
-      background: var(--glass-bg); backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border);
-      border-radius: 16px; padding: 2rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    }
-
-    h1, h2, h3 { color: #fff; font-weight: 700; margin-bottom: 1rem; }
+    body { background-color: var(--bg-dark); background-image: radial-gradient(circle at top right, rgba(57, 255, 20, 0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(20, 25, 30, 1), transparent 40%); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+    .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; backdrop-filter: blur(80px); }
+    .glass-panel { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 2rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); }
+    h1, h2, h3, h4 { color: #fff; font-weight: 700; margin-bottom: 1rem; }
     p { color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5; }
-    
     .input-group { margin-bottom: 1.5rem; }
     .input-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
-    .input-glass {
-      width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-      color: #fff; border-radius: 8px; outline: none; transition: 0.3s;
-    }
+    .input-glass { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px; outline: none; transition: 0.3s; }
     .input-glass:focus { border-color: var(--neon-green); box-shadow: var(--neon-glow); }
-
-    .btn-neon {
-      width: 100%; padding: 12px; font-weight: 600; font-size: 1rem;
-      background: transparent; color: var(--neon-green);
-      border: 1px solid var(--neon-green); border-radius: 8px;
-      cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
-    }
+    .btn-neon { width: 100%; padding: 12px; font-weight: 600; font-size: 1rem; background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
     .btn-neon:hover { background: var(--neon-green); color: #000; box-shadow: var(--neon-glow); }
     .btn-danger { border-color: var(--danger); color: var(--danger); }
     .btn-danger:hover { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(255,68,68,0.4); }
-
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; position: relative; z-index: 50; }
     .hidden { display: none !important; }
-    
-    #watermark-layer {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      pointer-events: none; z-index: 9999; opacity: 0.04;
-      display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center;
-      font-size: 2rem; font-weight: bold; color: #fff; transform: rotate(-30deg);
-    }
-
+    #watermark-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; font-size: 2rem; font-weight: bold; color: #fff; transform: rotate(-30deg); }
     .exam-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border); margin-bottom: 2rem;}
     .timer-box { font-size: 1.5rem; font-weight: bold; color: var(--neon-green); text-shadow: var(--neon-glow); }
     .question-card { margin-bottom: 2rem; }
     .options-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem; }
-    .option-label {
-      display: flex; align-items: center; padding: 1rem;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
-      border-radius: 8px; cursor: pointer; transition: 0.2s;
-    }
+    .option-label { display: flex; align-items: center; padding: 1rem; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; transition: 0.2s; }
     .option-label:hover { background: rgba(57, 255, 20, 0.1); border-color: var(--neon-green); }
     input[type="radio"] { margin-right: 15px; accent-color: var(--neon-green); transform: scale(1.2); }
-    
     .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
     .stat-card { text-align: center; }
     .stat-number { font-size: 2.5rem; font-weight: 700; color: var(--neon-green); }
-    
-    .admin-tabs { display: flex; gap: 10px; margin-bottom: 1.5rem; overflow-x: auto; }
+    .admin-tabs { display: flex; gap: 10px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 10px; }
     .tab-btn { padding: 10px 20px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; cursor: pointer; border-radius: 8px; transition: 0.3s; white-space: nowrap; }
     .tab-btn.active { background: var(--neon-green); color: black; font-weight: bold; border-color: var(--neon-green); box-shadow: var(--neon-glow); }
     .tab-btn:hover:not(.active) { border-color: var(--neon-green); color: var(--neon-green); }
-
-    #toast {
-      position: fixed; top: 20px; right: 20px; z-index: 10000;
-      background: rgba(255,0,0,0.9); padding: 15px 25px; border-radius: 8px;
-      color: white; font-weight: bold; border-left: 5px solid white;
-      transform: translateX(150%); transition: transform 0.3s ease;
-    }
-
-    .star-rating { direction: rtl; display: inline-block; font-size: 2rem; }
-    .star-rating input { display: none; }
-    .star-rating label { color: var(--text-muted); cursor: pointer; padding: 0 5px; }
-    .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #ffd700; }
+    #toast { position: fixed; top: 20px; right: 20px; z-index: 10000; background: rgba(255,0,0,0.9); padding: 15px 25px; border-radius: 8px; color: white; font-weight: bold; border-left: 5px solid white; transform: translateX(150%); transition: transform 0.3s ease; }
+    
+    /* Custom Pop-up Broadcast untuk Mahasiswa */
+    #broadcast-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 11000; display: flex; justify-content: center; align-items: center; }
+    .broadcast-content { background: var(--danger); padding: 30px; border-radius: 15px; text-align: center; max-width: 500px; box-shadow: 0 0 30px rgba(255,68,68,0.5); }
+    
+    /* Detail Table Admin */
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--glass-border); padding: 12px; text-align: left; }
+    th { background: rgba(0,0,0,0.5); color: var(--neon-green); }
+    .audio-bar { height: 10px; background: #333; border-radius: 5px; overflow: hidden; width: 100px; }
+    .audio-level { height: 100%; background: var(--neon-green); transition: width 0.5s; }
+    .noise-high { background: var(--danger); }
   </style>
 </head>
 <body>
   <div class="bg-animation"></div>
   <div id="watermark-layer" class="hidden"></div>
-  <div id="toast">Pesat Broadcast!</div>
+  <div id="toast">Notifikasi!</div>
+  
+  <div id="broadcast-modal" class="hidden">
+    <div class="broadcast-content">
+      <h2 style="color: white; font-size: 2rem;">PENGUMUMAN PENTING</h2>
+      <p id="broadcast-text" style="color: white; font-size: 1.2rem; margin: 20px 0;"></p>
+      <button class="btn-neon" style="border-color: white; color: white;" onclick="document.getElementById('broadcast-modal').classList.add('hidden')">SAYA MENGERTI</button>
+    </div>
+  </div>
 
   <div class="container">
     
@@ -124,69 +77,55 @@
         <p id="portal-subtitle">Dental Secure Portal</p>
       </div>
       <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
-        <div class="input-group">
-          <label>ID Pengguna (NIM/Admin)</label>
-          <input type="text" id="in-nim" class="input-glass" required autocomplete="off">
-        </div>
-        <div class="input-group">
-          <label>Kata Sandi</label>
-          <input type="password" id="in-pass" class="input-glass" required>
-        </div>
+        <div class="input-group"><label>ID Pengguna (NIM/Admin)</label><input type="text" id="in-nim" class="input-glass" required autocomplete="off"></div>
+        <div class="input-group"><label>Kata Sandi</label><input type="password" id="in-pass" class="input-glass" required></div>
         <button type="submit" class="btn-neon" id="btn-login">Masuk Sistem</button>
       </form>
     </div>
 
-    <!-- 2. STUDENT: PORTAL / EXAM RULES -->
+    <!-- 2. STUDENT PORTAL -->
     <div id="student-portal-view" class="glass-panel hidden" style="max-width: 600px; margin: 10vh auto;">
       <h2>Selamat Datang, <span id="student-name"></span></h2>
       <p style="color: var(--danger); font-weight: bold;">⚠️ PERHATIAN: SISTEM ANTI-NYONTEK AKTIF</p>
       <ul style="margin-left: 20px; color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">
-        <li>Mode Layar Penuh wajib diaktifkan.</li>
-        <li>Mikrofon akan merekam tingkat kebisingan (Distraction Alert).</li>
+        <li>Mode Layar Penuh wajib diaktifkan & Popup Broadcast aktif.</li>
+        <li>Mikrofon merekam kebisingan untuk Live Proctoring Admin.</li>
         <li>Berpindah tab/aplikasi otomatis memicu peringatan ke server.</li>
         <li>Copy, Paste, & Klik Kanan dinonaktifkan.</li>
-        <li>Ujian tertutup otomatis jika waktu habis.</li>
       </ul>
       <button class="btn-neon" onclick="startExamSequence()">Mulai Ujian & Izinkan Sensor</button>
     </div>
 
-    <!-- 3. STUDENT: EXAM RUNNING -->
+    <!-- 3. EXAM RUNNING -->
     <div id="exam-view" class="hidden">
       <div class="glass-panel exam-header">
-        <div>
-          <h2 id="exam-title" style="margin:0;">Ujian Modul</h2>
-          <p style="margin:0; font-size: 0.8rem;" id="student-identity"></p>
-        </div>
+        <div><h2 id="exam-title" style="margin:0;">Ujian Modul</h2><p style="margin:0; font-size: 0.8rem;" id="student-identity"></p></div>
         <div class="timer-box" id="timer-display">00:00</div>
       </div>
       <div id="questions-container"></div>
-      <div style="text-align: right; margin-top: 2rem;">
-        <button class="btn-neon" style="width: auto; padding: 12px 40px;" onclick="forceSubmitExam()">Submit Jawaban</button>
-      </div>
+      <div style="text-align: right; margin-top: 2rem;"><button class="btn-neon" style="width: auto; padding: 12px 40px;" onclick="forceSubmitExam()">Submit Jawaban</button></div>
     </div>
 
-    <!-- 4. STUDENT: FEEDBACK -->
-    <div id="feedback-view" class="glass-panel hidden" style="max-width: 500px; margin: 10vh auto; text-align: center;">
-      <h2>Ujian Selesai</h2>
-      <p>Data berhasil diamankan ke server. Silakan isi rating kendala teknis.</p>
-      <form onsubmit="event.preventDefault(); submitFeedback();">
-        <div class="star-rating">
-          <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
-          <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
-          <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
-          <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
-          <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
-        </div>
-        <textarea id="feed-comment" class="input-glass" rows="4" placeholder="Komentar tambahan (opsional)..." style="margin-top: 1rem; resize: none;"></textarea>
-        <button type="submit" class="btn-neon" style="margin-top: 1rem;">Kirim & Keluar</button>
-      </form>
-    </div>
-
-    <!-- 5. ADMIN: DASHBOARD -->
+    <!-- 4. ADMIN DASHBOARD -->
     <div id="admin-view" class="hidden">
       <div class="exam-header">
         <h2>Dashboard Admin - Zettbos</h2>
         <div>
+          <!-- Pilihan Filter Departemen Global untuk Admin -->
+          <select id="global-dept-filter" class="input-glass" style="width: auto; display: inline-block; margin-right: 15px;" onchange="fetchAdminData()">
+            <option value="ALL">Semua Departemen</option>
+            <option value="Biologi Oral">Biologi Oral</option>
+            <option value="Ilmu Bahan dan Teknologi">Ilmu Bahan dan Teknologi</option>
+            <option value="Ilmu Kedokteran Gigi Anak">Ilmu Kedokteran Gigi Anak</option>
+            <option value="Ilmu Kedokteran Gigi Masyarakat - Pencegahan">Ilmu Kedok Gigi Masy. Pencegahan</option>
+            <option value="Ilmu Penyakit Mulut">Ilmu Penyakit Mulut</option>
+            <option value="Konservasi Gigi">Konservasi Gigi</option>
+            <option value="Oral and Maxillofacial Radiology">Oral & Maxillo Radiology</option>
+            <option value="Ortodonti">Ortodonti</option>
+            <option value="Periodonsia">Periodonsia</option>
+            <option value="Prostodonsia">Prostodonsia</option>
+            <option value="Oral and Maxillofacial Surgery">Oral & Maxillo Surgery</option>
+          </select>
           <button class="btn-neon btn-danger" style="width: auto; border:none;" onclick="logout()">Logout</button>
         </div>
       </div>
@@ -195,62 +134,92 @@
         <button class="tab-btn active" onclick="switchAdminTab('admin-stats')">Analytics & Live</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-users')">Manajemen User</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-questions')">Manajemen Soal</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-jawaban')">Monitoring Jawaban</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-audio')">Radar Suara (Audio)</button>
       </div>
 
+      <!-- TAB 1: ANALYTICS -->
       <div id="admin-stats">
         <div class="dashboard-grid">
-          <div class="glass-panel stat-card">
-            <p>Total Peserta Aktif</p>
-            <div class="stat-number" id="stat-peserta">0</div>
-          </div>
-          <div class="glass-panel stat-card">
-            <p>Rata-rata Global</p>
-            <div class="stat-number" id="stat-avg">0</div>
-          </div>
-          <div class="glass-panel stat-card" style="border-color: var(--danger);">
-            <p>Pelanggaran Terdeteksi</p>
-            <div class="stat-number" style="color: var(--danger);" id="stat-violation">0</div>
-          </div>
+          <div class="glass-panel stat-card"><p>Total Peserta (<span class="lbl-dept">ALL</span>)</p><div class="stat-number" id="stat-peserta">0</div></div>
+          <div class="glass-panel stat-card"><p>Rata-rata Nilai</p><div class="stat-number" id="stat-avg">0</div></div>
         </div>
         <div class="dashboard-grid" style="margin-top: 2rem;">
           <div class="glass-panel">
-             <h3>Live Proctoring & Broadcast</h3>
-             <div class="input-group">
-               <input type="text" id="in-broadcast" class="input-glass" placeholder="Ketik peringatan massal...">
-               <button class="btn-neon" style="margin-top: 10px;" onclick="sendBroadcast()">Kirim Peringatan</button>
-             </div>
+             <h3>Global Broadcast</h3>
+             <div class="input-group"><input type="text" id="in-broadcast" class="input-glass" placeholder="Pesan Pop-up ke semua peserta..."><button class="btn-neon" style="margin-top: 10px;" onclick="sendBroadcast()">Kirim Peringatan Layar</button></div>
              <hr style="border-color: var(--glass-border); margin: 15px 0;">
-             <h4>Log Kecurangan Terbaru</h4>
-             <div id="admin-logs" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;"></div>
+             <h4>Log Kecurangan</h4><div id="admin-logs" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: MANAJEMEN USER (DENGAN CSV UPLOAD) -->
+      <div id="admin-users" class="hidden">
+        <div class="dashboard-grid">
+          <div class="glass-panel">
+            <h3>Upload Bulk (CSV)</h3>
+            <p>Format CSV: NIM,Nama Lengkap (Tanpa Header). Pastikan ekstensi .csv</p>
+            <div class="input-group">
+              <input type="file" id="csv-file" accept=".csv" class="input-glass">
+            </div>
+            <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
+              <input type="checkbox" id="chk-univ-pass" onchange="document.getElementById('add-bulk-pass').classList.toggle('hidden')" checked> 
+              <label style="margin:0;">Gunakan 1 Password untuk batch ini</label>
+            </div>
+            <div class="input-group"><input type="text" id="add-bulk-pass" class="input-glass" placeholder="Password Batch" required></div>
+            <div class="input-group">
+              <label>Pilih Departemen untuk Batch</label>
+              <select id="add-bulk-dept" class="input-glass" style="background: var(--bg-dark);">
+                <option value="Biologi Oral">Biologi Oral</option>
+                <option value="Ilmu Bahan dan Teknologi">Ilmu Bahan dan Teknologi</option>
+                <option value="Ilmu Kedokteran Gigi Anak">Ilmu Kedokteran Gigi Anak</option>
+                <option value="Ilmu Kedokteran Gigi Masyarakat - Pencegahan">Ilmu Kedok Gigi Masy. Pencegahan</option>
+                <option value="Ilmu Penyakit Mulut">Ilmu Penyakit Mulut</option>
+                <option value="Konservasi Gigi">Konservasi Gigi</option>
+                <option value="Oral and Maxillofacial Radiology">Oral & Maxillo Radiology</option>
+                <option value="Ortodonti">Ortodonti</option>
+                <option value="Periodonsia">Periodonsia</option>
+                <option value="Prostodonsia">Prostodonsia</option>
+                <option value="Oral and Maxillofacial Surgery">Oral & Maxillo Surgery</option>
+              </select>
+            </div>
+            <button class="btn-neon" onclick="uploadCSV()">Upload CSV</button>
           </div>
           <div class="glass-panel">
-             <h3>Analytics (Simulasi)</h3>
-             <canvas id="myChart"></canvas>
+            <h3>Tambah User Manual</h3>
+            <form onsubmit="event.preventDefault(); submitNewUser();">
+              <div class="input-group"><input type="text" id="add-nim" class="input-glass" placeholder="NIM" required></div>
+              <div class="input-group"><input type="text" id="add-name" class="input-glass" placeholder="Nama" required></div>
+              <div class="input-group"><input type="text" id="add-pass" class="input-glass" placeholder="Password" required></div>
+              <div class="input-group"><select id="add-role" class="input-glass" style="background: var(--bg-dark);"><option value="Student">Student</option><option value="Admin">Admin</option></select></div>
+              <button type="submit" class="btn-neon" style="width: 200px;">Simpan Manual</button>
+            </form>
           </div>
         </div>
       </div>
 
-      <div id="admin-users" class="hidden">
-        <div class="glass-panel">
-          <h3>Tambah User Baru</h3>
-          <form onsubmit="event.preventDefault(); submitNewUser();">
-            <div class="dashboard-grid" style="margin-bottom: 1rem;">
-              <div class="input-group"><label>NIM</label><input type="text" id="add-nim" class="input-glass" required></div>
-              <div class="input-group"><label>Nama Lengkap</label><input type="text" id="add-name" class="input-glass" required></div>
-              <div class="input-group"><label>Password</label><input type="text" id="add-pass" class="input-glass" required></div>
-              <div class="input-group"><label>Role</label><select id="add-role" class="input-glass" required style="background: var(--bg-dark);"><option value="Student">Student</option><option value="Admin">Admin</option></select></div>
-              <div class="input-group"><label>Departemen</label><select id="add-dept" class="input-glass" required style="background: var(--bg-dark);"><option value="Konservasi Gigi">Konservasi Gigi</option><option value="Ortodonti">Ortodonti</option><option value="ALL">ALL (Admin)</option></select></div>
-            </div>
-            <button type="submit" class="btn-neon" style="width: 200px;">Simpan User</button>
-          </form>
-        </div>
-      </div>
-
+      <!-- TAB 3: MANAJEMEN SOAL -->
       <div id="admin-questions" class="hidden">
         <div class="glass-panel">
-          <h3>Upload Pertanyaan Ujian</h3>
+          <h3>Upload Pertanyaan Berdasarkan Departemen</h3>
           <form onsubmit="event.preventDefault(); submitNewQuestion();">
-            <div class="input-group"><label>ID Ujian (cth: EXM-001)</label><input type="text" id="add-q-examid" class="input-glass" required></div>
+            <div class="input-group">
+              <label>Pilih Departemen Ujian (Otomatis masuk ke Exam ID yang aktif)</label>
+              <select id="add-q-dept" class="input-glass" required style="background: var(--bg-dark);">
+                <option value="Biologi Oral">Biologi Oral</option>
+                <option value="Ilmu Bahan dan Teknologi">Ilmu Bahan dan Teknologi</option>
+                <option value="Ilmu Kedokteran Gigi Anak">Ilmu Kedokteran Gigi Anak</option>
+                <option value="Ilmu Kedokteran Gigi Masyarakat - Pencegahan">Ilmu Kedok Gigi Masy. Pencegahan</option>
+                <option value="Ilmu Penyakit Mulut">Ilmu Penyakit Mulut</option>
+                <option value="Konservasi Gigi">Konservasi Gigi</option>
+                <option value="Oral and Maxillofacial Radiology">Oral & Maxillo Radiology</option>
+                <option value="Ortodonti">Ortodonti</option>
+                <option value="Periodonsia">Periodonsia</option>
+                <option value="Prostodonsia">Prostodonsia</option>
+                <option value="Oral and Maxillofacial Surgery">Oral & Maxillo Surgery</option>
+              </select>
+            </div>
             <div class="input-group"><label>Teks Pertanyaan</label><textarea id="add-q-text" class="input-glass" rows="3" required></textarea></div>
             <div class="dashboard-grid" style="margin-bottom: 1rem;">
               <div class="input-group"><label>Opsi A</label><input type="text" id="add-q-a" class="input-glass" required></div>
@@ -258,307 +227,276 @@
               <div class="input-group"><label>Opsi C</label><input type="text" id="add-q-c" class="input-glass" required></div>
               <div class="input-group"><label>Opsi D</label><input type="text" id="add-q-d" class="input-glass" required></div>
             </div>
-            <div class="input-group"><label>Kunci Jawaban Benar</label><input type="text" id="add-q-correct" class="input-glass" required></div>
+            <div class="input-group"><label>Kunci Jawaban Benar (Ketik Persis Sesuai Opsi)</label><input type="text" id="add-q-correct" class="input-glass" required></div>
             <button type="submit" class="btn-neon" style="width: 200px;">Simpan Soal</button>
           </form>
         </div>
       </div>
+
+      <!-- TAB 4: MONITORING JAWABAN -->
+      <div id="admin-jawaban" class="hidden">
+        <div class="glass-panel">
+          <h3>Detail Jawaban Siswa Selesai (<span class="lbl-dept">ALL</span>)</h3>
+          <p>Klik pada baris nama untuk melihat detail jawaban.</p>
+          <table id="tbl-jawaban">
+            <thead><tr><th>NIM</th><th>Nama Siswa</th><th>Nilai</th><th>Aksi</th></tr></thead>
+            <tbody><!-- Diisi JS --></tbody>
+          </table>
+          <div id="detail-jawaban-box" style="margin-top:20px; border-top:1px solid var(--neon-green); padding-top:15px; display:none;">
+            <h4 id="det-nama" style="color:var(--neon-green);"></h4>
+            <div id="det-list" style="font-size:0.9rem;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: RADAR SUARA (LIVE AUDIO) -->
+      <div id="admin-audio" class="hidden">
+        <div class="glass-panel">
+          <h3>Live Audio & Session Radar (<span class="lbl-dept">ALL</span>)</h3>
+          <p>Memantau kebisingan ruangan peserta (Refresh setiap 10 detik).</p>
+          <table id="tbl-audio">
+            <thead><tr><th>NIM & Nama</th><th>Status</th><th>Tingkat Bising</th><th>Terakhir Update</th></tr></thead>
+            <tbody><!-- Diisi JS --></tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script>
     // ==========================================
-    // EXTERNAL API CONFIGURATION (VERCEL/GITHUB)
+    // CONFIG: VERCEL ROUTING & GAS API
     // ==========================================
-    // URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyJHkKQh6s3f7idploBQVw62YzWY3oKV0S3l78JfvrKoyW7OyJJrTrAQt3K6duJBg/exec"; 
 
-    let currentUser = null;
-    let currentExam = null;
-    let examQuestions = [];
-    let studentAnswers = {};
-    let violationCount = 0;
-    let timeRemaining = 0;
-    let timerInterval, adminInterval;
-    let audioContext, micStream;
+    let currentUser = null, currentExam = null, examQuestions = [];
+    let studentAnswers = {}, violationCount = 0, timeRemaining = 0;
+    let timerInterval, adminInterval, pingInterval, broadcastInterval;
+    let audioContext, micStream, lastBroadcastId = "0";
 
-    // Data Dummy untuk Safe Preview Canvas
-    const MOCK_DB = {
-      userAdmin: { status: 'success', user: { nim: 'admin', name: 'Super Admin', role: 'Admin', dept: 'All' } },
-      userStudent: { status: 'success', user: { nim: '040201', name: 'drg. Budi', role: 'Student', dept: 'Konservasi Gigi' } },
-      examData: {
-        status: 'success',
-        exam: { examId: 'EXM-001', title: 'Ujian Modul Konservasi Gigi', duration: 1 },
-        questions: [{ id: 'Q-01', text: 'Karies di pit fissure?', options: ['Klas I', 'Klas II', 'Klas III', 'Klas IV'] }]
-      }
-    };
+    // MOCK DATA (Safety Fallback)
+    const MOCK = { status:'success', user:{nim:'admin',name:'Admin',role:'Admin',dept:'ALL'} };
 
-    // ------------------------------------------
-    // VERCEL / GITHUB ROUTING LOGIC & SESSION
-    // ------------------------------------------
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. Cek URL Parameter (?page=admin)
-      const urlParams = new URLSearchParams(window.location.search);
-      const page = urlParams.get('page');
-
-      if (page === 'admin') {
-          document.getElementById('portal-title').innerText = "PORTAL ADMIN";
-          document.getElementById('portal-subtitle').innerText = "Manajemen Sistem Ujian";
-      }
-
-      // 2. Cek Sesi Penyimpanan (Agar tidak logout saat F5/Refresh)
+      const page = new URLSearchParams(window.location.search).get('page');
+      
+      // Auto-Routing Sesi (Vercel)
       const savedUser = sessionStorage.getItem('zettbos_session');
       if (savedUser) {
           currentUser = JSON.parse(savedUser);
-          if (currentUser.role === 'Admin') {
-              initAdminDashboard();
+          if (currentUser.role === 'Admin') initAdminDashboard();
+          else if(page === 'exam') {
+            document.getElementById('student-name').innerText = currentUser.name;
+            switchView('student-portal-view');
           } else {
-              document.getElementById('student-name').innerText = currentUser.name;
-              switchView('student-portal-view');
+             location.href = '?page=exam'; // Redirect student if accessing root
           }
+      } else {
+         if (page === 'admin') { document.getElementById('portal-title').innerText = "PORTAL ADMIN"; }
       }
     });
 
     function logout() {
       sessionStorage.removeItem('zettbos_session');
-      location.href = window.location.pathname; // Hapus parameter URL & Reload
+      location.href = window.location.pathname;
     }
 
-    // ------------------------------------------
-    // THE NEW FETCH API (BYPASS CORS GOOGLE SCRIPT)
-    // ------------------------------------------
     async function runServer(funcName, argsArray, onSuccess) {
-      if (GAS_API_URL === "https://script.google.com/macros/s/AKfycbyJ.../exec" || typeof google !== 'undefined') {
-        // Fallback Simulasi Canvas (Jika URL belum diganti)
-        setTimeout(() => {
-          if (funcName === 'authenticateUser') onSuccess(argsArray[0] === 'admin' ? MOCK_DB.userAdmin : MOCK_DB.userStudent);
-          else if (funcName === 'getStudentExam') onSuccess(MOCK_DB.examData);
-          else if (funcName === 'getAdminDashboardData') onSuccess({ status: 'success', stats: { totalPeserta: 120, rataRataGlobal: 78, pelanggaranTinggi: 3 }, recentLogs: [['L1','EXM','040201','Tab Switch','','10:00']] });
-          else if (funcName === 'addAdminUser' || funcName === 'addAdminQuestion') onSuccess({ status: 'success', message: 'Simulasi Canvas Berhasil!' });
-          else onSuccess({ status: 'success', score: 85 });
-        }, 500);
-        return;
-      }
-
-      // KOMUNIKASI ASLI KE GAS API
+      if (GAS_API_URL === "URL_ANDA" || typeof google !== 'undefined') return onSuccess(MOCK); // Canvas mode
       try {
         const response = await fetch(GAS_API_URL, {
-          method: "POST",
-          // MENGGUNAKAN text/plain ADALAH RAHASIA BYPASS CORS GOOGLE SCRIPT!
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ action: funcName, args: argsArray })
         });
-        
-        const result = await response.json();
-        onSuccess(result);
-      } catch (err) {
-        showToast("Koneksi API Gagal: Periksa URL GAS Anda.");
-        console.error(err);
-      }
+        onSuccess(await response.json());
+      } catch (err) { console.error(err); }
     }
 
-    // ------------------------------------------
-    // CORE APP LOGIC (UI & FEATURES)
-    // ------------------------------------------
+    // --- STUDENT LOGIC ---
     function switchView(viewId) {
-      ['login-view', 'student-portal-view', 'exam-view', 'feedback-view', 'admin-view'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
+      ['login-view', 'student-portal-view', 'exam-view', 'admin-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(viewId).classList.remove('hidden');
     }
 
     function handleLogin() {
-      const nim = document.getElementById('in-nim').value.trim();
-      const pass = document.getElementById('in-pass').value.trim();
-      const btn = document.getElementById('btn-login');
-      btn.innerText = "Memproses...";
-      
-      runServer('authenticateUser', [nim, pass], (res) => {
-        btn.innerText = "Masuk Sistem";
+      const n = document.getElementById('in-nim').value, p = document.getElementById('in-pass').value;
+      const b = document.getElementById('btn-login'); b.innerText = "Proses...";
+      runServer('authenticateUser', [n, p], (res) => {
+        b.innerText = "Masuk Sistem";
         if (res.status === 'success') {
-          currentUser = res.user;
-          // Simpan sesi ke penyimpanan browser (Vercel Support)
-          sessionStorage.setItem('zettbos_session', JSON.stringify(currentUser));
-          
-          if (currentUser.role === 'Admin') {
-            initAdminDashboard();
-          } else {
-            document.getElementById('student-name').innerText = currentUser.name;
-            switchView('student-portal-view');
-          }
-        } else {
-          showToast(res.message);
-        }
+          sessionStorage.setItem('zettbos_session', JSON.stringify(res.user));
+          location.href = res.user.role === 'Admin' ? '?page=admin' : '?page=exam';
+        } else alert(res.message);
       });
     }
 
-    // -- STUDENT EXAM SEQUENCE --
     function startExamSequence() {
-      if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(e=>{});
-      
+      if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
       runServer('getStudentExam', [currentUser.dept], (res) => {
         if (res.status === 'success') {
           currentExam = res.exam; examQuestions = res.questions;
+          document.getElementById('watermark-layer').innerHTML = Array(50).fill(`${currentUser.nim} - ${currentUser.name}`).join(' &nbsp;&nbsp;&nbsp;');
+          document.getElementById('watermark-layer').classList.remove('hidden');
+
+          window.onblur = () => { logViolation("Pindah Tab"); };
           
-          const wm = document.getElementById('watermark-layer');
-          let text = ''; for(let i=0; i<50; i++) text += `${currentUser.nim} - ${currentUser.name} &nbsp;&nbsp;&nbsp;`;
-          wm.innerHTML = text; wm.classList.remove('hidden');
-
-          document.addEventListener('contextmenu', e => e.preventDefault());
-          document.addEventListener('copy', e => { e.preventDefault(); logViolation("Copy Attempt"); });
-          document.addEventListener('paste', e => e.preventDefault());
-          window.addEventListener('blur', () => { document.body.style.filter = 'blur(10px)'; logViolation("Pindah Tab"); });
-          window.addEventListener('focus', () => { document.body.style.filter = 'none'; });
-
-          history.pushState(null, null, location.href);
-          window.onpopstate = function () { history.go(1); showToast("Navigasi Dikunci!"); };
-
           initAudioSensor(); renderQuestions(); startTimer(currentExam.duration);
+          
+          // Mulai Polling Broadcast & Session Ping
+          broadcastInterval = setInterval(pollBroadcast, 15000);
+          pingInterval = setInterval(() => sendPing('Online'), 10000);
+          
           switchView('exam-view');
-        } else { showToast(res.message); }
+        } else alert(res.message);
       });
-    }
-
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
     }
 
     function renderQuestions() {
       document.getElementById('exam-title').innerText = currentExam.title;
       document.getElementById('student-identity').innerText = `NIM: ${currentUser.nim} | Dept: ${currentUser.dept}`;
-      const container = document.getElementById('questions-container'); container.innerHTML = '';
-      
-      const shuffledQ = shuffleArray([...examQuestions]);
-      shuffledQ.forEach((q, index) => {
-        const shuffledOptions = shuffleArray([...q.options]);
-        let html = `<div class="glass-panel question-card"><h3>Soal ${index + 1}</h3><p style="color: #fff; font-size: 1.1rem;">${q.text}</p><div class="options-grid">`;
-        shuffledOptions.forEach(opt => {
-          html += `<label class="option-label"><input type="radio" name="q_${q.id}" value="${opt}" onchange="saveAnswer('${q.id}', '${opt}')">${opt}</label>`;
-        });
-        html += `</div></div>`;
-        container.innerHTML += html;
+      const c = document.getElementById('questions-container'); c.innerHTML = '';
+      examQuestions.forEach((q, i) => {
+        let h = `<div class="glass-panel question-card"><h3>Soal ${i+1}</h3><p style="color:#fff;">${q.text}</p><div class="options-grid">`;
+        q.options.forEach(opt => { h += `<label class="option-label"><input type="radio" name="q_${q.id}" value="${opt}" onchange="studentAnswers['${q.id}']='${opt}'">${opt}</label>`; });
+        c.innerHTML += h + `</div></div>`;
       });
     }
 
-    function saveAnswer(qId, val) { studentAnswers[qId] = val; }
-
-    function startTimer(minutes) {
-      timeRemaining = minutes * 60;
-      const display = document.getElementById('timer-display');
+    function startTimer(m) {
+      timeRemaining = m * 60;
       timerInterval = setInterval(() => {
-        let m = Math.floor(timeRemaining / 60); let s = timeRemaining % 60;
-        display.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        if (timeRemaining <= 300) display.style.color = 'var(--danger)'; 
-        if (timeRemaining <= 0) { clearInterval(timerInterval); forceSubmitExam(); }
-        timeRemaining--;
+        document.getElementById('timer-display').innerText = `${Math.floor(timeRemaining/60).toString().padStart(2,'0')}:${(timeRemaining%60).toString().padStart(2,'0')}`;
+        if(timeRemaining <= 0) forceSubmitExam(); timeRemaining--;
       }, 1000);
     }
 
+    // NEW: Real-time Audio Polling & Session Keep-alive
+    let currentNoise = 0;
     async function initAudioSensor() {
       try {
         micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
-        const microphone = audioContext.createMediaStreamSource(micStream);
-        microphone.connect(analyser); analyser.fftSize = 256;
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
+        const a = audioContext.createAnalyser(); audioContext.createMediaStreamSource(micStream).connect(a);
+        const data = new Uint8Array(a.frequencyBinCount);
         setInterval(() => {
-          analyser.getByteFrequencyData(dataArray);
-          let sum = 0; for(let i=0; i<dataArray.length; i++) sum += dataArray[i];
-          if((sum / dataArray.length) > 80) { logViolation("Suara Berisik"); showToast("⚠️ PERINGATAN: Suara Keras!"); }
-        }, 3000);
-      } catch (err) { logViolation("Mikrofon Diblokir"); }
+          a.getByteFrequencyData(data);
+          let sum=0; data.forEach(v=>sum+=v); currentNoise = Math.round(sum/data.length);
+          if(currentNoise > 80) logViolation("Bising!");
+        }, 2000);
+      } catch (e) { currentNoise = -1; }
     }
 
-    function logViolation(type) {
-      violationCount++;
-      if (violationCount > 5) forceSubmitExam(); 
-      runServer('logViolation', [currentExam.examId, currentUser.nim, type, 'Client Script'], ()=>{});
+    function sendPing(status) {
+      runServer('pingSession', [{ nim: currentUser.nim, name: currentUser.name, dept: currentUser.dept, status: status, noiseLevel: currentNoise }], ()=>{});
     }
 
-    function forceSubmitExam() {
-      clearInterval(timerInterval);
-      if(micStream) micStream.getTracks().forEach(track => track.stop()); 
-      document.getElementById('watermark-layer').classList.add('hidden');
-      if (document.exitFullscreen) document.exitFullscreen();
-
-      const payload = { examId: currentExam.examId, nim: currentUser.nim, answers: studentAnswers, violationCount: violationCount };
-      runServer('submitExamResult', [payload], (res) => {
-        if (res.status === 'success') switchView('feedback-view');
-      });
-    }
-
-    function submitFeedback() {
-      const rating = document.querySelector('input[name="rating"]:checked')?.value || 5;
-      const comment = document.getElementById('feed-comment').value.trim();
-      runServer('submitFeedback', [{ nim: currentUser.nim, examId: currentExam.examId, rating: rating, comment: comment }], () => {
-        logout(); // Keluar dan Hapus Sesi
-      });
-    }
-
-    // -- ADMIN SEQUENCE --
-    function switchAdminTab(tabId) {
-      ['admin-stats', 'admin-users', 'admin-questions'].forEach(id => { document.getElementById(id).classList.add('hidden'); });
-      document.getElementById(tabId).classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-    }
-
-    function initAdminDashboard() {
-      switchView('admin-view');
-      fetchAdminData();
-      if(!adminInterval) adminInterval = setInterval(fetchAdminData, 10000);
-    }
-
-    function fetchAdminData() {
-      runServer('getAdminDashboardData', [], (res) => {
-        if (res.status === 'success') {
-          document.getElementById('stat-peserta').innerText = res.stats.totalPeserta;
-          document.getElementById('stat-avg').innerText = res.stats.rataRataGlobal;
-          document.getElementById('stat-violation').innerText = res.stats.pelanggaranTinggi;
-          let logsHtml = '';
-          res.recentLogs.forEach(log => { logsHtml += `<div style="padding: 8px; border-bottom: 1px solid #333;"><strong style="color:var(--danger)">${log[2]}</strong>: ${log[3]}</div>`; });
-          document.getElementById('admin-logs').innerHTML = logsHtml;
-          renderAdminChart();
+    function pollBroadcast() {
+      runServer('checkBroadcast', [lastBroadcastId], (res) => {
+        if(res.status === 'success') {
+          lastBroadcastId = res.msgId;
+          document.getElementById('broadcast-text').innerText = res.message;
+          document.getElementById('broadcast-modal').classList.remove('hidden');
         }
       });
     }
 
-    function renderAdminChart() {
-      const ctx = document.getElementById('myChart');
-      if(window.adminChart) window.adminChart.destroy();
-      window.adminChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Konservasi', 'Bedah Mulut', 'Ortodonti', 'Biologi Oral'],
-          datasets: [{ label: 'Rata-Rata Nilai', data: [78, 85, 62, 90], backgroundColor: 'rgba(57, 255, 20, 0.2)', borderColor: '#39ff14', borderWidth: 1, borderRadius: 5 }]
-        },
-        options: { responsive: true, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { labels: { color: '#fff' } } } }
+    function logViolation(t) { violationCount++; if(violationCount>5) forceSubmitExam(); runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); }
+
+    function forceSubmitExam() {
+      clearInterval(timerInterval); clearInterval(broadcastInterval); clearInterval(pingInterval);
+      if(micStream) micStream.getTracks().forEach(t=>t.stop());
+      runServer('submitExamResult', [{ examId: currentExam.examId, nim: currentUser.nim, answers: studentAnswers, violationCount: violationCount }], (res) => {
+        alert("Ujian Selesai! Skor: " + res.score); logout();
       });
     }
 
-    function submitNewUser() {
-      const p = { nim: document.getElementById('add-nim').value, name: document.getElementById('add-name').value, password: document.getElementById('add-pass').value, role: document.getElementById('add-role').value, dept: document.getElementById('add-dept').value };
-      runServer('addAdminUser', [p], (res) => { showToast(res.message); document.querySelector('#admin-users form').reset(); });
+    // --- ADMIN LOGIC ---
+    function switchAdminTab(t) {
+      ['admin-stats', 'admin-users', 'admin-questions', 'admin-jawaban', 'admin-audio'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById(t).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active');
     }
 
-    function submitNewQuestion() {
-      const p = { examId: document.getElementById('add-q-examid').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, correct: document.getElementById('add-q-correct').value };
-      runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); });
+    function initAdminDashboard() {
+      switchView('admin-view'); fetchAdminData();
+      adminInterval = setInterval(fetchAdminData, 15000); // Radar Refresh 15 detik
+    }
+
+    function fetchAdminData() {
+      const dept = document.getElementById('global-dept-filter').value;
+      document.querySelectorAll('.lbl-dept').forEach(el => el.innerText = dept);
+      
+      // Fetch Stats & Audio
+      runServer('getAdminDashboardData', [dept], (res) => {
+        if (res.status === 'success') {
+          document.getElementById('stat-peserta').innerText = res.stats.totalPeserta;
+          document.getElementById('stat-avg').innerText = res.stats.rataRataGlobal;
+          
+          let audioHtml = '';
+          res.liveSessions.forEach(s => {
+            let width = s.noise > 0 ? (s.noise > 100 ? 100 : s.noise) : 0;
+            let c = width > 80 ? 'noise-high' : '';
+            audioHtml += `<tr><td>${s.nim} - ${s.name}</td><td>${s.status}</td><td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td><td>${s.time}</td></tr>`;
+          });
+          document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml || '<tr><td colspan="4">Tidak ada sesi aktif</td></tr>';
+        }
+      });
+
+      // Fetch Detail Jawaban
+      runServer('getMonitoringJawaban', [dept], (res) => {
+         if (res.status === 'success') {
+           let jwbHtml = '';
+           res.data.forEach(d => {
+             jwbHtml += `<tr><td>${d.nim}</td><td><a href="javascript:void(0)" onclick='tampilDetail(${JSON.stringify(d).replace(/'/g, "&apos;")})' style="color:var(--neon-green)">${d.name}</a></td><td>${d.score}</td><td><button onclick='tampilDetail(${JSON.stringify(d).replace(/'/g, "&apos;")})' style="background:var(--bg-dark); color:#fff; border:1px solid #fff; padding:5px; border-radius:4px; cursor:pointer;">Lihat Detail</button></td></tr>`;
+           });
+           document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = jwbHtml || '<tr><td colspan="4">Tidak ada data penyelesaian</td></tr>';
+         }
+      });
+    }
+
+    function tampilDetail(d) {
+      document.getElementById('detail-jawaban-box').style.display = 'block';
+      document.getElementById('det-nama').innerText = `Detail Jawaban: ${d.name} (Skor: ${d.score})`;
+      let h = '';
+      d.details.forEach((det, i) => {
+         let clr = det.isCorrect ? '#39ff14' : '#ff4444';
+         let sym = det.isCorrect ? '✔' : '✘';
+         h += `<div style="margin-bottom:10px;"><strong>Q${i+1}: ${det.q}</strong><br><span style="color:${clr}">${sym} Menjawab: ${det.a || 'Tidak Dijawab'}</span></div>`;
+      });
+      document.getElementById('det-list').innerHTML = h;
+    }
+
+    // CSV Bulk Upload
+    function uploadCSV() {
+      const file = document.getElementById('csv-file').files[0];
+      if(!file) return alert("Pilih file CSV dulu!");
+      const pass = document.getElementById('add-bulk-pass').value;
+      const dept = document.getElementById('add-bulk-dept').value;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const rows = e.target.result.split('\n');
+        let users = [];
+        rows.forEach(r => {
+           let cols = r.split(',');
+           if(cols.length >= 2 && cols[0].trim() !== '') users.push({ nim: cols[0].trim(), name: cols[1].trim() });
+        });
+        if(users.length > 0) {
+           runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => alert(res.message));
+        }
+      };
+      reader.readAsText(file);
     }
 
     function sendBroadcast() {
-      runServer('sendGlobalBroadcast', [document.getElementById('in-broadcast').value], () => { document.getElementById('in-broadcast').value = ''; showToast("Pesan terkirim!"); });
+      const msg = document.getElementById('in-broadcast').value;
+      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; alert("Broadcast Terkirim ke semua ujian online!"); });
     }
-
-    function showToast(msg) {
-      const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
-      setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
+    
+    function submitNewQuestion() {
+      const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, correct: document.getElementById('add-q-correct').value };
+      runServer('addAdminQuestion', [p], (res) => { alert(res.message); document.querySelector('#admin-questions form').reset(); });
     }
   </script>
 </body>
