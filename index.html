@@ -18,14 +18,14 @@
   <style>
     /* ==========================================
        SUPER BIG UPGRADE CSS3 - FUTURISTIC UI V4
-       (Command Center Dense Layout & Aesthetic)
+       (Mobile & Desktop Friendly Command Center)
        ========================================== */
     :root { 
       --bg-base: #020617; 
-      --glass-bg: rgba(10, 15, 30, 0.75); 
+      --glass-bg: rgba(10, 15, 30, 0.7); 
       --glass-border: rgba(0, 255, 136, 0.2); 
       --neon-green: #00ff88; 
-      --neon-glow: 0 0 20px rgba(0, 255, 136, 0.4); 
+      --neon-glow: 0 0 20px rgba(0, 255, 136, 0.3); 
       --neon-blue: #0ea5e9;
       --text-main: #f8fafc; 
       --text-muted: #94a3b8; 
@@ -40,8 +40,8 @@
       background-image: 
         radial-gradient(circle at 80% 0%, rgba(0, 255, 136, 0.08), transparent 40%), 
         radial-gradient(circle at 20% 100%, rgba(14, 165, 233, 0.08), transparent 50%),
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), 
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
       color: var(--text-main); 
       min-height: 100vh; 
@@ -63,7 +63,7 @@
       border: 1px solid var(--glass-border); 
       border-radius: 20px; 
       padding: 2.5rem; 
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.03); 
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.02); 
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
     }
     
@@ -113,8 +113,7 @@
     /* ANTI-SCREENSHOT & FORCE FULLSCREEN DRM */
     #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; flex-direction: column; }
     
-    /* Auto Full Screen Red Trap Overlay */
-    #force-fs-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 0, 0, 0.95); backdrop-filter: blur(15px); z-index: 999998; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; cursor: pointer; }
+    #force-fs-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(15px); z-index: 999998; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; cursor: pointer; }
     
     @media print { html, body { display: none !important; } }
 
@@ -131,6 +130,7 @@
     .btn-q.active { border: 2px solid #fff; transform: scale(1.15); z-index: 2; box-shadow: 0 0 20px rgba(255,255,255,0.5); }
     
     .cbt-nav-btns { display: flex; justify-content: space-between; margin-top: 35px; gap: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; }
+    
     .exam-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 2.5rem;}
     
     @keyframes pulse-neon { 0% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } 50% { box-shadow: inset 0 0 20px rgba(0,255,136,0.5), 0 0 20px rgba(0,255,136,0.5); } 100% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } }
@@ -149,7 +149,6 @@
     /* DASHBOARD ADMIN UI (COMPACT & DENSE) */
     .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
     
-    /* Pengecilan elemen di Admin khusus agar muat banyak data */
     #admin-view .glass-panel { padding: 1.5rem; border-radius: 16px; }
     #admin-view h3 { font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
     #admin-view .stat-card { padding: 1.5rem; border-top: 3px solid var(--neon-green); border-radius: 12px; background: rgba(15, 23, 42, 0.8); transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
@@ -267,7 +266,7 @@
   <!-- Modal Detail Jawaban -->
   <div id="detail-jawaban-modal" class="fullscreen-modal hidden">
     <div class="modal-content">
-      <h3 id="det-nama" style="color: var(--neon-green); font-size: 1.4rem;">Detail Jawaban</h3>
+      <h3 id="det-nama" style="color: var(--neon-green); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; font-size: 1.6rem;">Detail Jawaban</h3>
       <div id="det-list" style="font-size: 0.95rem; line-height: 1.7;"></div>
       <button class="btn-neon" style="margin-top: 25px; padding: 12px;" onclick="document.getElementById('detail-jawaban-modal').classList.add('hidden')">Tutup Lembar Koreksi</button>
     </div>
@@ -946,7 +945,7 @@
        if(isSubmitting) return;
        violationCount++; 
        if(violationCount > 5) {
-           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan otomatis!"); forceSubmitExam(); 
+           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan secara otomatis!"); forceSubmitExam(); 
        }
        runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); 
     }
@@ -1075,7 +1074,7 @@
       });
     }
 
-    function playAudioWarning() { showToast("Radar Desibel (dB) Real-time aktif di background."); }
+    function playAudioWarning() { showToast("Sistem Anti-Nyontek berjalan aktif via Radar Desibel (dB) Real-time di background."); }
 
     function tampilDetail(d) {
       document.getElementById('detail-jawaban-modal').classList.remove('hidden');
@@ -1211,15 +1210,23 @@
 
     async function extractTextFromFile(file, stElement) {
         let ext = file.name.split('.').pop().toLowerCase();
-        if (ext === 'docx') { return (await mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()})).value; } 
-        else if (ext === 'pdf') {
+        if (ext === 'docx') {
+             const arrayBuffer = await file.arrayBuffer();
+             return (await mammoth.extractRawText({arrayBuffer: arrayBuffer})).value;
+        } else if (ext === 'pdf') {
              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-             const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+             const arrayBuffer = await file.arrayBuffer();
+             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
              let rawText = "";
-             for (let i = 1; i <= pdf.numPages; i++) rawText += (await (await pdf.getPage(i)).getTextContent()).items.map(s => s.str).join(' ') + "\n";
+             for (let i = 1; i <= pdf.numPages; i++) {
+                 const page = await pdf.getPage(i);
+                 rawText += (await page.getTextContent()).items.map(s => s.str).join(' ') + "\n";
+             }
              return rawText;
         } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
-             return XLSX.utils.sheet_to_json(XLSX.read(await file.arrayBuffer(), {type: 'array'}).Sheets[XLSX.read(await file.arrayBuffer(), {type: 'array'}).SheetNames[0]], {header: 1}); 
+             const arrayBuffer = await file.arrayBuffer();
+             const wb = XLSX.read(arrayBuffer, {type: 'array'});
+             return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
         }
         throw new Error("Format tidak didukung");
     }
@@ -1231,16 +1238,22 @@
       const dept = document.getElementById('add-bulk-dept').value;
       const st = document.getElementById('bulk-u-status');
       st.innerText = "Sistem mengekstrak data user...";
+      
       try {
          const data = await extractTextFromFile(file, st);
          let users = [];
-         if(Array.isArray(data)) { data.forEach(r => { if(r.length >= 2 && r[0]) users.push({ nim: String(r[0]).trim(), name: String(r[1]).trim() }); }); } 
-         else { 
-             data.split('\n').forEach(l => {
+         
+         if(Array.isArray(data)) { 
+             data.forEach(r => { if(r.length >= 2 && r[0]) users.push({ nim: String(r[0]).trim(), name: String(r[1]).trim() }); });
+         } else { 
+             st.innerText = "Memparsing Teks Dokumen...";
+             let lines = data.split('\n');
+             lines.forEach(l => {
                  let parts = l.trim().split(/\s+(.*)/); 
                  if(parts.length >= 2 && !isNaN(parts[0])) users.push({ nim: parts[0], name: parts[1] });
              });
          }
+         
          if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; loadAdminUsers(); });
          else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA.";
       } catch(e) { st.innerText = e; }
@@ -1248,7 +1261,10 @@
 
     function mapKeyToText(keyStr, a, b, c, d, e) {
         let k = keyStr.trim();
-        if(k.length === 1) { const map = { 'A': a, 'B': b, 'C': c, 'D': d, 'E': e }; if(map[k.toUpperCase()]) return map[k.toUpperCase()]; }
+        if(k.length === 1) {
+             const map = { 'A': a, 'B': b, 'C': c, 'D': d, 'E': e };
+             if(map[k.toUpperCase()]) return map[k.toUpperCase()];
+        }
         return k; 
     }
 
@@ -1262,19 +1278,26 @@
       try {
           const data = await extractTextFromFile(file, st);
           let parsedQuestions = [];
+          
           if(Array.isArray(data)) { 
              data.forEach(r => {
                  if(r.length >= 6 && r[0]) {
                      let cor = r[r.length-1] ? String(r[r.length-1]) : '';
-                     parsedQuestions.push({ text: r[0], optA: r[1], optB: r[2], optC: r[3], optD: r[4], optE: r[5] || '', correct: mapKeyToText(cor, r[1], r[2], r[3], r[4], r[5]||'') });
+                     parsedQuestions.push({ 
+                         text: r[0], optA: r[1], optB: r[2], optC: r[3], optD: r[4], optE: r[5] || '', 
+                         correct: mapKeyToText(cor, r[1], r[2], r[3], r[4], r[5]||'') 
+                     });
                  }
              });
           } else { 
               st.innerText = "Memparsing Pola Teks... (Sabar ya, ini mungkin butuh waktu)";
-              let lines = data.split('\n'), currentQ = null;
+              let lines = data.split('\n');
+              let currentQ = null;
+
               for(let i=0; i<lines.length; i++) {
                   let line = lines[i].trim();
                   if(!line) continue;
+
                   let qMatch = line.match(/^(\d+)[\.\-\)]\s+(.*)/i) || line.match(/^Soal:\s*(.*)/i);
                   if(qMatch) {
                       if(currentQ && currentQ.text && currentQ.correct) parsedQuestions.push(currentQ);
@@ -1282,27 +1305,39 @@
                       if (!isNaN(qMatch[1]) && qMatch[2]) currentQ.text = qMatch[2];
                       continue;
                   }
+
                   if(!currentQ) continue;
+
                   let optMatch = line.match(/^([a-eA-E])[\.\-\)]\s+(.*)/);
                   if(optMatch) {
-                      let letter = optMatch[1].toUpperCase(), text = optMatch[2].trim();
-                      if(letter === 'A') currentQ.optA = text; else if(letter === 'B') currentQ.optB = text; else if(letter === 'C') currentQ.optC = text; else if(letter === 'D') currentQ.optD = text; else if(letter === 'E') currentQ.optE = text;
+                      let letter = optMatch[1].toUpperCase();
+                      let text = optMatch[2].trim();
+                      if(letter === 'A') currentQ.optA = text;
+                      else if(letter === 'B') currentQ.optB = text;
+                      else if(letter === 'C') currentQ.optC = text;
+                      else if(letter === 'D') currentQ.optD = text;
+                      else if(letter === 'E') currentQ.optE = text;
                       continue;
                   }
+
                   let keyMatch = line.match(/^Kunci\s*:\s*(.*)/i) || line.match(/^Jawaban\s*:\s*(.*)/i);
-                  if(keyMatch) { currentQ.correct = mapKeyToText(keyMatch[1], currentQ.optA, currentQ.optB, currentQ.optC, currentQ.optD, currentQ.optE); continue; }
+                  if(keyMatch) {
+                      currentQ.correct = mapKeyToText(keyMatch[1], currentQ.optA, currentQ.optB, currentQ.optC, currentQ.optD, currentQ.optE);
+                      continue;
+                  }
                   if(currentQ && !currentQ.optA) currentQ.text += " " + line;
               }
               if(currentQ && currentQ.text && currentQ.correct) parsedQuestions.push(currentQ);
           }
+
           if(parsedQuestions.length > 0) runServer('bulkAddQuestions', [{dept: dept, questions: parsedQuestions}], (res) => { st.innerText = res.message; loadAdminQuestions(); });
-          else st.innerText = "Gagal parsing. Pola tidak cocok. Direkomendasikan pakai .CSV/.XLSX.";
+          else st.innerText = "Gagal parsing. Pola tidak cocok. Direkomendasikan pakai .CSV/.XLSX dengan format tabel.";
       } catch (err) { st.innerText = "Error membaca file: " + err; }
     }
 
     function sendBroadcast() {
       const msg = document.getElementById('in-broadcast').value;
-      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim!"); });
+      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim ke semua peserta aktif!"); });
     }
     
     function submitNewUser() {
@@ -1313,6 +1348,7 @@
     function submitNewQuestion() {
       let keyInput = document.getElementById('add-q-correct').value;
       let realCorrect = mapKeyToText(keyInput, document.getElementById('add-q-a').value, document.getElementById('add-q-b').value, document.getElementById('add-q-c').value, document.getElementById('add-q-d').value, document.getElementById('add-q-e').value);
+      
       const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, correct: realCorrect };
       runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
