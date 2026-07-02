@@ -18,14 +18,14 @@
   <style>
     /* ==========================================
        SUPER BIG UPGRADE CSS3 - FUTURISTIC UI V4
-       (Mobile & Desktop Friendly Command Center)
+       (Command Center Dense Layout & Aesthetic)
        ========================================== */
     :root { 
       --bg-base: #020617; 
-      --glass-bg: rgba(10, 15, 30, 0.7); 
+      --glass-bg: rgba(10, 15, 30, 0.75); 
       --glass-border: rgba(0, 255, 136, 0.2); 
       --neon-green: #00ff88; 
-      --neon-glow: 0 0 20px rgba(0, 255, 136, 0.3); 
+      --neon-glow: 0 0 20px rgba(0, 255, 136, 0.4); 
       --neon-blue: #0ea5e9;
       --text-main: #f8fafc; 
       --text-muted: #94a3b8; 
@@ -40,8 +40,8 @@
       background-image: 
         radial-gradient(circle at 80% 0%, rgba(0, 255, 136, 0.08), transparent 40%), 
         radial-gradient(circle at 20% 100%, rgba(14, 165, 233, 0.08), transparent 50%),
-        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
-        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
       color: var(--text-main); 
       min-height: 100vh; 
@@ -63,7 +63,7 @@
       border: 1px solid var(--glass-border); 
       border-radius: 20px; 
       padding: 2.5rem; 
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.02); 
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.03); 
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
     }
     
@@ -113,7 +113,8 @@
     /* ANTI-SCREENSHOT & FORCE FULLSCREEN DRM */
     #drm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 999999; color: var(--danger); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: bold; text-align: center; flex-direction: column; }
     
-    #force-fs-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(15px); z-index: 999998; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; }
+    /* Auto Full Screen Red Trap Overlay */
+    #force-fs-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 0, 0, 0.95); backdrop-filter: blur(15px); z-index: 999998; display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; cursor: pointer; }
     
     @media print { html, body { display: none !important; } }
 
@@ -130,7 +131,6 @@
     .btn-q.active { border: 2px solid #fff; transform: scale(1.15); z-index: 2; box-shadow: 0 0 20px rgba(255,255,255,0.5); }
     
     .cbt-nav-btns { display: flex; justify-content: space-between; margin-top: 35px; gap: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; }
-    
     .exam-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 2.5rem;}
     
     @keyframes pulse-neon { 0% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } 50% { box-shadow: inset 0 0 20px rgba(0,255,136,0.5), 0 0 20px rgba(0,255,136,0.5); } 100% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } }
@@ -146,71 +146,78 @@
     .option-label.selected .custom-radio::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--neon-green); border-radius: 50%; box-shadow: var(--neon-glow); }
     input[type="radio"] { display: none; } 
     
-    /* DASHBOARD ADMIN UI */
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .stat-card { text-align: center; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.05); border-top: 4px solid var(--neon-green); border-radius: 16px; padding: 2.5rem; transition: 0.3s; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .stat-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, rgba(0,255,136,0.05) 0%, transparent 100%); pointer-events: none; }
-    .stat-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,136,0.1); }
-    .stat-number { font-size: 3.8rem; font-weight: 800; color: var(--neon-green); text-shadow: var(--neon-glow); margin-top: 15px; }
+    /* DASHBOARD ADMIN UI (COMPACT & DENSE) */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
     
-    .admin-tabs { display: flex; gap: 12px; margin-bottom: 2.5rem; overflow-x: auto; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); scroll-behavior: smooth; }
-    .tab-btn { padding: 14px 28px; background: rgba(0,0,0,0.2); border: 1px solid transparent; color: var(--text-muted); cursor: pointer; border-radius: 12px 12px 0 0; transition: 0.3s; white-space: nowrap; font-weight: 700; font-size: 1rem; }
-    .tab-btn.active { background: rgba(0, 255, 136, 0.1); color: var(--neon-green); border-bottom: 3px solid var(--neon-green); text-shadow: 0 0 15px rgba(0,255,136,0.4); border-color: rgba(0,255,136,0.2) rgba(0,255,136,0.2) transparent rgba(0,255,136,0.2); }
+    /* Pengecilan elemen di Admin khusus agar muat banyak data */
+    #admin-view .glass-panel { padding: 1.5rem; border-radius: 16px; }
+    #admin-view h3 { font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+    #admin-view .stat-card { padding: 1.5rem; border-top: 3px solid var(--neon-green); border-radius: 12px; background: rgba(15, 23, 42, 0.8); transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    #admin-view .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 15px rgba(0,255,136,0.1); }
+    #admin-view .stat-number { font-size: 2.8rem; font-weight: 800; margin-top: 5px; }
+    #admin-view .input-group { margin-bottom: 1rem; }
+    #admin-view .input-group label { font-size: 0.8rem; margin-bottom: 0.4rem; }
+    #admin-view .input-glass { padding: 10px 14px; font-size: 0.9rem; border-radius: 8px; }
+    #admin-view .btn-neon, #admin-view .btn-start-exam { padding: 12px; font-size: 0.9rem; border-radius: 8px; }
+    
+    .admin-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); scroll-behavior: smooth; }
+    .tab-btn { padding: 12px 20px; background: rgba(0,0,0,0.2); border: 1px solid transparent; color: var(--text-muted); cursor: pointer; border-radius: 8px 8px 0 0; transition: 0.3s; white-space: nowrap; font-weight: 700; font-size: 0.9rem; }
+    .tab-btn.active { background: rgba(0, 255, 136, 0.1); color: var(--neon-green); border-bottom: 3px solid var(--neon-green); text-shadow: 0 0 10px rgba(0,255,136,0.4); }
     .tab-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.05); }
     
-    #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 18px 28px; border-radius: 12px; color: white; font-weight: 600; border-left: 6px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 16px 24px; border-radius: 10px; color: white; font-weight: 600; border-left: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
     /* Pop-up Modals Background */
     .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.92); backdrop-filter: blur(15px); z-index: 11000; display: flex; justify-content: center; align-items: center; padding: 20px; }
-    .modal-content { background: var(--bg-base); border: 1px solid rgba(0,255,136,0.3); padding: 40px; border-radius: 24px; width: 100%; max-width: 800px; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,136,0.05); max-height: 90vh; overflow-y: auto; position: relative; }
-    .broadcast-content { background: linear-gradient(135deg, #ff2a5f 0%, #990033 100%); text-align: center; border: 1px solid #ffb700; box-shadow: 0 0 60px rgba(255,42,95,0.5); max-width: 550px; }
+    .modal-content { background: var(--bg-base); border: 1px solid rgba(0,255,136,0.3); padding: 30px; border-radius: 20px; width: 100%; max-width: 700px; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,136,0.05); max-height: 90vh; overflow-y: auto; position: relative; }
+    .broadcast-content { background: linear-gradient(135deg, #ff2a5f 0%, #990033 100%); text-align: center; border: 1px solid #ffb700; box-shadow: 0 0 60px rgba(255,42,95,0.5); max-width: 500px; }
     
     /* Responsive Table Wrapper */
-    .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-top: 1.5rem; }
-    table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.95rem; }
-    th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 18px 20px; text-align: left; white-space: nowrap; }
-    th { background: rgba(0,0,0,0.6); color: var(--neon-green); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 0.85rem; }
+    .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-top: 1rem; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.85rem; }
+    th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; text-align: left; white-space: nowrap; }
+    th { background: rgba(0,0,0,0.6); color: var(--neon-green); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem; }
     tr:hover td { background: rgba(255,255,255,0.03); }
     
-    .audio-bar { height: 14px; background: rgba(0,0,0,0.6); border-radius: 7px; overflow: hidden; width: 120px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+    .audio-bar { height: 12px; background: rgba(0,0,0,0.6); border-radius: 6px; overflow: hidden; width: 100px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
     .audio-level { height: 100%; background: linear-gradient(90deg, #00ff88, #ffb700); transition: width 0.5s ease; }
-    .noise-high { background: var(--danger) !important; box-shadow: 0 0 15px var(--danger); }
-    .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
+    .noise-high { background: var(--danger) !important; box-shadow: 0 0 10px var(--danger); }
+    .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
     .btn-play:hover { background: var(--neon-green); color: #020617; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
     
-    .star-rating { direction: rtl; display: inline-block; font-size: 3rem; margin: 10px 0; }
+    .star-rating { direction: rtl; display: inline-block; font-size: 2.5rem; margin: 10px 0; }
     .star-rating input { display: none; }
     .star-rating label { color: rgba(255,255,255,0.1); cursor: pointer; padding: 0 8px; transition: 0.2s; }
     .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #ffb700; text-shadow: 0 0 20px rgba(255, 183, 0, 0.6); transform: scale(1.15); }
 
-    .chart-container { position: relative; height: 350px; width: 100%; margin-top: 20px; }
+    .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px; }
 
     /* FOOTER STYLES */
     .app-footer {
       text-align: center;
-      padding: 20px;
+      padding: 15px;
       color: var(--text-muted);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       border-top: 1px solid rgba(255,255,255,0.05);
       font-weight: 500;
       margin-top: auto;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0,0,0,0.5);
       backdrop-filter: blur(10px);
     }
     .app-footer span.brand { color: var(--neon-green); font-weight: 700; letter-spacing: 1px; }
 
     /* MOBILE RESPONSIVENESS */
     @media (max-width: 768px) {
-        .glass-panel { padding: 1.5rem; }
-        .dashboard-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+        .glass-panel, #admin-view .glass-panel { padding: 1.2rem; }
+        .dashboard-grid { grid-template-columns: 1fr; gap: 1rem; }
         .cbt-container { flex-direction: column-reverse; }
-        .stat-number { font-size: 3rem; }
-        h2 { font-size: 1.6rem !important; }
+        .stat-number, #admin-view .stat-number { font-size: 2.5rem; }
+        h2 { font-size: 1.5rem !important; }
         .timer-box { font-size: 1.5rem; padding: 10px 15px; }
         .cbt-nav-btns { flex-direction: column; }
         .cbt-nav-btns button { width: 100% !important; margin-bottom: 10px; }
-        .admin-tabs { margin-bottom: 1.5rem; }
-        .modal-content { padding: 25px; }
+        .admin-tabs { margin-bottom: 1rem; }
+        .modal-content { padding: 20px; }
     }
   </style>
 </head>
@@ -223,36 +230,36 @@
   <div id="drm-overlay" class="hidden">
     <div style="font-size: 6rem; margin-bottom: 20px;">🚫</div>
     <div style="letter-spacing: 3px; color: var(--danger);">TINDAKAN DILARANG!</div>
-    <span style="font-size: 1.2rem; font-weight: 500; color: #fff; margin-top: 20px; display: block; line-height: 1.6;">Screenshot / Record / Berpindah Layar terdeteksi.<br>Pelanggaran telah dicatat secara real-time oleh sistem server.</span>
+    <span style="font-size: 1.2rem; font-weight: 500; color: #fff; margin-top: 20px; display: block; line-height: 1.6;">Screenshot / Record / Inspect / Berpindah Layar terdeteksi.<br>Pelanggaran telah dicatat secara real-time oleh sistem server.</span>
   </div>
   
   <!-- FORCE FULL SCREEN OVERLAY (ESC TRAP) -->
-  <div id="force-fs-overlay" class="hidden">
-    <div style="font-size: 5rem; margin-bottom: 20px;">⚠️</div>
+  <div id="force-fs-overlay" class="hidden" onclick="returnToFullScreen()">
+    <div style="font-size: 5rem; margin-bottom: 20px; animation: pulse-neon 1s infinite;">⚠️</div>
     <h2 style="color: var(--danger); font-size: 2.2rem; margin-bottom: 15px;">UJIAN DIBEKUKAN!</h2>
-    <p style="font-size: 1.2rem; color: #fff; max-width: 600px; line-height: 1.6; margin-bottom: 30px;">
-      Anda terdeteksi keluar dari Mode Layar Penuh. Hal ini dikategorikan sebagai pelanggaran sistem CBT. Segera kembali ke layar penuh untuk melanjutkan ujian.
+    <p style="font-size: 1.1rem; color: #fff; max-width: 600px; line-height: 1.6; margin-bottom: 30px;">
+      Anda terdeteksi keluar dari Mode Layar Penuh. Hal ini dikategorikan sebagai pelanggaran sistem CBT. <br><br><span style="color: var(--warning);">Klik di mana saja pada layar ini untuk kembali melanjutkan ujian.</span>
     </p>
-    <button class="btn-start-exam" style="max-width: 400px; padding: 18px;" onclick="returnToFullScreen()">KEMBALI KE UJIAN (FULLSCREEN)</button>
+    <button class="btn-start-exam" style="max-width: 350px; padding: 15px;" onclick="returnToFullScreen()">KEMBALI KE UJIAN (FULLSCREEN)</button>
   </div>
   
   <!-- Modal Broadcast -->
   <div id="broadcast-modal" class="fullscreen-modal hidden" style="z-index: 13000;">
     <div class="modal-content broadcast-content">
-      <h2 style="color: white; font-size: 2rem; text-transform: uppercase; letter-spacing: 1px;">PENGUMUMAN PENTING</h2>
-      <p id="broadcast-text" style="color: white; font-size: 1.2rem; margin: 25px 0; line-height: 1.6; font-weight: 600;"></p>
+      <h2 style="color: white; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px;">PENGUMUMAN PENTING</h2>
+      <p id="broadcast-text" style="color: white; font-size: 1.1rem; margin: 20px 0; line-height: 1.6; font-weight: 600;"></p>
       <button class="btn-start-exam" style="background: #fff; color: var(--danger); box-shadow: 0 5px 15px rgba(0,0,0,0.3);" onclick="document.getElementById('broadcast-modal').classList.add('hidden')">SAYA MENGERTI</button>
     </div>
   </div>
 
   <!-- Modal Konfirmasi Submit Custom -->
   <div id="custom-confirm-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
-    <div class="modal-content" style="max-width: 500px; text-align: center;">
-      <h2 style="color: var(--text-main); font-size: 2rem; margin-bottom: 15px;">Konfirmasi Ujian</h2>
-      <p id="confirm-msg" style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.7; margin-bottom: 35px;"></p>
-      <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-          <button class="btn-neon" style="color: white; border-color: rgba(255,255,255,0.2); flex: 1; min-width: 150px;" onclick="closeConfirm()">BATAL & KEMBALI</button>
-          <button class="btn-start-exam" style="margin-top: 0; padding: 14px; flex: 1; min-width: 150px;" onclick="proceedSubmit()">YAKIN SUBMIT</button>
+    <div class="modal-content" style="max-width: 450px; text-align: center;">
+      <h2 style="color: var(--text-main); font-size: 1.8rem; margin-bottom: 15px;">Konfirmasi Ujian</h2>
+      <p id="confirm-msg" style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 30px;"></p>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn-neon" style="color: white; border-color: rgba(255,255,255,0.2); flex: 1; min-width: 130px;" onclick="closeConfirm()">BATAL & KEMBALI</button>
+          <button class="btn-start-exam" style="margin-top: 0; padding: 12px; flex: 1; min-width: 130px;" onclick="proceedSubmit()">YAKIN SUBMIT</button>
       </div>
     </div>
   </div>
@@ -260,9 +267,9 @@
   <!-- Modal Detail Jawaban -->
   <div id="detail-jawaban-modal" class="fullscreen-modal hidden">
     <div class="modal-content">
-      <h3 id="det-nama" style="color: var(--neon-green); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; font-size: 1.6rem;">Detail Jawaban</h3>
-      <div id="det-list" style="font-size: 1.05rem; line-height: 1.8;"></div>
-      <button class="btn-neon" style="margin-top: 30px; font-size: 1.1rem; padding: 15px;" onclick="document.getElementById('detail-jawaban-modal').classList.add('hidden')">Tutup Lembar Koreksi</button>
+      <h3 id="det-nama" style="color: var(--neon-green); font-size: 1.4rem;">Detail Jawaban</h3>
+      <div id="det-list" style="font-size: 0.95rem; line-height: 1.7;"></div>
+      <button class="btn-neon" style="margin-top: 25px; padding: 12px;" onclick="document.getElementById('detail-jawaban-modal').classList.add('hidden')">Tutup Lembar Koreksi</button>
     </div>
   </div>
   
@@ -276,10 +283,10 @@
   <div class="container">
     
     <!-- 1. LOGIN VIEW -->
-    <div id="login-view" class="glass-panel" style="max-width: 450px; margin: 10vh auto;">
-      <div style="text-align: center; margin-bottom: 2.5rem;">
-        <h2 id="portal-title" style="color: var(--neon-green); font-size: 2.5rem; margin-bottom: 5px; letter-spacing: 2px;">AXA XYZ</h2>
-        <p id="portal-subtitle" style="font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">Axa Dental Exam Portal</p>
+    <div id="login-view" class="glass-panel" style="max-width: 400px; margin: 8vh auto;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 id="portal-title" class="brand-text" style="color: var(--neon-green); font-size: 2.4rem; margin-bottom: 5px; letter-spacing: 2px;">AXA XYZ</h2>
+        <p id="portal-subtitle" style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">Axa Dental Exam Portal</p>
       </div>
       <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
         <div class="input-group">
@@ -290,31 +297,31 @@
            <label>Kata Sandi</label>
            <input type="password" id="in-pass" class="input-glass" required placeholder="••••••••">
         </div>
-        <button type="submit" class="btn-start-exam" id="btn-login" style="margin-top: 25px;">MASUK SISTEM</button>
+        <button type="submit" class="btn-start-exam" id="btn-login" style="margin-top: 20px;">MASUK SISTEM</button>
       </form>
     </div>
 
     <!-- 2. STUDENT PORTAL -->
-    <div id="student-portal-view" class="glass-panel hidden" style="max-width: 750px; margin: 10vh auto;">
-      <h2 style="font-size: 2.2rem; letter-spacing: 0.5px;">Selamat Datang,<br><span id="student-name" style="color: var(--neon-green);"></span></h2>
-      <div style="background: rgba(255,42,95,0.08); border-left: 5px solid var(--danger); padding: 25px; border-radius: 12px; margin: 30px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-          <p style="color: var(--danger); font-weight: 800; margin-bottom: 15px; font-size: 1.15rem; text-transform: uppercase; letter-spacing: 1px;">⚠️ Sistem Anti-Nyontek Aktif</p>
-          <ul style="margin-left: 22px; color: #e2e8f0; font-size: 1.05rem; line-height: 1.8; font-weight: 400;">
+    <div id="student-portal-view" class="glass-panel hidden" style="max-width: 650px; margin: 8vh auto;">
+      <h2 style="font-size: 2rem; letter-spacing: 0.5px;">Selamat Datang,<br><span id="student-name" style="color: var(--neon-green);"></span></h2>
+      <div style="background: rgba(255,42,95,0.08); border-left: 4px solid var(--danger); padding: 20px; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+          <p style="color: var(--danger); font-weight: 800; margin-bottom: 12px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">⚠️ Sistem Anti-Nyontek Aktif</p>
+          <ul style="margin-left: 20px; color: #e2e8f0; font-size: 0.95rem; line-height: 1.7; font-weight: 400;">
             <li>Layar ujian akan dikunci permanen ke mode <b style="color:#fff;">Full-Screen</b>. Keluar dari mode ini akan membekukan ujian.</li>
             <li>Sistem <b style="color:#fff;">Radar Desibel (dB)</b> memantau tingkat kebisingan ruangan.</li>
             <li>Aplikasi <b style="color:#fff;">Snipping Tool, Print Screen, & Klik Kanan (Inspect)</b> dimatikan secara paksa.</li>
             <li>Berpindah tab atau meminimize jendela otomatis memicu diskualifikasi.</li>
           </ul>
       </div>
-      <button class="btn-start-exam" style="font-size: 1.2rem; padding: 20px;" onclick="startExamSequence()">MULAI UJIAN SEKARANG</button>
+      <button class="btn-start-exam" style="font-size: 1.1rem; padding: 18px;" onclick="startExamSequence()">MULAI UJIAN SEKARANG</button>
     </div>
 
     <!-- 3. EXAM RUNNING (PROFESSIONAL CBT UI) -->
     <div id="exam-view" class="hidden">
-      <div class="glass-panel exam-header" style="padding: 1.8rem 2.5rem;">
+      <div class="glass-panel exam-header" style="padding: 1.5rem 2rem;">
         <div>
-           <h2 id="exam-title" style="margin:0; font-size: 1.5rem; letter-spacing: 1px; color: var(--neon-green);">Ujian Modul</h2>
-           <p style="margin:8px 0 0 0; font-size: 0.95rem; color: var(--text-muted); font-weight: 500;" id="student-identity"></p>
+           <h2 id="exam-title" style="margin:0; font-size: 1.4rem; letter-spacing: 1px; color: var(--neon-green);">Ujian Modul</h2>
+           <p style="margin:6px 0 0 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500;" id="student-identity"></p>
         </div>
         <div class="timer-box" id="timer-display">00:00:00</div>
       </div>
@@ -325,34 +332,34 @@
                 <!-- Soal Muncul 1 per 1 di sini -->
              </div>
              <div class="cbt-nav-btns">
-                 <button class="btn-neon" style="width: auto; color: #fff; border-color: rgba(255,255,255,0.15); padding: 14px 28px; background: rgba(255,255,255,0.05);" onclick="prevQuestion()">◄ SOAL SEBELUMNYA</button>
-                 <button class="btn-neon btn-warning" style="width: auto; padding: 14px 28px;" onclick="toggleFlagQuestion()">⚑ TANDAI RAGU-RAGU</button>
-                 <button class="btn-neon" style="width: auto; padding: 14px 28px; background: rgba(0,255,136,0.1);" onclick="nextQuestion()">SOAL SELANJUTNYA ►</button>
+                 <button class="btn-neon" style="width: auto; color: #fff; border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);" onclick="prevQuestion()">◄ SEBELUMNYA</button>
+                 <button class="btn-neon btn-warning" style="width: auto;" onclick="toggleFlagQuestion()">⚑ RAGU-RAGU</button>
+                 <button class="btn-neon" style="width: auto; background: rgba(0,255,136,0.1);" onclick="nextQuestion()">SELANJUTNYA ►</button>
              </div>
           </div>
           <div class="cbt-sidebar">
-             <h3 style="font-size: 1.2rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 15px; margin-bottom: 20px;">Navigasi Nomor Soal</h3>
+             <h3 style="font-size: 1.1rem; text-align: center;">Navigasi Soal</h3>
              <div id="question-palette" class="q-palette">
                 <!-- Palet Nomor Muncul di sini -->
              </div>
-             <div style="margin-top: 25px; font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 12px; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                 <div style="display:flex; align-items:center; gap:12px; font-weight:500;"><span style="width:16px; height:16px; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); display:inline-block; border-radius:4px;"></span> Belum Dijawab</div>
-                 <div style="display:flex; align-items:center; gap:12px; font-weight:600; color:#fff;"><span style="width:16px; height:16px; background:var(--neon-green); display:inline-block; border-radius:4px; box-shadow:0 0 8px var(--neon-green);"></span> Sudah Dijawab</div>
-                 <div style="display:flex; align-items:center; gap:12px; font-weight:600;"><span style="width:16px; height:16px; background:var(--warning); display:inline-block; border-radius:4px; box-shadow:0 0 8px var(--warning);"></span> Ragu-ragu</div>
+             <div style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 10px; padding: 12px; background: rgba(0,0,0,0.4); border-radius: 10px;">
+                 <div style="display:flex; align-items:center; gap:10px; font-weight:500;"><span style="width:14px; height:14px; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); display:inline-block; border-radius:4px;"></span> Belum Dijawab</div>
+                 <div style="display:flex; align-items:center; gap:10px; font-weight:600; color:#fff;"><span style="width:14px; height:14px; background:var(--neon-green); display:inline-block; border-radius:4px; box-shadow:0 0 8px var(--neon-green);"></span> Sudah Dijawab</div>
+                 <div style="display:flex; align-items:center; gap:10px; font-weight:600;"><span style="width:14px; height:14px; background:var(--warning); display:inline-block; border-radius:4px; box-shadow:0 0 8px var(--warning);"></span> Ragu-ragu</div>
              </div>
-             <button class="btn-start-exam" style="margin-top: 30px; font-size: 1.1rem; padding: 18px; background: linear-gradient(135deg, #ff2a5f 0%, #a60000 100%); box-shadow: 0 8px 25px rgba(255,42,95,0.4);" onclick="manualSubmitBtn()">SELESAI UJIAN</button>
+             <button class="btn-start-exam" style="margin-top: 25px; font-size: 1rem; padding: 15px; background: linear-gradient(135deg, #ff2a5f 0%, #a60000 100%); box-shadow: 0 6px 20px rgba(255,42,95,0.4);" onclick="manualSubmitBtn()">SELESAI UJIAN</button>
           </div>
       </div>
     </div>
 
     <!-- 4. FEEDBACK / LOGOUT VIEW -->
-    <div id="feedback-view" class="glass-panel hidden" style="max-width: 650px; margin: 10vh auto; text-align: center;">
-      <div style="font-size: 4.5rem; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255,255,255,0.2);">🎉</div>
-      <h2 style="color: var(--neon-green); font-size: 2.5rem; letter-spacing: 1px;">Ujian Telah Berakhir</h2>
-      <p id="feedback-message" style="font-weight: 500; margin-bottom: 2.5rem; font-size: 1.2rem; color: #fff; line-height: 1.6;"></p>
+    <div id="feedback-view" class="glass-panel hidden" style="max-width: 550px; margin: 10vh auto; text-align: center;">
+      <div style="font-size: 4rem; margin-bottom: 15px; text-shadow: 0 0 20px rgba(255,255,255,0.2);">🎉</div>
+      <h2 style="color: var(--neon-green); font-size: 2.2rem;">Ujian Selesai</h2>
+      <p id="feedback-message" style="font-weight: 500; margin-bottom: 2rem; font-size: 1.1rem; color: #fff; line-height: 1.6;"></p>
       
-      <div style="background: rgba(0,0,0,0.4); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
-          <p style="font-size: 1.05rem; margin-bottom: 15px; font-weight: 500;">Bagaimana pengalaman aplikasi CBT ini?</p>
+      <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);">
+          <p style="font-size: 0.95rem; margin-bottom: 15px; font-weight: 500;">Bagaimana pengalaman CBT ini?</p>
           <form onsubmit="event.preventDefault(); submitFeedback();">
             <div class="star-rating">
               <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
@@ -361,65 +368,63 @@
               <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
               <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
             </div>
-            <textarea id="feed-comment" class="input-glass" rows="4" placeholder="Kritik & saran membangun (opsional)..." style="margin-top: 1.5rem; resize: none; font-size: 1rem;"></textarea>
-            <button type="submit" class="btn-start-exam" style="margin-top: 1.8rem;">KIRIM & KELUAR SISTEM</button>
+            <textarea id="feed-comment" class="input-glass" rows="3" placeholder="Kritik & saran membangun (opsional)..." style="margin-top: 1rem; resize: none; font-size: 0.9rem;"></textarea>
+            <button type="submit" class="btn-start-exam" style="margin-top: 1.5rem; padding: 14px;">KIRIM & KELUAR</button>
           </form>
       </div>
     </div>
 
     <!-- 5. ADMIN DASHBOARD -->
     <div id="admin-view" class="hidden">
-      <div class="exam-header" style="flex-wrap: wrap; gap: 15px;">
-        <h2 style="font-size: 2rem;">Dashboard Admin <span id="admin-brand-header" style="color:var(--neon-green)">AXA XYZ</span></h2>
-        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-          <select id="global-dept-filter" class="input-glass dept-options" style="width: auto; padding: 12px 18px; font-weight: 600; min-width: 250px;" onchange="fetchAdminData()">
-            <option value="ALL">🌐 Semua Departemen (Global)</option>
+      <div class="exam-header" style="flex-wrap: wrap; gap: 15px; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.6rem; margin:0;">Command Center <span class="brand-text" style="color:var(--neon-green)">AXA XYZ</span></h2>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <select id="global-dept-filter" class="input-glass dept-options" style="width: auto; padding: 10px 14px; font-weight: 600; font-size:0.85rem;" onchange="fetchAdminData()">
+            <option value="ALL">🌐 Filter: Global Semua Departemen</option>
           </select>
-          <button class="btn-neon btn-danger" style="width: auto; border:none; padding: 12px 25px; box-shadow: 0 4px 15px rgba(255,42,95,0.4);" onclick="logout()">LOGOUT</button>
+          <button class="btn-neon btn-danger" style="width: auto; border:none; padding: 10px 20px; font-size:0.85rem;" onclick="logout()">LOGOUT</button>
         </div>
       </div>
       
       <div class="admin-tabs">
-        <button class="tab-btn active" onclick="switchAdminTab('admin-stats')">Analytics & Live</button>
-        <button class="tab-btn" onclick="switchAdminTab('admin-exams')">Manajemen Exams</button>
-        <button class="tab-btn" onclick="switchAdminTab('admin-users')">Manajemen User</button>
-        <button class="tab-btn" onclick="switchAdminTab('admin-questions')">Manajemen Soal</button>
-        <button class="tab-btn" onclick="switchAdminTab('admin-jawaban')">Monitoring Jawaban</button>
-        <button class="tab-btn" onclick="switchAdminTab('admin-audio')">Radar Suara (Audio)</button>
-        <button class="tab-btn" onclick="switchAdminTab('admin-web')">Manajemen Web & Hotkeys</button>
+        <button class="tab-btn active" onclick="switchAdminTab('admin-stats')">Analytics</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-exams')">Exams</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-users')">Users</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-questions')">Soal</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-jawaban')">Koreksi</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-audio')">Radar</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-web')">⚙️ Settings</button>
       </div>
 
       <!-- TAB 1: ANALYTICS -->
       <div id="admin-stats">
         <div class="dashboard-grid">
           <div class="glass-panel stat-card">
-            <p style="font-size:1.05rem; font-weight:700; color:var(--text-main); text-transform: uppercase;">Peserta Online Aktif</p>
+            <p>Peserta Online Aktif</p>
             <div class="stat-number" id="stat-online">0</div>
           </div>
           <div class="glass-panel stat-card">
-            <p style="font-size:1.05rem; font-weight:700; color:var(--text-main); text-transform: uppercase;">Total Selesai (<span class="lbl-dept" style="color:var(--neon-green)">ALL</span>)</p>
+            <p>Total Selesai (<span class="lbl-dept" style="color:var(--neon-green)">ALL</span>)</p>
             <div class="stat-number" id="stat-selesai">0</div>
           </div>
           <div class="glass-panel stat-card">
-            <p style="font-size:1.05rem; font-weight:700; color:var(--text-main); text-transform: uppercase;">Rata-rata Nilai Global</p>
+            <p>Rata-rata Nilai Global</p>
             <div class="stat-number" id="stat-avg">0</div>
           </div>
         </div>
-        <div class="dashboard-grid" style="margin-top: 2rem;">
+        <div class="dashboard-grid" style="margin-top: 1.5rem;">
           <div class="glass-panel" style="grid-column: span 1;">
-             <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; font-size: 1.3rem;">Global Broadcast Peringatan</h3>
-             <div class="input-group" style="margin-top: 25px;">
+             <h3>Global Broadcast Peringatan</h3>
+             <div class="input-group">
                 <input type="text" id="in-broadcast" class="input-glass" placeholder="Ketik pesan yang akan membekukan layar peserta...">
-                <button class="btn-start-exam" style="margin-top: 15px; font-size: 1rem; padding: 14px;" onclick="sendBroadcast()">KIRIM BROADCAST</button>
+                <button class="btn-start-exam" style="margin-top: 10px;" onclick="sendBroadcast()">KIRIM BROADCAST</button>
              </div>
              
-             <h4 style="margin-top: 35px; color: var(--danger); font-size: 1.2rem;">Log Pelanggaran (<span class="lbl-dept">ALL</span>)</h4>
-             <div id="admin-logs" style="font-size: 0.95rem; height: 260px; overflow-y: auto; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,51,102,0.2); box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);">
-                <!-- Logs will load here -->
-             </div>
+             <h4 style="margin-top: 25px; color: var(--danger); font-size: 1rem;">Log Pelanggaran (<span class="lbl-dept">ALL</span>)</h4>
+             <div id="admin-logs" style="font-size: 0.85rem; height: 200px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,42,95,0.2);"></div>
           </div>
           <div class="glass-panel" style="grid-column: span 1;">
-             <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px; font-size: 1.3rem;">Grafik Rata-rata Departemen</h3>
+             <h3>Grafik Rata-rata Departemen</h3>
              <div class="chart-container">
                 <canvas id="myChart"></canvas>
              </div>
@@ -430,11 +435,10 @@
       <!-- TAB 1.5: MANAJEMEN EXAMS -->
       <div id="admin-exams" class="hidden">
         <div class="glass-panel">
-          <h3 style="font-size: 1.4rem;">Daftar Konfigurasi Ujian (Exams)</h3>
-          <p>Ubah status aktivasi ujian, batas waktu, dan pengaturan visibilitas hasil secara langsung.</p>
+          <h3>Daftar Konfigurasi Ujian (Exams)</h3>
           <div class="table-wrapper">
              <table id="tbl-exams">
-               <thead><tr><th>Exam ID</th><th>Departemen</th><th>Judul Ujian</th><th>Durasi (Menit)</th><th>Status Aktif</th><th>Visibilitas Nilai</th><th>Aksi</th></tr></thead>
+               <thead><tr><th>ID</th><th>Departemen</th><th>Judul Ujian</th><th>Menit</th><th>Status</th><th>Visibilitas</th><th>Aksi</th></tr></thead>
                <tbody><!-- JS --></tbody>
              </table>
           </div>
@@ -445,48 +449,46 @@
       <div id="admin-users" class="hidden">
         <div class="dashboard-grid">
           <div class="glass-panel">
-            <h3 style="color:var(--neon-green); font-size: 1.3rem;">Upload Bulk Users (.xlsx, .csv, .pdf)</h3>
-            <p>Sistem cerdas mem-parsing data. <br>Kolom A / Baris Kiri = NIM, Kolom B / Kanan = Nama.</p>
-            <div class="input-group" style="margin-top:25px;"><input type="file" id="bulk-file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .docx, .pdf" class="input-glass"></div>
-            <div class="input-group" style="display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-              <input type="checkbox" id="chk-univ-pass" style="width:20px; height:20px; accent-color:var(--neon-green); cursor: pointer;" onchange="document.getElementById('add-bulk-pass').classList.toggle('hidden')" checked> 
-              <label style="margin:0; cursor: pointer; color: #fff;">Gunakan 1 Password Massal</label>
+            <h3 style="color:var(--neon-green);">Upload Bulk Users (.xlsx, .csv, .pdf)</h3>
+            <div class="input-group"><input type="file" id="bulk-file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .docx, .pdf" class="input-glass"></div>
+            <div class="input-group" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px;">
+              <input type="checkbox" id="chk-univ-pass" style="width:16px; height:16px; accent-color:var(--neon-green); cursor: pointer;" onchange="document.getElementById('add-bulk-pass').classList.toggle('hidden')" checked> 
+              <label style="margin:0; cursor: pointer; color: #fff;">1 Password Massal</label>
             </div>
             <div class="input-group"><input type="text" id="add-bulk-pass" class="input-glass" placeholder="Ketik Password Batch" required></div>
             <div class="input-group">
               <label>Pilih Departemen (Auto-Bind Exam ID)</label>
               <select id="add-bulk-dept" class="input-glass dept-options" style="background: var(--bg-base);"></select>
             </div>
-            <button class="btn-start-exam" style="padding:15px; font-size:1rem;" onclick="processBulkUsers()">MULAI UPLOAD USERS</button>
-            <p id="bulk-u-status" style="margin-top:15px; font-size:0.95rem; font-weight:600; color:var(--neon-green);"></p>
+            <button class="btn-start-exam" onclick="processBulkUsers()">UPLOAD USERS</button>
+            <p id="bulk-u-status" style="margin-top:10px; font-size:0.85rem; font-weight:600; color:var(--neon-green);"></p>
           </div>
           <div class="glass-panel">
-            <h3 style="font-size: 1.3rem;">Tambah User Manual</h3>
-            <form onsubmit="event.preventDefault(); submitNewUser();" style="margin-top:25px;">
-              <div class="input-group"><input type="text" id="add-nim" class="input-glass" placeholder="NIM / ID Pengguna" required></div>
+            <h3>Tambah User Manual</h3>
+            <form onsubmit="event.preventDefault(); submitNewUser();">
+              <div class="input-group"><input type="text" id="add-nim" class="input-glass" placeholder="NIM / ID" required></div>
               <div class="input-group"><input type="text" id="add-name" class="input-glass" placeholder="Nama Lengkap" required></div>
-              <div class="input-group"><input type="text" id="add-pass" class="input-glass" placeholder="Password Akun" required></div>
+              <div class="input-group"><input type="text" id="add-pass" class="input-glass" placeholder="Password" required></div>
               <div class="input-group">
-                  <select id="add-role" class="input-glass" style="background: var(--bg-base);"><option value="Student">Student (Mahasiswa)</option><option value="Admin">Administrator</option></select>
+                  <select id="add-role" class="input-glass" style="background: var(--bg-base);"><option value="Student">Student</option><option value="Admin">Admin</option></select>
               </div>
               <div class="input-group">
                  <select id="add-dept" class="input-glass dept-options" style="background: var(--bg-base);"></select>
               </div>
-              <button type="submit" class="btn-neon" style="padding:15px; margin-top: 10px;">SIMPAN USER</button>
+              <button type="submit" class="btn-neon">SIMPAN USER</button>
             </form>
           </div>
         </div>
-        <!-- FITUR EDIT USER DATABASE -->
-        <div class="glass-panel" style="margin-top: 30px;">
-           <h3 style="font-size: 1.4rem;">Daftar User Database</h3>
-           <div class="input-group" style="max-width: 350px;">
-              <select id="filter-u-dept" class="input-glass dept-options" style="background: var(--bg-base); padding: 14px;" onchange="loadAdminUsers()">
+        <div class="glass-panel" style="margin-top: 1.5rem;">
+           <h3>Daftar User Database</h3>
+           <div class="input-group" style="max-width: 300px;">
+              <select id="filter-u-dept" class="input-glass dept-options" style="background: var(--bg-base);" onchange="loadAdminUsers()">
                  <option value="ALL">Filter: Semua Departemen</option>
               </select>
            </div>
            <div class="table-wrapper">
               <table id="tbl-users">
-                <thead><tr><th>NIM</th><th>Nama Lengkap</th><th>Password</th><th>Role</th><th>Departemen</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>NIM</th><th>Nama</th><th>Password</th><th>Role</th><th>Departemen</th><th>Aksi</th></tr></thead>
                 <tbody><!-- JS --></tbody>
               </table>
            </div>
@@ -497,46 +499,45 @@
       <div id="admin-questions" class="hidden">
         <div class="dashboard-grid">
           <div class="glass-panel" style="grid-column: span 1;">
-            <h3 style="color:var(--neon-green); font-size: 1.3rem;">Upload Bulk Soal (.xlsx, .csv, .pdf)</h3>
-            <p style="font-size:0.9rem;">Format Dokumen Teks (Contoh): <br><span style="color:#e2e8f0; font-family:monospace; background:rgba(0,0,0,0.6); padding:15px; display:block; border-radius:10px; margin-top:12px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.6;">1. [teks soal]<br>A. [opsi] <br>B. [opsi] <br>C. [opsi] <br>D. [opsi] <br>E. [opsi]<br>Kunci: A</span></p>
-            <div class="input-group" style="margin-top:25px;">
+            <h3 style="color:var(--neon-green);">Upload Bulk Soal (.xlsx, .csv, .pdf)</h3>
+            <div class="input-group">
               <label>Departemen Ujian Tujuan</label>
               <select id="bulk-q-dept" class="input-glass dept-options" style="background: var(--bg-base);"></select>
             </div>
             <div class="input-group"><input type="file" id="bulk-q-file" accept=".csv, .xlsx, .xls, .docx, .pdf" class="input-glass"></div>
-            <button class="btn-start-exam" style="padding:15px; font-size:1rem;" onclick="processBulkQuestions()">MULAI UPLOAD SOAL</button>
-            <p id="bulk-q-status" style="margin-top:15px; font-size:0.95rem; font-weight:600; color:var(--neon-green);"></p>
+            <button class="btn-start-exam" onclick="processBulkQuestions()">UPLOAD SOAL</button>
+            <p id="bulk-q-status" style="margin-top:10px; font-size:0.85rem; font-weight:600; color:var(--neon-green);"></p>
           </div>
           <div class="glass-panel" style="grid-column: span 1;">
-            <h3 style="font-size: 1.3rem;">Input Soal Manual (Hingga Opsi E)</h3>
-            <form onsubmit="event.preventDefault(); submitNewQuestion();" style="margin-top:20px;">
+            <h3>Input Soal Manual</h3>
+            <form onsubmit="event.preventDefault(); submitNewQuestion();">
               <div class="input-group">
                 <select id="add-q-dept" class="input-glass dept-options" required style="background: var(--bg-base);"></select>
               </div>
-              <div class="input-group"><label>Teks Pertanyaan</label><textarea id="add-q-text" class="input-glass" rows="3" required placeholder="Ketik soal evaluasi disini..."></textarea></div>
-              <div class="dashboard-grid" style="margin-bottom: 1.5rem; gap: 1rem;">
-                <div class="input-group" style="margin-bottom:0;"><input type="text" id="add-q-a" class="input-glass" placeholder="Opsi A" required></div>
-                <div class="input-group" style="margin-bottom:0;"><input type="text" id="add-q-b" class="input-glass" placeholder="Opsi B" required></div>
-                <div class="input-group" style="margin-bottom:0;"><input type="text" id="add-q-c" class="input-glass" placeholder="Opsi C" required></div>
-                <div class="input-group" style="margin-bottom:0;"><input type="text" id="add-q-d" class="input-glass" placeholder="Opsi D" required></div>
-                <div class="input-group" style="margin-bottom:0; grid-column:span 2;"><input type="text" id="add-q-e" class="input-glass" placeholder="Opsi E (Kosongkan jika tidak ada)"></div>
+              <div class="input-group"><textarea id="add-q-text" class="input-glass" rows="2" required placeholder="Teks Soal..."></textarea></div>
+              <div class="dashboard-grid" style="margin-bottom: 1rem; gap: 0.5rem;">
+                <div class="input-group" style="margin:0;"><input type="text" id="add-q-a" class="input-glass" placeholder="Opsi A" required></div>
+                <div class="input-group" style="margin:0;"><input type="text" id="add-q-b" class="input-glass" placeholder="Opsi B" required></div>
+                <div class="input-group" style="margin:0;"><input type="text" id="add-q-c" class="input-glass" placeholder="Opsi C" required></div>
+                <div class="input-group" style="margin:0;"><input type="text" id="add-q-d" class="input-glass" placeholder="Opsi D" required></div>
+                <div class="input-group" style="margin:0; grid-column:span 2;"><input type="text" id="add-q-e" class="input-glass" placeholder="Opsi E (Opsional)"></div>
               </div>
               <div class="input-group">
-                 <label style="color: var(--neon-green);">Kunci Jawaban (Ketik A/B/C/D/E)</label>
-                 <input type="text" id="add-q-correct" class="input-glass" required placeholder="Contoh: B" style="text-transform:uppercase; font-size: 1.2rem; font-weight: bold; width: 150px; text-align: center;">
+                 <label style="color: var(--neon-green);">Kunci Jawaban (A/B/C/D/E)</label>
+                 <input type="text" id="add-q-correct" class="input-glass" required style="text-transform:uppercase; font-weight: bold; width: 100px; text-align: center;">
               </div>
-              <button type="submit" class="btn-neon" style="padding:15px;">SIMPAN SOAL</button>
+              <button type="submit" class="btn-neon">SIMPAN SOAL</button>
             </form>
           </div>
         </div>
-        <div class="glass-panel" style="margin-top: 30px;">
-           <h3 style="font-size: 1.4rem;">Daftar Bank Soal</h3>
-           <div class="input-group" style="max-width: 350px;">
-              <select id="filter-q-dept" class="input-glass dept-options" style="background: var(--bg-base); padding: 14px;" onchange="loadAdminQuestions()"></select>
+        <div class="glass-panel" style="margin-top: 1.5rem;">
+           <h3>Daftar Bank Soal</h3>
+           <div class="input-group" style="max-width: 300px;">
+              <select id="filter-q-dept" class="input-glass dept-options" style="background: var(--bg-base);" onchange="loadAdminQuestions()"></select>
            </div>
            <div class="table-wrapper">
               <table id="tbl-questions">
-                <thead><tr><th>ID Soal</th><th>Teks Soal</th><th>Kunci Jawaban</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>ID</th><th>Soal</th><th>Kunci</th><th>Aksi</th></tr></thead>
                 <tbody><!-- JS --></tbody>
               </table>
            </div>
@@ -546,11 +547,10 @@
       <!-- TAB 4: MONITORING JAWABAN -->
       <div id="admin-jawaban" class="hidden">
         <div class="glass-panel">
-          <h3 style="font-size: 1.4rem;">Detail Evaluasi Jawaban (<span class="lbl-dept">ALL</span>)</h3>
-          <p>Tabel rekapitulasi waktu pengumpulan dan akses lembar koreksi interaktif.</p>
+          <h3>Detail Evaluasi Jawaban (<span class="lbl-dept">ALL</span>)</h3>
           <div class="table-wrapper">
               <table id="tbl-jawaban">
-                <thead><tr><th>NIM</th><th>Nama Lengkap Mahasiswa</th><th>Waktu Selesai Submit</th><th>Nilai Akhir</th><th>Lembar Koreksi</th></tr></thead>
+                <thead><tr><th>NIM</th><th>Nama</th><th>Selesai Submit</th><th>Nilai</th><th>Aksi</th></tr></thead>
                 <tbody><!-- Diisi JS --></tbody>
               </table>
           </div>
@@ -560,22 +560,21 @@
       <!-- TAB 5: RADAR SUARA (LIVE AUDIO) -->
       <div id="admin-audio" class="hidden">
         <div class="glass-panel">
-          <h3 style="font-size: 1.4rem;">Live Audio & Session Radar (<span class="lbl-dept">ALL</span>)</h3>
-          <p style="color:var(--text-muted); font-size:1.05rem; line-height: 1.6;">Sistem menggunakan instrumen <b style="color:var(--neon-green);">Radar Desibel (dB) Real-time</b> untuk mendeteksi suara percakapan atau kecurangan fisik di ruangan peserta ujian.</p>
+          <h3>Live Audio & Session Radar (<span class="lbl-dept">ALL</span>)</h3>
           <div class="table-wrapper">
               <table id="tbl-audio">
-                <thead><tr><th>Identitas Peserta</th><th>Status Sistem</th><th>Grafik Indikator Bising (dB)</th><th>Aksi Monitoring</th></tr></thead>
+                <thead><tr><th>Peserta</th><th>Status</th><th>Radar Bising (dB)</th><th>Aksi</th></tr></thead>
                 <tbody><!-- Diisi JS --></tbody>
               </table>
           </div>
         </div>
       </div>
       
-      <!-- TAB 6: MANAJEMEN WEB & HOTKEYS (BARU) -->
+      <!-- TAB 6: MANAJEMEN WEB & HOTKEYS (DATABASE CONNECTED) -->
       <div id="admin-web" class="hidden">
-        <div class="glass-panel" style="max-width: 800px; margin: 0 auto;">
-          <h3 style="font-size: 1.5rem; color: var(--neon-green); margin-bottom: 20px;">Konfigurasi Web & Pengawas (Hotkeys)</h3>
-          <p style="margin-bottom: 25px;">Atur identitas sistem dan shortcut rahasia pengawas untuk membuka paksa layar ujian mahasiswa.</p>
+        <div class="glass-panel" style="max-width: 700px; margin: 0 auto;">
+          <h3 style="color: var(--neon-green);">Konfigurasi Web & Pengawas</h3>
+          <p style="font-size: 0.85rem; margin-bottom: 20px;">Konfigurasi ini terhubung langsung ke Database Server (Sheet Settings).</p>
           
           <form id="form-web-settings" onsubmit="event.preventDefault(); saveWebSettings();">
              <div class="input-group">
@@ -583,14 +582,18 @@
                 <input type="text" id="set-web-title" class="input-glass" required>
              </div>
              <div class="input-group">
-                <label>Nama Sistem / Brand (Muncul di Judul & Footer)</label>
+                <label>Nama Sistem / Brand (Akan mengubah semua teks Brand)</label>
                 <input type="text" id="set-web-brand" class="input-glass" required>
              </div>
-             <div class="dashboard-grid" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+             <div class="input-group">
+                <label>Teks Footer Khusus</label>
+                <input type="text" id="set-footer-text" class="input-glass" required>
+             </div>
+             <div class="dashboard-grid" style="gap: 1rem; margin-bottom: 1.5rem;">
                 <div class="input-group" style="margin-bottom: 0;">
-                   <label style="color: var(--warning);">Kunci Darurat (Bypass) - Windows</label>
+                   <label style="color: var(--warning);">Kunci Bypass Pengawas (Windows)</label>
                    <div style="display: flex; gap: 10px;">
-                      <select id="set-hotkey-win-mod" class="input-glass" style="width: 40%;">
+                      <select id="set-hotkey-win-mod" class="input-glass" style="width: 50%;">
                          <option value="Alt">Alt +</option>
                          <option value="Ctrl">Ctrl +</option>
                       </select>
@@ -598,9 +601,9 @@
                    </div>
                 </div>
                 <div class="input-group" style="margin-bottom: 0;">
-                   <label style="color: var(--neon-blue);">Kunci Darurat (Bypass) - MacOS</label>
+                   <label style="color: var(--neon-blue);">Kunci Bypass Pengawas (Mac)</label>
                    <div style="display: flex; gap: 10px;">
-                      <select id="set-hotkey-mac-mod" class="input-glass" style="width: 40%;">
+                      <select id="set-hotkey-mac-mod" class="input-glass" style="width: 50%;">
                          <option value="Ctrl">Ctrl +</option>
                          <option value="Cmd">Cmd +</option>
                       </select>
@@ -608,8 +611,7 @@
                    </div>
                 </div>
              </div>
-             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">*Catatan: Konfigurasi ini disimpan dengan aman di LocalStorage Vercel. Tidak perlu sinkronisasi ulang dengan GAS (Code.gs) sehingga perubahan bersifat instan.</p>
-             <button type="submit" class="btn-start-exam">SIMPAN PENGATURAN WEB</button>
+             <button type="submit" class="btn-start-exam">SIMPAN PENGATURAN KE DATABASE</button>
           </form>
         </div>
       </div>
@@ -617,9 +619,9 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <footer class="app-footer">
-      &copy; <span id="footer-year">2026</span> All Right Reserved. SYSTEM BY <span id="footer-brand" class="brand">AXA XYZ</span>
+  <!-- FOOTER DINAMIS -->
+  <footer class="app-footer" style="text-align: center; padding: 15px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); background: rgba(0,0,0,0.6); margin-top: auto;">
+      <span id="footer-text">© 2026 All Right Reserved. SYSTEM BY AXA XYZ</span>
   </footer>
 
   <script>
@@ -640,48 +642,54 @@
         DEPARTMENTS.forEach(d => { select.innerHTML += `<option value="${d}">${d}</option>`; });
     });
 
-    // --- WEB SETTINGS MANAGER (LocalStorage untuk Frontend Vercel) ---
+    // --- MANAJEMEN WEB DARI DATABASE (Poin 3) ---
     let webSettings = {
-        title: "Axa Dental Exam",
-        brand: "AXA XYZ",
-        winMod: "Alt", winKey: "Q",
-        macMod: "Ctrl", macKey: "Q"
+        Web_Title: "Axa Dental Exam",
+        Brand_Name: "AXA XYZ",
+        Footer_Text: "© 2026 All Right Reserved. SYSTEM BY AXA XYZ",
+        Hotkey_Win_Mod: "Alt", Hotkey_Win_Key: "Q",
+        Hotkey_Mac_Mod: "Ctrl", Hotkey_Mac_Key: "Q"
     };
 
-    function loadWebSettings() {
-        const saved = localStorage.getItem('axa_web_settings');
-        if(saved) {
-            webSettings = JSON.parse(saved);
-        }
-        document.getElementById('doc-title').innerText = webSettings.title;
-        document.getElementById('portal-title').innerText = webSettings.brand;
-        document.getElementById('admin-brand-header').innerText = webSettings.brand;
-        document.getElementById('footer-brand').innerText = webSettings.brand;
-        document.getElementById('footer-year').innerText = new Date().getFullYear();
+    function applyWebSettings() {
+        document.getElementById('doc-title').innerText = webSettings.Web_Title || "Axa Dental Exam";
+        document.querySelectorAll('.brand-text').forEach(el => el.innerText = webSettings.Brand_Name || "AXA XYZ");
+        document.getElementById('footer-text').innerText = webSettings.Footer_Text || "© 2026 All Right Reserved. SYSTEM BY AXA XYZ";
         
-        // Populate form if in admin
-        const setForm = document.getElementById('form-web-settings');
-        if(setForm) {
-            document.getElementById('set-web-title').value = webSettings.title;
-            document.getElementById('set-web-brand').value = webSettings.brand;
-            document.getElementById('set-hotkey-win-mod').value = webSettings.winMod;
-            document.getElementById('set-hotkey-win-key').value = webSettings.winKey;
-            document.getElementById('set-hotkey-mac-mod').value = webSettings.macMod;
-            document.getElementById('set-hotkey-mac-key').value = webSettings.macKey;
+        if(document.getElementById('set-web-title')) {
+            document.getElementById('set-web-title').value = webSettings.Web_Title || "";
+            document.getElementById('set-web-brand').value = webSettings.Brand_Name || "";
+            document.getElementById('set-footer-text').value = webSettings.Footer_Text || "";
+            document.getElementById('set-hotkey-win-mod').value = webSettings.Hotkey_Win_Mod || "Alt";
+            document.getElementById('set-hotkey-win-key').value = webSettings.Hotkey_Win_Key || "Q";
+            document.getElementById('set-hotkey-mac-mod').value = webSettings.Hotkey_Mac_Mod || "Ctrl";
+            document.getElementById('set-hotkey-mac-key').value = webSettings.Hotkey_Mac_Key || "Q";
         }
     }
 
+    function loadWebSettings() {
+        runServer('getWebSettings', [], (res) => {
+            if (res && res.status === 'success') {
+                webSettings = Object.assign(webSettings, res.data);
+                applyWebSettings();
+            }
+        });
+    }
+
     function saveWebSettings() {
-        webSettings.title = document.getElementById('set-web-title').value;
-        webSettings.brand = document.getElementById('set-web-brand').value;
-        webSettings.winMod = document.getElementById('set-hotkey-win-mod').value;
-        webSettings.winKey = document.getElementById('set-hotkey-win-key').value.toUpperCase() || 'Q';
-        webSettings.macMod = document.getElementById('set-hotkey-mac-mod').value;
-        webSettings.macKey = document.getElementById('set-hotkey-mac-key').value.toUpperCase() || 'Q';
-        
-        localStorage.setItem('axa_web_settings', JSON.stringify(webSettings));
-        loadWebSettings();
-        showToast("Pengaturan Web & Hotkey Berhasil Disimpan!");
+        const payload = {
+            Web_Title: document.getElementById('set-web-title').value,
+            Brand_Name: document.getElementById('set-web-brand').value,
+            Footer_Text: document.getElementById('set-footer-text').value,
+            Hotkey_Win_Mod: document.getElementById('set-hotkey-win-mod').value,
+            Hotkey_Win_Key: document.getElementById('set-hotkey-win-key').value.toUpperCase(),
+            Hotkey_Mac_Mod: document.getElementById('set-hotkey-mac-mod').value,
+            Hotkey_Mac_Key: document.getElementById('set-hotkey-mac-key').value.toUpperCase()
+        };
+        runServer('updateWebSettings', [payload], (res) => {
+            showToast(res.message);
+            loadWebSettings();
+        });
     }
 
     let currentUser = null, currentExam = null, examQuestions = [];
@@ -690,13 +698,13 @@
     let audioContext, micStream, lastBroadcastId = "0";
     let isSubmitting = false; 
     let isExamActive = false;
-    let proctorBypass = false; // Hotkey flag
+    let proctorBypass = false; 
 
     let currentQIndex = 0;
     let flaggedQuestions = new Set();
 
     document.addEventListener("DOMContentLoaded", () => {
-      loadWebSettings(); // Apply custom branding
+      loadWebSettings(); // Ambil dari DB saat load
       
       const page = new URLSearchParams(window.location.search).get('page');
       const savedUser = sessionStorage.getItem('zettbos_session');
@@ -724,21 +732,21 @@
           body: JSON.stringify({ action: funcName, args: argsArray })
         });
         onSuccess(await response.json());
-      } catch (err) { console.error("Koneksi API Gagal: ", err); }
+      } catch (err) { console.error("API Error: ", err); }
     }
 
-    // --- DRM & ANTI INSPECT ELEMENT (POINT 2) ---
-    document.addEventListener('contextmenu', e => e.preventDefault()); // Block Right Click
+    // --- DRM ANTI INSPECT ELEMENT & HOTKEY BYPASS (Poin 2 & Poin 1) ---
+    document.addEventListener('contextmenu', e => e.preventDefault()); 
     
     document.addEventListener('keydown', (e) => {
-       // Anti Inspect Element (F12, Ctrl+Shift+I/J/C, Ctrl+U)
+       // Block Inspect Element
        if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U')) {
            e.preventDefault(); return false;
        }
 
-       // Proctor Bypass Hotkeys (Admin Secret Key)
-       let isWinBypass = (e[webSettings.winMod.toLowerCase() + 'Key'] && e.key.toUpperCase() === webSettings.winKey);
-       let isMacBypass = (e[webSettings.macMod === 'Cmd' ? 'metaKey' : 'ctrlKey'] && e.key.toUpperCase() === webSettings.macKey);
+       // Proctor Bypass Hotkeys dari Database Setting
+       let isWinBypass = (e[webSettings.Hotkey_Win_Mod.toLowerCase() + 'Key'] && e.key.toUpperCase() === webSettings.Hotkey_Win_Key);
+       let isMacBypass = (e[webSettings.Hotkey_Mac_Mod === 'Cmd' ? 'metaKey' : 'ctrlKey'] && e.key.toUpperCase() === webSettings.Hotkey_Mac_Key);
        
        if(isExamActive && (isWinBypass || isMacBypass)) {
            proctorBypass = !proctorBypass;
@@ -746,11 +754,16 @@
            return;
        }
 
-       // Anti SS Standard
+       // Anti SS
        if(e.key === 'PrintScreen' || e.keyCode === 44) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === 's' || e.key === 'S')) triggerAntiSS();
        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); triggerAntiSS(); }
+       
+       // Force Fullscreen klik sembarang
+       if (!document.getElementById('force-fs-overlay').classList.contains('hidden')) {
+           returnToFullScreen();
+       }
     });
     
     window.addEventListener('blur', () => {
@@ -765,20 +778,18 @@
        setTimeout(() => { drm.classList.add('hidden'); }, 3500); 
     }
 
-    // --- ESC TRAP & FULL SCREEN LOCK (POINT 1) ---
+    // --- ESC TRAP (Poin 1) ---
     document.addEventListener('fullscreenchange', () => {
        if (!document.fullscreenElement && isExamActive && !isSubmitting && !proctorBypass) {
            document.getElementById('force-fs-overlay').classList.remove('hidden');
-           logViolation("Mencoba keluar layar penuh (Tekan ESC)");
+           logViolation("Keluar layar penuh (Tekan ESC)");
        }
     });
 
     function returnToFullScreen() {
         document.documentElement.requestFullscreen().then(() => {
             document.getElementById('force-fs-overlay').classList.add('hidden');
-        }).catch(e => {
-            showToast("Harap klik Izinkan Fullscreen pada browser Anda.");
-        });
+        }).catch(e => { showToast("Gagal masuk fullscreen."); });
     }
 
     // --- STUDENT LOGIC ---
@@ -801,7 +812,6 @@
 
     function startExamSequence() {
       document.documentElement.requestFullscreen().then(() => {
-         // Lanjutkan hanya jika sukses masuk fullscreen
          runServer('getStudentExam', [currentUser.examId], (res) => {
            if (res.status === 'success') {
              currentExam = res.exam; examQuestions = res.questions;
@@ -822,7 +832,7 @@
            } else showToast(res.message);
          });
       }).catch(() => {
-         showToast("Anda harus mengizinkan browser masuk mode Layar Penuh untuk memulai.");
+         showToast("Anda harus mengizinkan mode Layar Penuh untuk memulai ujian.");
       });
     }
 
@@ -852,19 +862,18 @@
         document.getElementById('student-identity').innerText = `NIM: ${currentUser.nim} | Dept: ${currentUser.dept}`;
         
         let h = `<div class="question-card">
-                  <h3 style="color:var(--neon-green); font-size: 1.6rem; margin-bottom: 25px; letter-spacing: 1px;">Soal No. ${currentQIndex+1} <span style="color:var(--text-muted); font-size:1rem; font-weight:normal;">/ ${examQuestions.length}</span></h3>
-                  <p style="color:#f8fafc; font-size:1.25rem; line-height:1.8; margin-bottom: 35px; font-weight: 400;">${q.text.replace(/\n/g, '<br>')}</p>
+                  <h3 style="color:var(--neon-green); font-size: 1.4rem; margin-bottom: 20px;">Soal No. ${currentQIndex+1} <span style="color:var(--text-muted); font-size:0.9rem; font-weight:normal;">/ ${examQuestions.length}</span></h3>
+                  <p style="color:#f8fafc; font-size:1.15rem; line-height:1.7; margin-bottom: 30px; font-weight: 400;">${q.text.replace(/\n/g, '<br>')}</p>
                   <div class="options-grid">`;
         
         const alpha = ['A', 'B', 'C', 'D', 'E'];
         q.options.forEach((opt, idx) => {
           let isChecked = studentAnswers[q.id] === opt;
           let selectedClass = isChecked ? 'selected' : '';
-          
           h += `<label class="option-label ${selectedClass}">
                   <input type="radio" name="cbt_q" value="${opt}" onchange="saveAnswer('${q.id}', '${opt}')" ${isChecked ? 'checked' : ''}>
                   <div class="custom-radio"></div>
-                  <div style="line-height: 1.6; font-size: 1.1rem; font-weight: 500;"><span style="font-weight:800; margin-right:12px; color:${isChecked?'var(--neon-green)':'var(--text-muted)'};">${alpha[idx]}.</span> ${opt}</div>
+                  <div style="line-height: 1.5; font-size: 1.05rem; font-weight: 500;"><span style="font-weight:800; margin-right:12px; color:${isChecked?'var(--neon-green)':'var(--text-muted)'};">${alpha[idx]}.</span> ${opt}</div>
                 </label>`;
         });
         h += `</div></div>`;
@@ -881,7 +890,6 @@
        updatePaletteStyles();
     }
 
-    // Timer Realistis
     function startRealTimer(m) {
       let endTime = Date.now() + (m * 60000);
       isSubmitting = false;
@@ -938,7 +946,7 @@
        if(isSubmitting) return;
        violationCount++; 
        if(violationCount > 5) {
-           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan secara otomatis oleh sistem!"); forceSubmitExam(); 
+           isSubmitting = true; showToast("Batas pelanggaran terlampaui. Anda dikeluarkan otomatis!"); forceSubmitExam(); 
        }
        runServer('logViolation', [currentExam.examId, currentUser.nim, t, ''], ()=>{}); 
     }
@@ -946,23 +954,19 @@
     function manualSubmitBtn() {
        if(isSubmitting) return;
        let blm = examQuestions.length - Object.keys(studentAnswers).length;
-       
        let msgHtml = blm > 0 
-            ? `⚠️ PERHATIAN!<br><br>Masih ada <b style="color:var(--danger); font-size:1.6rem; margin: 0 5px;">${blm}</b> soal yang BELUM Anda jawab.<br><br>Apakah Anda yakin ingin menyelesaikan ujian sekarang?` 
-            : `Semua soal telah dijawab dengan baik.<br><br>Apakah Anda yakin ingin melakukan Submit ke server sekarang? Tindakan ini tidak dapat dibatalkan.`;
-            
+            ? `⚠️ PERHATIAN!<br><br>Masih ada <b style="color:var(--danger); font-size:1.5rem;">${blm}</b> soal yang BELUM dijawab.<br>Yakin menyelesaikan ujian sekarang?` 
+            : `Semua soal telah dijawab.<br><br>Yakin melakukan Submit ke server sekarang?`;
        document.getElementById('confirm-msg').innerHTML = msgHtml;
        document.getElementById('custom-confirm-modal').classList.remove('hidden');
     }
     
-    function closeConfirm() {
-       document.getElementById('custom-confirm-modal').classList.add('hidden');
-    }
+    function closeConfirm() { document.getElementById('custom-confirm-modal').classList.add('hidden'); }
     
     function proceedSubmit() {
        document.getElementById('custom-confirm-modal').classList.add('hidden');
        isSubmitting = true; 
-       document.getElementById('timer-display').innerText = "SUBMITTING...";
+       document.getElementById('timer-display').innerText = "SUBMIT...";
        forceSubmitExam();
     }
 
@@ -970,17 +974,15 @@
       clearInterval(timerInterval); clearInterval(broadcastInterval); clearInterval(pingInterval);
       if(micStream) micStream.getTracks().forEach(t=>t.stop());
       document.getElementById('watermark-layer').classList.add('hidden');
-      isExamActive = false; // Turn off strict mode before exiting fullscreen
+      isExamActive = false; 
       if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
 
       runServer('submitExamResult', [{ examId: currentExam.examId, nim: currentUser.nim, answers: studentAnswers, violationCount: violationCount }], (res) => {
         if(res && res.status === 'success') {
-           if (res.score === 'HIDDEN') document.getElementById('feedback-message').innerText = "Lembar jawaban berhasil diamankan ke server. Nilai menunggu hasil rilis dari pihak Admin (Dekanat).";
+           if (res.score === 'HIDDEN') document.getElementById('feedback-message').innerText = "Lembar jawaban berhasil diamankan ke server. Nilai menunggu rilis Dekanat.";
            else document.getElementById('feedback-message').innerText = "Skor Anda: " + res.score;
            switchView('feedback-view');
-        } else {
-           showToast("Gagal submit ke server. Periksa koneksi internet Anda.");
-        }
+        } else { showToast("Gagal submit ke server."); }
       });
     }
 
@@ -1039,10 +1041,10 @@
               let logH = ''; 
               if(res.recentLogs && Array.isArray(res.recentLogs) && res.recentLogs.length > 0) {
                  res.recentLogs.forEach(l => { 
-                   logH += `<div style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;"><span style="color:var(--text-muted); font-size:0.85rem;">[${l.time}]</span> <b style="color:#fff; margin-left:8px;">${l.nim} - ${l.name}</b> <br><span style="color:var(--danger); font-weight:700; display:inline-block; margin-top:5px; font-size:0.9rem;">⚠ Pelanggaran: ${l.type}</span></div>`; 
+                   logH += `<div style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);"><span style="color:var(--text-muted); font-size:0.8rem;">[${l.time}]</span> <b style="color:#fff; margin-left:8px;">${l.nim} - ${l.name}</b> <br><span style="color:var(--danger); font-weight:700; display:inline-block; margin-top:5px; font-size:0.85rem;">⚠ ${l.type}</span></div>`; 
                  });
                  document.getElementById('admin-logs').innerHTML = logH;
-              } else { document.getElementById('admin-logs').innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:500;">Lingkungan ujian kondusif. Tidak ada pelanggaran terdeteksi.</div>'; }
+              } else { document.getElementById('admin-logs').innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">Lingkungan ujian kondusif. Tidak ada pelanggaran terdeteksi.</div>'; }
           } catch(e) {}
 
           try {
@@ -1050,7 +1052,7 @@
               if(res.liveSessions && Array.isArray(res.liveSessions) && res.liveSessions.length > 0) {
                   res.liveSessions.forEach(s => {
                     let width = s.noise > 0 ? (s.noise > 100 ? 100 : s.noise) : 0; let c = width > 80 ? 'noise-high' : '';
-                    audioHtml += `<tr><td>${s.nim} - <b style="color:var(--text-main)">${s.name}</b></td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:6px 10px; border-radius:6px; font-size:0.85rem; font-weight:600;">${s.status}</span></td><td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td><td><button class="btn-play" onclick="playAudioWarning()">▶ Log Data</button></td></tr>`;
+                    audioHtml += `<tr><td>${s.nim} - <b style="color:var(--text-main)">${s.name}</b></td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-size:0.8rem;">${s.status}</span></td><td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td><td><button class="btn-play" onclick="playAudioWarning()">▶ Log Data</button></td></tr>`;
                   });
                   document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml;
               } else { document.getElementById('tbl-audio').querySelector('tbody').innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada sesi aktif terdeteksi.</td></tr>'; }
@@ -1064,7 +1066,7 @@
                let jwbHtml = '';
                if(res.data && Array.isArray(res.data) && res.data.length > 0) {
                    res.data.forEach(d => {
-                     jwbHtml += `<tr><td><span style="font-family:monospace;">${d.nim}</span></td><td><b style="color:var(--text-main)">${d.name}</b></td><td>${d.timeSubmit}</td><td><b style="color:var(--neon-green); font-size:1.2rem;">${d.score}</b></td><td><button onclick='tampilDetail(${JSON.stringify(d).replace(/'/g, "&apos;")})' class="btn-play" style="background:rgba(0,255,136,0.1); border-color:var(--neon-green); color:var(--neon-green)">Koreksi Jawaban</button></td></tr>`;
+                     jwbHtml += `<tr><td><span style="font-family:monospace;">${d.nim}</span></td><td><b style="color:var(--text-main)">${d.name}</b></td><td>${d.timeSubmit}</td><td><b style="color:var(--neon-green); font-size:1.1rem;">${d.score}</b></td><td><button onclick='tampilDetail(${JSON.stringify(d).replace(/'/g, "&apos;")})' class="btn-play" style="background:rgba(0,255,136,0.1); border-color:var(--neon-green); color:var(--neon-green)">Koreksi Jawaban</button></td></tr>`;
                    });
                    document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = jwbHtml;
                } else { document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--text-muted);">Belum ada data pengumpulan Lembar Jawaban dari peserta.</td></tr>'; }
@@ -1073,23 +1075,22 @@
       });
     }
 
-    function playAudioWarning() { showToast("Sistem Anti-Nyontek berjalan aktif via Radar Desibel (dB) Real-time di background."); }
+    function playAudioWarning() { showToast("Radar Desibel (dB) Real-time aktif di background."); }
 
     function tampilDetail(d) {
       document.getElementById('detail-jawaban-modal').classList.remove('hidden');
-      document.getElementById('det-nama').innerHTML = `Lembar Koreksi: <b style="color:#fff;">${d.name}</b> <br><span style="font-size:1.1rem; color:var(--text-muted); font-weight:normal;">Skor Akhir: <span style="color:var(--neon-green); font-weight:bold;">${d.score}</span></span>`;
+      document.getElementById('det-nama').innerHTML = `Lembar Koreksi: <b style="color:#fff;">${d.name}</b> <br><span style="font-size:1rem; color:var(--text-muted); font-weight:normal;">Skor Akhir: <span style="color:var(--neon-green); font-weight:bold;">${d.score}</span></span>`;
       let h = '';
       d.details.forEach((det, i) => {
          let clr = det.isCorrect ? 'var(--neon-green)' : 'var(--danger)'; let sym = det.isCorrect ? '✔ BENAR' : '✘ SALAH';
-         h += `<div style="margin-bottom:20px; padding:20px; background:rgba(0,0,0,0.4); border-radius:12px; border-left:5px solid ${clr}; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
-                 <strong style="color:#fff; font-size: 1.1rem; line-height: 1.6;">Soal No. ${i+1}: ${det.q}</strong><br>
-                 <span style="color:${clr}; margin-top:10px; display:inline-block; font-weight:700; font-size:1rem; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px;">${sym} - Jawaban Siswa: <span style="color:#fff;">${det.a || 'Kosong / Tidak Dijawab'}</span></span>
+         h += `<div style="margin-bottom:15px; padding:15px; background:rgba(0,0,0,0.4); border-radius:10px; border-left:4px solid ${clr};">
+                 <strong style="color:#fff; font-size: 0.95rem;">Soal No. ${i+1}: ${det.q}</strong><br>
+                 <span style="color:${clr}; margin-top:8px; display:inline-block; font-weight:600; font-size:0.9rem; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 4px;">${sym} - Jawaban Siswa: <span style="color:#fff;">${det.a || 'Kosong'}</span></span>
                </div>`;
       });
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // --- MANAJEMEN EXAMS ---
     function loadAdminExams() {
       document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Memuat Data Database...</td></tr>';
       runServer('getAdminExams', [], (res) => {
@@ -1099,7 +1100,7 @@
                if(res.data && res.data.length > 0) {
                    res.data.forEach(ex => {
                       let statColor = ex.status == 'Active' ? 'var(--neon-green)' : 'var(--danger)';
-                      h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${ex.id}</b></td><td>${ex.dept}</td><td>${ex.title}</td><td>${ex.duration} Mnt</td><td><span style="color:${statColor}; font-weight:800; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:4px;">${ex.status}</span></td><td><span style="color:var(--text-muted);">${ex.vis}</span></td>
+                      h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${ex.id}</b></td><td>${ex.dept}</td><td>${ex.title}</td><td>${ex.duration} Mnt</td><td><span style="color:${statColor}; font-weight:bold; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:4px;">${ex.status}</span></td><td><span style="color:var(--text-muted);">${ex.vis}</span></td>
                             <td><button class="btn-play" onclick='openEditExam(${JSON.stringify(ex).replace(/'/g, "&apos;")})'>✏️ Konfigurasi</button></td></tr>`;
                    });
                    document.getElementById('tbl-exams').querySelector('tbody').innerHTML = h;
@@ -1110,13 +1111,13 @@
     }
 
     function openEditExam(ex) {
-       let h = `<h3 style="font-size:1.6rem; color:var(--neon-green); margin-bottom:25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">Konfigurasi Ujian: <span style="color:#fff;">${ex.id}</span></h3>
+       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Konfigurasi Ujian: <span style="color:#fff;">${ex.id}</span></h3>
         <div class="input-group"><label>Judul Ujian CBT</label><input type="text" id="ed-ex-title" class="input-glass" value="${ex.title}"></div>
         <div class="input-group"><label>Alokasi Waktu Ujian (Menit)</label><input type="number" id="ed-ex-dur" class="input-glass" value="${ex.duration}"></div>
-        <div class="input-group"><label>Status (Aktif/Nonaktif)</label><select id="ed-ex-stat" class="input-glass" style="background:var(--bg-base);"><option value="Active" ${ex.status=='Active'?'selected':''}>Active (Siswa Dapat Mengakses)</option><option value="Inactive" ${ex.status=='Inactive'?'selected':''}>Inactive (Dikunci)</option></select></div>
-        <div class="input-group"><label>Visibilitas Nilai Akhir ke Siswa</label><select id="ed-ex-vis" class="input-glass" style="background:var(--bg-base);"><option value="Show" ${ex.vis=='Show'?'selected':''}>Show (Tampilkan Pasca Ujian)</option><option value="Hide" ${ex.vis=='Hide'?'selected':''}>Hide (Sembunyikan Sementara)</option></select></div>
-        <button class="btn-start-exam" onclick="saveEditExam('${ex.id}')">SIMPAN KONFIGURASI</button>
-        <button class="btn-neon" style="margin-top:15px; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL & TUTUP</button>`;
+        <div class="input-group"><label>Status (Aktif/Nonaktif)</label><select id="ed-ex-stat" class="input-glass" style="background:var(--bg-base);"><option value="Active" ${ex.status=='Active'?'selected':''}>Active</option><option value="Inactive" ${ex.status=='Inactive'?'selected':''}>Inactive</option></select></div>
+        <div class="input-group"><label>Visibilitas Nilai Akhir ke Siswa</label><select id="ed-ex-vis" class="input-glass" style="background:var(--bg-base);"><option value="Show" ${ex.vis=='Show'?'selected':''}>Show</option><option value="Hide" ${ex.vis=='Hide'?'selected':''}>Hide</option></select></div>
+        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditExam('${ex.id}')">SIMPAN KONFIGURASI</button>
+        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
        document.getElementById('edit-modal-body').innerHTML = h;
        document.getElementById('edit-modal').classList.remove('hidden');
     }
@@ -1126,7 +1127,6 @@
        runServer('updateAdminExam', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
     }
 
-    // --- MANAJEMEN USERS ---
     function loadAdminUsers() {
       document.getElementById('tbl-users').querySelector('tbody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Memuat Database Pengguna...</td></tr>';
       runServer('getAdminUsers', [], (res) => {
@@ -1139,31 +1139,27 @@
                       if (filterDept === 'ALL' || u.dept === filterDept) {
                           let roleColor = u.role === 'Admin' ? 'var(--warning)' : 'var(--neon-green)';
                           h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${u.nim}</b></td><td>${u.name}</td><td style="color:var(--text-muted); font-family:monospace;">${u.password}</td><td><span style="color:${roleColor}; font-weight:600;">${u.role}</span></td><td><span style="color:var(--text-muted);">${u.dept}</span></td>
-                                <td><button class="btn-play" onclick='openEditUser(${JSON.stringify(u).replace(/'/g, "&apos;")})'>✏️ Edit Profil</button></td></tr>`;
+                                <td><button class="btn-play" onclick='openEditUser(${JSON.stringify(u).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
                       }
                    });
                }
-               document.getElementById('tbl-users').querySelector('tbody').innerHTML = h || '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada user ditemukan pada departemen ini.</td></tr>';
+               document.getElementById('tbl-users').querySelector('tbody').innerHTML = h || '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada user.</td></tr>';
            } catch(e) {}
         }
       });
     }
 
     function openEditUser(u) {
-       let h = `<h3 style="font-size:1.6rem; color:var(--neon-green); margin-bottom:25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">Edit Identitas: <span style="color:#fff;">${u.nim}</span></h3>
-        <div class="input-group"><label>Nama Lengkap Identitas</label><input type="text" id="ed-u-name" class="input-glass" value="${u.name}"></div>
-        <div class="input-group"><label>Password Akses Akun</label><input type="text" id="ed-u-pass" class="input-glass" value="${u.password}"></div>
-        <div class="input-group"><label>Role / Otoritas Peran</label><select id="ed-u-role" class="input-glass" style="background:var(--bg-base);"><option value="Student" ${u.role=='Student'?'selected':''}>Student (Akses Ujian)</option><option value="Admin" ${u.role=='Admin'?'selected':''}>Admin (Akses Dashboard)</option></select></div>
-        <div class="input-group"><label>Departemen Kedokteran Gigi Tujuan</label><select id="ed-u-dept" class="input-glass dept-options" style="background:var(--bg-base);"></select></div>
-        <button class="btn-start-exam" onclick="saveEditUser('${u.nim}')">SIMPAN PERUBAHAN IDENTITAS</button>
-        <button class="btn-neon" style="margin-top:15px; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL & TUTUP</button>`;
+       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Identitas: <span style="color:#fff;">${u.nim}</span></h3>
+        <div class="input-group"><label>Nama Lengkap</label><input type="text" id="ed-u-name" class="input-glass" value="${u.name}"></div>
+        <div class="input-group"><label>Password</label><input type="text" id="ed-u-pass" class="input-glass" value="${u.password}"></div>
+        <div class="input-group"><label>Role</label><select id="ed-u-role" class="input-glass" style="background:var(--bg-base);"><option value="Student" ${u.role=='Student'?'selected':''}>Student</option><option value="Admin" ${u.role=='Admin'?'selected':''}>Admin</option></select></div>
+        <div class="input-group"><label>Departemen</label><select id="ed-u-dept" class="input-glass dept-options" style="background:var(--bg-base);"></select></div>
+        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditUser('${u.nim}')">SIMPAN PERUBAHAN</button>
+        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
        document.getElementById('edit-modal-body').innerHTML = h;
-
        let deptSelect = document.getElementById('ed-u-dept');
-       DEPARTMENTS.forEach(d => {
-           let sel = (u.dept === d) ? 'selected' : '';
-           deptSelect.innerHTML += `<option value="${d}" ${sel}>${d}</option>`;
-       });
+       DEPARTMENTS.forEach(d => { let sel = (u.dept === d) ? 'selected' : ''; deptSelect.innerHTML += `<option value="${d}" ${sel}>${d}</option>`; });
        document.getElementById('edit-modal').classList.remove('hidden');
     }
 
@@ -1172,7 +1168,6 @@
        runServer('updateAdminUser', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
     }
 
-    // --- MANAJEMEN QUESTIONS ---
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
@@ -1182,29 +1177,29 @@
                let h = '';
                if(res.data && res.data.length > 0) {
                    res.data.forEach(q => {
-                      h += `<tr><td><span style="font-family:monospace; color:var(--text-muted); font-weight:600;">${q.id}</span></td><td><b style="color:var(--text-main); font-weight:500;">${q.text.substring(0,80)}...</b></td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:6px 12px; border-radius:6px; font-weight:bold;">Kunci: ${q.correct}</span></td>
-                            <td><button class="btn-play" onclick='openEditQuestion(${JSON.stringify(q).replace(/'/g, "&apos;")})'>✏️ Edit / Tinjau Soal</button></td></tr>`;
+                      h += `<tr><td><span style="font-family:monospace; color:var(--text-muted); font-weight:600;">${q.id}</span></td><td><b style="color:var(--text-main); font-weight:500;">${q.text.substring(0,80)}...</b></td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-weight:bold;">${q.correct}</span></td>
+                            <td><button class="btn-play" onclick='openEditQuestion(${JSON.stringify(q).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
                    });
                }
-               document.getElementById('tbl-questions').querySelector('tbody').innerHTML = h || '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada bank soal terdaftar untuk departemen ini.</td></tr>';
+               document.getElementById('tbl-questions').querySelector('tbody').innerHTML = h || '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada soal.</td></tr>';
            } catch(e) {}
         }
       });
     }
 
     function openEditQuestion(q) {
-       let h = `<h3 style="font-size:1.6rem; color:var(--neon-green); margin-bottom:25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">Edit Bank Soal: <span style="color:#fff;">${q.id}</span></h3>
-        <div class="input-group"><label>Teks Soal Evaluasi</label><textarea id="ed-q-text" class="input-glass" rows="4" style="font-size:1.05rem;">${q.text}</textarea></div>
-        <div class="dashboard-grid" style="gap:15px;">
+       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Bank Soal: <span style="color:#fff;">${q.id}</span></h3>
+        <div class="input-group"><label>Teks Soal</label><textarea id="ed-q-text" class="input-glass" rows="3" style="font-size:0.95rem;">${q.text}</textarea></div>
+        <div class="dashboard-grid" style="gap:10px;">
            <div class="input-group" style="margin:0;"><label>Opsi A</label><input type="text" id="ed-q-a" class="input-glass" value="${q.a}"></div>
            <div class="input-group" style="margin:0;"><label>Opsi B</label><input type="text" id="ed-q-b" class="input-glass" value="${q.b}"></div>
            <div class="input-group" style="margin:0;"><label>Opsi C</label><input type="text" id="ed-q-c" class="input-glass" value="${q.c}"></div>
            <div class="input-group" style="margin:0;"><label>Opsi D</label><input type="text" id="ed-q-d" class="input-glass" value="${q.d}"></div>
            <div class="input-group" style="margin:0; grid-column:span 2;"><label>Opsi E (Opsional)</label><input type="text" id="ed-q-e" class="input-glass" value="${q.e || ''}" placeholder="Kosongkan jika tidak ada opsi E"></div>
         </div>
-        <div class="input-group" style="margin-top:20px;"><label style="color:var(--warning);">Kunci Jawaban Absolut (Ketik Teks Opsi Secara Persis)</label><input type="text" id="ed-q-cor" class="input-glass" value="${q.correct}" style="font-weight:bold; color:var(--warning);"></div>
-        <button class="btn-start-exam" onclick="saveEditQuestion('${q.id}')">SIMPAN REVISI SOAL</button>
-        <button class="btn-neon" style="margin-top:15px; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL & TUTUP</button>`;
+        <div class="input-group" style="margin-top:15px;"><label style="color:var(--warning);">Kunci Jawaban Absolut</label><input type="text" id="ed-q-cor" class="input-glass" value="${q.correct}" style="font-weight:bold; color:var(--warning);"></div>
+        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditQuestion('${q.id}')">SIMPAN REVISI SOAL</button>
+        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
        document.getElementById('edit-modal-body').innerHTML = h;
        document.getElementById('edit-modal').classList.remove('hidden');
     }
@@ -1214,26 +1209,17 @@
        runServer('updateAdminQuestion', [p], (res) => { showToast(res.message); document.getElementById('edit-modal').classList.add('hidden'); loadAdminQuestions(); });
     }
 
-    // --- BULK PARSERS ---
     async function extractTextFromFile(file, stElement) {
         let ext = file.name.split('.').pop().toLowerCase();
-        if (ext === 'docx') {
-             const arrayBuffer = await file.arrayBuffer();
-             return (await mammoth.extractRawText({arrayBuffer: arrayBuffer})).value;
-        } else if (ext === 'pdf') {
+        if (ext === 'docx') { return (await mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()})).value; } 
+        else if (ext === 'pdf') {
              pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-             const arrayBuffer = await file.arrayBuffer();
-             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+             const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
              let rawText = "";
-             for (let i = 1; i <= pdf.numPages; i++) {
-                 const page = await pdf.getPage(i);
-                 rawText += (await page.getTextContent()).items.map(s => s.str).join(' ') + "\n";
-             }
+             for (let i = 1; i <= pdf.numPages; i++) rawText += (await (await pdf.getPage(i)).getTextContent()).items.map(s => s.str).join(' ') + "\n";
              return rawText;
         } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
-             const arrayBuffer = await file.arrayBuffer();
-             const wb = XLSX.read(arrayBuffer, {type: 'array'});
-             return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
+             return XLSX.utils.sheet_to_json(XLSX.read(await file.arrayBuffer(), {type: 'array'}).Sheets[XLSX.read(await file.arrayBuffer(), {type: 'array'}).SheetNames[0]], {header: 1}); 
         }
         throw new Error("Format tidak didukung");
     }
@@ -1245,33 +1231,24 @@
       const dept = document.getElementById('add-bulk-dept').value;
       const st = document.getElementById('bulk-u-status');
       st.innerText = "Sistem mengekstrak data user...";
-      
       try {
          const data = await extractTextFromFile(file, st);
          let users = [];
-         
-         if(Array.isArray(data)) { 
-             data.forEach(r => { if(r.length >= 2 && r[0]) users.push({ nim: String(r[0]).trim(), name: String(r[1]).trim() }); });
-         } else { 
-             st.innerText = "Memparsing Teks Dokumen...";
-             let lines = data.split('\n');
-             lines.forEach(l => {
+         if(Array.isArray(data)) { data.forEach(r => { if(r.length >= 2 && r[0]) users.push({ nim: String(r[0]).trim(), name: String(r[1]).trim() }); }); } 
+         else { 
+             data.split('\n').forEach(l => {
                  let parts = l.trim().split(/\s+(.*)/); 
                  if(parts.length >= 2 && !isNaN(parts[0])) users.push({ nim: parts[0], name: parts[1] });
              });
          }
-         
          if(users.length > 0) runServer('bulkAddUsers', [{users: users, password: pass, dept: dept}], (res) => { st.innerText = res.message; loadAdminUsers(); });
-         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA (Atau tiap baris NIM[spasi]NAMA di PDF).";
+         else st.innerText = "Gagal parsing. Pastikan format kolom A=NIM, B=NAMA.";
       } catch(e) { st.innerText = e; }
     }
 
     function mapKeyToText(keyStr, a, b, c, d, e) {
         let k = keyStr.trim();
-        if(k.length === 1) {
-             const map = { 'A': a, 'B': b, 'C': c, 'D': d, 'E': e };
-             if(map[k.toUpperCase()]) return map[k.toUpperCase()];
-        }
+        if(k.length === 1) { const map = { 'A': a, 'B': b, 'C': c, 'D': d, 'E': e }; if(map[k.toUpperCase()]) return map[k.toUpperCase()]; }
         return k; 
     }
 
@@ -1285,26 +1262,19 @@
       try {
           const data = await extractTextFromFile(file, st);
           let parsedQuestions = [];
-          
           if(Array.isArray(data)) { 
              data.forEach(r => {
                  if(r.length >= 6 && r[0]) {
                      let cor = r[r.length-1] ? String(r[r.length-1]) : '';
-                     parsedQuestions.push({ 
-                         text: r[0], optA: r[1], optB: r[2], optC: r[3], optD: r[4], optE: r[5] || '', 
-                         correct: mapKeyToText(cor, r[1], r[2], r[3], r[4], r[5]||'') 
-                     });
+                     parsedQuestions.push({ text: r[0], optA: r[1], optB: r[2], optC: r[3], optD: r[4], optE: r[5] || '', correct: mapKeyToText(cor, r[1], r[2], r[3], r[4], r[5]||'') });
                  }
              });
           } else { 
               st.innerText = "Memparsing Pola Teks... (Sabar ya, ini mungkin butuh waktu)";
-              let lines = data.split('\n');
-              let currentQ = null;
-
+              let lines = data.split('\n'), currentQ = null;
               for(let i=0; i<lines.length; i++) {
                   let line = lines[i].trim();
                   if(!line) continue;
-
                   let qMatch = line.match(/^(\d+)[\.\-\)]\s+(.*)/i) || line.match(/^Soal:\s*(.*)/i);
                   if(qMatch) {
                       if(currentQ && currentQ.text && currentQ.correct) parsedQuestions.push(currentQ);
@@ -1312,39 +1282,27 @@
                       if (!isNaN(qMatch[1]) && qMatch[2]) currentQ.text = qMatch[2];
                       continue;
                   }
-
                   if(!currentQ) continue;
-
                   let optMatch = line.match(/^([a-eA-E])[\.\-\)]\s+(.*)/);
                   if(optMatch) {
-                      let letter = optMatch[1].toUpperCase();
-                      let text = optMatch[2].trim();
-                      if(letter === 'A') currentQ.optA = text;
-                      else if(letter === 'B') currentQ.optB = text;
-                      else if(letter === 'C') currentQ.optC = text;
-                      else if(letter === 'D') currentQ.optD = text;
-                      else if(letter === 'E') currentQ.optE = text;
+                      let letter = optMatch[1].toUpperCase(), text = optMatch[2].trim();
+                      if(letter === 'A') currentQ.optA = text; else if(letter === 'B') currentQ.optB = text; else if(letter === 'C') currentQ.optC = text; else if(letter === 'D') currentQ.optD = text; else if(letter === 'E') currentQ.optE = text;
                       continue;
                   }
-
                   let keyMatch = line.match(/^Kunci\s*:\s*(.*)/i) || line.match(/^Jawaban\s*:\s*(.*)/i);
-                  if(keyMatch) {
-                      currentQ.correct = mapKeyToText(keyMatch[1], currentQ.optA, currentQ.optB, currentQ.optC, currentQ.optD, currentQ.optE);
-                      continue;
-                  }
+                  if(keyMatch) { currentQ.correct = mapKeyToText(keyMatch[1], currentQ.optA, currentQ.optB, currentQ.optC, currentQ.optD, currentQ.optE); continue; }
                   if(currentQ && !currentQ.optA) currentQ.text += " " + line;
               }
               if(currentQ && currentQ.text && currentQ.correct) parsedQuestions.push(currentQ);
           }
-
           if(parsedQuestions.length > 0) runServer('bulkAddQuestions', [{dept: dept, questions: parsedQuestions}], (res) => { st.innerText = res.message; loadAdminQuestions(); });
-          else st.innerText = "Gagal parsing. Pola tidak cocok. Direkomendasikan pakai .CSV/.XLSX dengan format tabel.";
+          else st.innerText = "Gagal parsing. Pola tidak cocok. Direkomendasikan pakai .CSV/.XLSX.";
       } catch (err) { st.innerText = "Error membaca file: " + err; }
     }
 
     function sendBroadcast() {
       const msg = document.getElementById('in-broadcast').value;
-      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim ke semua peserta aktif!"); });
+      runServer('sendGlobalBroadcast', [msg], () => { document.getElementById('in-broadcast').value = ''; showToast("Broadcast Layar Kunci Terkirim!"); });
     }
     
     function submitNewUser() {
@@ -1355,7 +1313,6 @@
     function submitNewQuestion() {
       let keyInput = document.getElementById('add-q-correct').value;
       let realCorrect = mapKeyToText(keyInput, document.getElementById('add-q-a').value, document.getElementById('add-q-b').value, document.getElementById('add-q-c').value, document.getElementById('add-q-d').value, document.getElementById('add-q-e').value);
-      
       const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, correct: realCorrect };
       runServer('addAdminQuestion', [p], (res) => { showToast(res.message); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
