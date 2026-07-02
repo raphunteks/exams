@@ -1,12 +1,13 @@
 {
   "name": "axa-dental-exam",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Axa Dental Exam Headless Portal by Axa Xyz",
   "main": "index.html",
   "scripts": {
     "start": "echo 'This is a static Vercel app. No build step required.'"
   },
   "dependencies": {
+    "js-cookie": "^3.0.5",
     "mammoth": "^1.6.0",
     "pdfjs-dist": "^3.11.174",
     "xlsx": "^0.18.5"
