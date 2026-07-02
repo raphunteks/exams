@@ -166,12 +166,10 @@
     
     #toast { position: fixed; top: 30px; right: 30px; z-index: 10000; background: rgba(255,42,95,0.95); padding: 18px 28px; border-radius: 12px; color: white; font-weight: 600; border-left: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
-    /* Pop-up Modals Background */
     .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.92); backdrop-filter: blur(15px); z-index: 11000; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .modal-content { background: var(--bg-base); border: 1px solid rgba(0,255,136,0.3); padding: 30px; border-radius: 20px; width: 100%; max-width: 700px; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,255,136,0.05); max-height: 90vh; overflow-y: auto; position: relative; }
     .broadcast-content { background: linear-gradient(135deg, #ff2a5f 0%, #990033 100%); text-align: center; border: 1px solid #ffb700; box-shadow: 0 0 60px rgba(255,42,95,0.5); max-width: 500px; }
     
-    /* Responsive Table Wrapper */
     .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-top: 1rem; }
     table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.85rem; }
     th, td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; text-align: left; white-space: nowrap; }
@@ -488,7 +486,7 @@
         <div class="dashboard-grid">
           <div class="glass-panel" style="grid-column: span 1;">
             <h3 style="color:var(--neon-green);">Upload Bulk Soal (.xlsx, .csv, .pdf)</h3>
-            <p style="font-size:0.85rem;">Format Isi File / Dokumen Teks: <br><span style="color:#e2e8f0; font-family:monospace; background:rgba(0,0,0,0.6); padding:15px; display:block; border-radius:10px; margin-top:8px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.6;">1. [teks soal]<br>A. [opsi] <br>B. [opsi] <br>C. [opsi] <br>D. [opsi] <br>E. [opsi]<br>Kunci: A</span></p>
+            <p style="font-size:0.85rem;">Sistem mem-parsing dokumen dengan struktur teks: <br><span style="color:#e2e8f0; font-family:monospace; background:rgba(0,0,0,0.6); padding:15px; display:block; border-radius:10px; margin-top:8px; border: 1px solid rgba(255,255,255,0.05); line-height: 1.6;">Soal: [teks soal]<br>A: [opsi] <br>B: [opsi] <br>C: [opsi] <br>D: [opsi] <br>E: [opsi]<br>Kunci: [Teks opsi jawaban persis]</span></p>
             <div class="input-group" style="margin-top:20px;">
               <label>Departemen Ujian Tujuan</label>
               <select id="bulk-q-dept" class="input-glass dept-options" style="background: var(--bg-base);"></select>
@@ -512,10 +510,10 @@
                 <div class="input-group" style="margin:0; grid-column:span 2;"><input type="text" id="add-q-e" class="input-glass" placeholder="Opsi E (Opsional)"></div>
               </div>
               <div class="input-group">
-                 <label style="color: var(--neon-green);">Kunci Jawaban (A/B/C/D/E)</label>
-                 <input type="text" id="add-q-correct" class="input-glass" required style="text-transform:uppercase; font-weight: bold; width: 100px; text-align: center;">
+                 <label style="color: var(--neon-green);">Kunci Jawaban (Ketik persis seperti isi opsi)</label>
+                 <input type="text" id="add-q-correct" class="input-glass" required style="font-weight: bold;">
               </div>
-              <button type="submit" class="btn-neon">SIM ঐতিহ্য</button>
+              <button type="submit" class="btn-neon">SIMPAN SOAL</button>
             </form>
           </div>
         </div>
@@ -622,7 +620,6 @@
     // ==========================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyJHkKQh6s3f7idploBQVw62YzWY3oKV0S3l78JfvrKoyW7OyJJrTrAQt3K6duJBg/exec"; 
 
-    // --- REUSABLE DEPARTMENTS ARRAY ---
     const DEPARTMENTS = [
         "Biologi Oral", "Ilmu Bahan dan Teknologi", "Ilmu Kedokteran Gigi Anak", 
         "Ilmu Kedokteran Gigi Masyarakat - Pencegahan", "Ilmu Penyakit Mulut", 
@@ -777,13 +774,11 @@
        }
     });
     
-    // Mencegah trigger false-positive dari scroll address bar di Mobile
     document.addEventListener('visibilitychange', () => {
        if(isExamActive && !isSubmitting && !proctorBypass && document.hidden) triggerAntiSS();
     });
     
     window.addEventListener('blur', () => {
-        // Hanya trigger blur (pindah jendela) di layar Desktop/Tablet besar
         if(window.innerWidth > 768 && isExamActive && !isSubmitting && !proctorBypass) {
             triggerAntiSS();
         }
@@ -819,7 +814,7 @@
     document.addEventListener('touchend', () => clearTimeout(touchTimer));
     document.addEventListener('touchmove', () => clearTimeout(touchTimer)); 
 
-    // --- ESC TRAP (Auto Full Screen Return) ---
+    // --- ESC TRAP ---
     document.addEventListener('fullscreenchange', () => {
        if (!document.fullscreenElement && isExamActive && !isSubmitting && !proctorBypass) {
            document.getElementById('force-fs-overlay').classList.remove('hidden');
@@ -830,10 +825,7 @@
     function returnToFullScreen() {
         let elem = document.documentElement;
         let requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen;
-        
-        if (requestFS) {
-            requestFS.call(elem).catch(e => console.log(e));
-        }
+        if (requestFS) requestFS.call(elem).catch(e => console.log(e));
         document.getElementById('force-fs-overlay').classList.add('hidden');
     }
 
@@ -856,7 +848,7 @@
       });
     }
 
-    // --- SMART AUTO-BACKUP: Local Storage System ---
+    // --- SMART AUTO-BACKUP (Cloud Sync Update) ---
     function saveLocalBackup() {
         const state = { answers: studentAnswers, violationCount: violationCount, endTime: examEndTime };
         localStorage.setItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`, JSON.stringify(state));
@@ -977,16 +969,29 @@
         updatePaletteStyles();
     }
 
+    // UPGRADE POINT 1: TRIGGER PING (CLOUD SYNC) SETIAP KALI PINDAH SOAL ATAU MENJAWAB
     function saveAnswer(qId, val) { 
         studentAnswers[qId] = val; 
         saveLocalBackup(); 
+        sendPing('Online'); // Cloud Sync
         renderSingleQuestion(); 
     }
     
-    // Sinkronisasi Cloud setiap pindah soal
-    function nextQuestion() { if(currentQIndex < examQuestions.length - 1) { currentQIndex++; renderSingleQuestion(); sendPing('Online'); } }
-    function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderSingleQuestion(); sendPing('Online'); } }
-    function goToQ(idx) { currentQIndex = idx; renderSingleQuestion(); sendPing('Online'); }
+    function nextQuestion() { 
+        if(currentQIndex < examQuestions.length - 1) { 
+            currentQIndex++; renderSingleQuestion(); sendPing('Online'); 
+        } 
+    }
+    
+    function prevQuestion() { 
+        if(currentQIndex > 0) { 
+            currentQIndex--; renderSingleQuestion(); sendPing('Online'); 
+        } 
+    }
+    
+    function goToQ(idx) { 
+        currentQIndex = idx; renderSingleQuestion(); sendPing('Online'); 
+    }
     
     function toggleFlagQuestion() {
        if(flaggedQuestions.has(currentQIndex)) flaggedQuestions.delete(currentQIndex); else flaggedQuestions.add(currentQIndex);
@@ -1488,8 +1493,10 @@
       runServer('addAdminQuestion', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
     }
 
+    // POINT 2: Peringatan disembunyikan untuk user Mobile, KECUALI yang kritis
     function showToast(msg, isCritical = false) {
       if(window.innerWidth <= 768 && !isCritical) return; 
+      
       const t = document.getElementById('toast'); t.innerText = msg; t.style.transform = 'translateX(0)';
       setTimeout(() => { t.style.transform = 'translateX(150%)'; }, 4000);
     }
