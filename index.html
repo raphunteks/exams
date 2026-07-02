@@ -21,7 +21,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V14 (Ultimate DRM & Backup System)
+       SUPER BIG UPGRADE CSS3 - V15 (Smart UI & Mobile Friendly Nav)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -127,6 +127,8 @@
     /* UI UJIAN CBT PROFESIONAL */
     .cbt-container { display: flex; gap: 30px; align-items: flex-start; }
     .cbt-main { flex: 3; width: 100%; }
+    
+    /* Desktop Sidebar styling */
     .cbt-sidebar { flex: 1; width: 100%; background: rgba(15, 23, 42, 0.85); padding: 25px; border-radius: 16px; border: 1px solid rgba(0, 255, 136, 0.2); position: sticky; top: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
     
     .q-palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; margin-top: 15px; max-height: 350px; overflow-y: auto; padding-right: 5px; }
@@ -142,6 +144,10 @@
     @keyframes pulse-neon { 0% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } 50% { box-shadow: inset 0 0 20px rgba(0,255,136,0.5), 0 0 20px rgba(0,255,136,0.5); } 100% { box-shadow: inset 0 0 10px rgba(0,255,136,0.2), 0 0 10px rgba(0,255,136,0.2); } }
     .timer-box { font-size: 2.2rem; font-weight: 800; color: var(--neon-green); text-shadow: var(--neon-glow); letter-spacing: 3px; background: rgba(0,0,0,0.6); padding: 12px 30px; border-radius: 12px; border: 1px solid rgba(0,255,136,0.4); animation: pulse-neon 2s infinite; }
     
+    /* Tombol Navigasi Mobile */
+    .btn-nav-toggle { display: none; }
+    .btn-close-sidebar { display: none; }
+
     .options-grid { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2rem; }
     .option-label { display: flex; align-items: flex-start; padding: 20px 25px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
     .option-label:hover { background: rgba(0, 255, 136, 0.05); border-color: rgba(0, 255, 136, 0.3); transform: translateX(8px); }
@@ -197,18 +203,69 @@
     .app-footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); font-weight: 500; margin-top: auto; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
     .app-footer span.brand { color: var(--neon-green); font-weight: 700; letter-spacing: 1px; }
 
-    /* MOBILE RESPONSIVENESS */
+    /* MOBILE RESPONSIVENESS - V15 FIX (Navigasi Button) */
     @media (max-width: 768px) {
         .glass-panel, #admin-view .glass-panel { padding: 1.2rem; }
         .dashboard-grid { grid-template-columns: 1fr; gap: 1rem; }
-        .cbt-container { flex-direction: column-reverse; }
+        .cbt-container { flex-direction: column; } 
         .stat-number, #admin-view .stat-number { font-size: 2.5rem; }
         h2 { font-size: 1.5rem !important; }
-        .timer-box { font-size: 1.5rem; padding: 10px 15px; }
+        .timer-box { font-size: 1.2rem; padding: 8px 12px; border-radius: 8px; }
         .cbt-nav-btns { flex-direction: column; }
         .cbt-nav-btns button { width: 100% !important; margin-bottom: 10px; }
         .admin-tabs { margin-bottom: 1rem; }
         .modal-content { padding: 20px; }
+        
+        /* Mobile Nav Toggle Button */
+        .btn-nav-toggle { 
+            display: block; 
+            background: rgba(0, 255, 136, 0.1); 
+            color: var(--neon-green); 
+            border: 1px solid var(--neon-green); 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-size: 0.85rem;
+            box-shadow: 0 0 10px rgba(0,255,136,0.2);
+            white-space: nowrap;
+        }
+        
+        /* Sidebar dirubah menjadi Modal / Sliding Drawer di Mobile */
+        .cbt-sidebar {
+            position: fixed; 
+            top: 0; 
+            right: -100%; 
+            width: 320px; 
+            height: 100vh; 
+            max-width: 100vw; 
+            z-index: 10000; 
+            border-radius: 0; 
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+            display: flex; 
+            flex-direction: column;
+            background: rgba(10, 15, 30, 0.98);
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
+            border-left: 2px solid var(--neon-green);
+        }
+        .cbt-sidebar.open { right: 0; }
+        .btn-close-sidebar { 
+            display: block; 
+            background: rgba(255,42,95,0.1); 
+            color: var(--danger); 
+            border: 1px solid var(--danger); 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%; 
+            text-align: center; 
+        }
+        .exam-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        .exam-header > div:last-child { width: 100%; display: flex; justify-content: space-between; align-items: center; }
     }
   </style>
 </head>
@@ -320,7 +377,11 @@
            <h2 id="exam-title" style="margin:0; font-size: 1.4rem; letter-spacing: 1px; color: var(--neon-green);">Ujian Modul</h2>
            <p style="margin:6px 0 0 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500;" id="student-identity"></p>
         </div>
-        <div class="timer-box" id="timer-display">00:00:00</div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+           <!-- Toggles sidebar on mobile -->
+           <button class="btn-nav-toggle" onclick="toggleSidebar()">📑 NAVIGASI</button>
+           <div class="timer-box" id="timer-display">00:00:00</div>
+        </div>
       </div>
       
       <div class="cbt-container">
@@ -329,10 +390,14 @@
              <div class="cbt-nav-btns">
                  <button class="btn-neon" style="width: auto; color: #fff; border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);" onclick="prevQuestion()">◄ SEBELUMNYA</button>
                  <button class="btn-neon btn-warning" style="width: auto;" onclick="toggleFlagQuestion()">⚑ RAGU-RAGU</button>
-                 <button class="btn-neon" style="width: auto; background: rgba(0,255,136,0.1);" onclick="nextQuestion()">SELANJUTNYA ►</button>
+                 <button id="btn-next" class="btn-neon" style="width: auto; background: rgba(0,255,136,0.1);" onclick="nextQuestion()">SELANJUTNYA ►</button>
+                 <!-- Tombol submit hanya muncul di soal terakhir -->
+                 <button id="btn-submit-main" class="btn-start-exam" style="display:none; width: auto; margin-top: 0; padding: 14px 28px; background: linear-gradient(135deg, #ff2a5f 0%, #a60000 100%); box-shadow: 0 6px 20px rgba(255,42,95,0.4);" onclick="manualSubmitBtn()">SELESAI UJIAN</button>
              </div>
           </div>
-          <div class="cbt-sidebar">
+          
+          <div class="cbt-sidebar" id="cbt-sidebar">
+             <button class="btn-close-sidebar" onclick="toggleSidebar()">✕ TUTUP NAVIGASI</button>
              <h3 style="font-size: 1.1rem; text-align: center;">Navigasi Soal</h3>
              <div id="question-palette" class="q-palette"></div>
              <div style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 10px; padding: 12px; background: rgba(0,0,0,0.4); border-radius: 10px;">
@@ -340,7 +405,8 @@
                  <div style="display:flex; align-items:center; gap:10px; font-weight:600; color:#fff;"><span style="width:14px; height:14px; background:var(--neon-green); display:inline-block; border-radius:4px; box-shadow:0 0 8px var(--neon-green);"></span> Sudah Dijawab</div>
                  <div style="display:flex; align-items:center; gap:10px; font-weight:600;"><span style="width:14px; height:14px; background:var(--warning); display:inline-block; border-radius:4px; box-shadow:0 0 8px var(--warning);"></span> Ragu-ragu</div>
              </div>
-             <button class="btn-start-exam" style="margin-top: 25px; font-size: 1rem; padding: 15px; background: linear-gradient(135deg, #ff2a5f 0%, #a60000 100%); box-shadow: 0 6px 20px rgba(255,42,95,0.4);" onclick="manualSubmitBtn()">SELESAI UJIAN</button>
+             <!-- Opsional jika ingin ada tombol submit di sidebar (Sama seperti main) -->
+             <button id="sidebar-btn-submit" class="btn-start-exam" style="display:none; margin-top: 25px; font-size: 1rem; padding: 15px; background: linear-gradient(135deg, #ff2a5f 0%, #a60000 100%); box-shadow: 0 6px 20px rgba(255,42,95,0.4);" onclick="manualSubmitBtn()">SELESAI UJIAN</button>
           </div>
       </div>
     </div>
@@ -762,21 +828,17 @@
            return;
        }
        
-       if (isExamActive && !proctorBypass && (e.metaKey || e.ctrlKey || e.key === 'Meta' || e.key === 'Control')) {
-           if (!hasLoggedKeyHold) {
-               logViolation("Mencoba Shortcut Sistem (Cmd/Ctrl)");
-               hasLoggedKeyHold = true;
-           }
-           clearTimeout(drmTimeout);
-           document.getElementById('drm-overlay').classList.remove('hidden');
-           if(e.key.toUpperCase() === 'P' || e.key.toUpperCase() === 'S') e.preventDefault();
+       // FIX 1: Mac Meta Key (Cmd) Trap untuk Anti-Screenshot yang lebih agresif
+       if (e.metaKey && !proctorBypass && isExamActive) {
+           triggerAntiSS();
        }
 
        if(e.key === 'PrintScreen' || e.keyCode === 44) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) triggerAntiSS();
        if (e.metaKey && e.shiftKey && (e.key === 's' || e.key === 'S')) triggerAntiSS();
+       if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); triggerAntiSS(); }
     });
-
+    
     document.addEventListener('keyup', (e) => {
        if (e.key === 'Meta' || e.key === 'Control' || (!e.metaKey && !e.ctrlKey)) {
            hasLoggedKeyHold = false;
@@ -784,11 +846,13 @@
        }
     });
     
+    // Mencegah trigger false-positive dari scroll address bar di Mobile
     document.addEventListener('visibilitychange', () => {
        if(isExamActive && !isSubmitting && !proctorBypass && document.hidden) triggerAntiSS();
     });
     
     window.addEventListener('blur', () => {
+        // Hanya trigger blur (pindah jendela) di layar Desktop/Tablet besar
         if(window.innerWidth > 768 && isExamActive && !isSubmitting && !proctorBypass) {
             triggerAntiSS();
         }
@@ -824,7 +888,7 @@
     document.addEventListener('touchend', () => clearTimeout(touchTimer));
     document.addEventListener('touchmove', () => clearTimeout(touchTimer)); 
 
-    // --- ESC TRAP ---
+    // --- ESC TRAP (Auto Full Screen Return) ---
     document.addEventListener('fullscreenchange', () => {
        if (!document.fullscreenElement && isExamActive && !isSubmitting && !proctorBypass) {
            document.getElementById('force-fs-overlay').classList.remove('hidden');
@@ -835,7 +899,10 @@
     function returnToFullScreen() {
         let elem = document.documentElement;
         let requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen;
-        if (requestFS) requestFS.call(elem).catch(e => console.log(e));
+        
+        if (requestFS) {
+            requestFS.call(elem).catch(e => console.log(e));
+        }
         document.getElementById('force-fs-overlay').classList.add('hidden');
     }
 
@@ -859,6 +926,11 @@
           showToast(res ? res.message : "Koneksi Gagal.", true);
         }
       });
+    }
+
+    // --- MOBILE SIDEBAR TOGGLE ---
+    function toggleSidebar() {
+        document.getElementById('cbt-sidebar').classList.toggle('open');
     }
 
     // --- SMART AUTO-BACKUP ---
@@ -979,6 +1051,16 @@
         });
         h += `</div></div>`;
         document.getElementById('question-render-area').innerHTML = h;
+        
+        // Hide "Selesai Ujian" in Nav buttons unless it's the last question
+        if (currentQIndex === examQuestions.length - 1) {
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-submit-main').style.display = 'block';
+        } else {
+            document.getElementById('btn-next').style.display = 'block';
+            document.getElementById('btn-submit-main').style.display = 'none';
+        }
+
         updatePaletteStyles();
     }
 
@@ -1003,6 +1085,9 @@
     
     function goToQ(idx) { 
         currentQIndex = idx; renderSingleQuestion(); sendPing('Online'); 
+        if(window.innerWidth <= 768) {
+            document.getElementById('cbt-sidebar').classList.remove('open');
+        }
     }
     
     function toggleFlagQuestion() {
@@ -1100,12 +1185,45 @@
 
     function manualSubmitBtn() {
        if(isSubmitting) return;
-       let blm = examQuestions.length - Object.keys(studentAnswers).length;
-       let msgHtml = blm > 0 
-            ? `⚠️ PERHATIAN!<br><br>Masih ada <b style="color:var(--danger); font-size:1.5rem;">${blm}</b> soal yang BELUM dijawab.<br>Yakin menyelesaikan ujian sekarang?` 
-            : `Semua soal telah dijawab.<br><br>Yakin melakukan Submit ke server sekarang?`;
+
+       // 1. Cek soal belum dijawab
+       let firstUnanswered = -1;
+       for (let i = 0; i < examQuestions.length; i++) {
+           if (!studentAnswers[examQuestions[i].id]) {
+               firstUnanswered = i;
+               break;
+           }
+       }
+
+       if (firstUnanswered !== -1) {
+           showToast(`⚠️ Masih ada soal belum dijawab! Mengalihkan ke Soal No. ${firstUnanswered + 1}`, true);
+           goToQ(firstUnanswered);
+           return;
+       }
+
+       // 2. Cek soal ragu-ragu
+       let firstFlagged = -1;
+       for (let i = 0; i < examQuestions.length; i++) {
+           if (flaggedQuestions.has(i)) {
+               firstFlagged = i;
+               break;
+           }
+       }
+
+       if (firstFlagged !== -1) {
+           showToast(`⚠️ Ada soal yang ditandai ragu-ragu! Mengalihkan ke Soal No. ${firstFlagged + 1}`, true);
+           goToQ(firstFlagged);
+           return;
+       }
+
+       // 3. Semua selesai dengan baik
+       let msgHtml = `Semua soal telah terjawab dengan baik dan tidak ada soal ragu-ragu.<br><br>Yakin melakukan Submit ke server sekarang? Tindakan ini tidak dapat dibatalkan.`;
        document.getElementById('confirm-msg').innerHTML = msgHtml;
        document.getElementById('custom-confirm-modal').classList.remove('hidden');
+       
+       if(window.innerWidth <= 768) {
+           document.getElementById('cbt-sidebar').classList.remove('open');
+       }
     }
     
     function closeConfirm() { document.getElementById('custom-confirm-modal').classList.add('hidden'); }
