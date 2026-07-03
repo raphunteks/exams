@@ -21,7 +21,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V18 (WebRTC Mobile Fix & Auth Clean)
+       SUPER BIG UPGRADE CSS3 - V19 (WebRTC UI Fix & STUN Servers)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -229,13 +229,39 @@
         border: 1px solid var(--danger);
     }
 
-    #webrtc-modal-video {
+    /* UPGRADE: Video Container CSS for Admin WebRTC Fix to avoid overlap */
+    .video-container {
+        position: relative;
         width: 100%;
-        max-height: 60vh;
-        background: #000;
+        min-height: 250px;
+        background: #020617;
         border-radius: 12px;
         border: 2px solid var(--neon-blue);
         box-shadow: 0 0 30px rgba(14, 165, 233, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    #webrtc-modal-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures video fills container if ratio differs */
+        position: relative;
+        z-index: 20;
+    }
+
+    #cam-loading {
+        position: absolute;
+        z-index: 10;
+        color: var(--neon-green);
+        font-weight: bold;
+        text-align: center;
+        padding: 20px;
+        width: 100%;
+        animation: pulse-neon 1s infinite;
     }
 
     .q-image-preview {
@@ -334,22 +360,23 @@
     <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
-  <!-- UPGRADE: WEBRTC ADMIN MODAL (FIXED DUMMY STREAM) -->
+  <!-- UPGRADE: WEBRTC ADMIN MODAL FIX UI TUMPANG TINDIH -->
   <div id="live-cam-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 700px; text-align: center; border-color: var(--neon-blue);">
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING (WebRTC P2P)</h3>
       <p id="cam-target-name" style="color: var(--text-muted); margin-bottom: 20px;"></p>
       
-      <div style="position: relative;">
-          <!-- UPGRADE: Tambahkan atribut 'muted' secara default untuk mem-bypass pemblokiran Autoplay Browser -->
+      <!-- UPGRADE CSS: Container Flexbox untuk mengatasi tumpang tindih text absolut -->
+      <div class="video-container">
+          <div id="cam-loading">Menghubungkan ke Kamera Peserta...</div>
+          <!-- Atribut muted penting agar autoplay video tidak diblok browser -->
           <video id="webrtc-modal-video" autoplay playsinline muted></video>
-          <div id="cam-loading" style="position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--neon-green); font-weight:bold; animation: pulse-neon 1s infinite;">Menghubungkan ke Kamera Peserta...</div>
       </div>
       
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
           <!-- UPGRADE: Tombol Toggle Suara agar Admin dapat mendengar peserta secara manual -->
-          <button class="btn-neon" style="width: auto; padding: 12px 20px;" onclick="document.getElementById('webrtc-modal-video').muted = !document.getElementById('webrtc-modal-video').muted">🔊 TOGGLE SUARA</button>
-          <button class="btn-danger btn-neon" style="width: auto; padding: 12px 20px;" onclick="closeLiveCam()">TUTUP KONEKSI</button>
+          <button class="btn-neon" style="width: auto; padding: 12px 20px; flex: 1;" onclick="toggleAdminAudio()">🔊 TOGGLE SUARA</button>
+          <button class="btn-danger btn-neon" style="width: auto; padding: 12px 20px; flex: 1;" onclick="closeLiveCam()">TUTUP KONEKSI</button>
       </div>
     </div>
   </div>
@@ -717,6 +744,19 @@
     // CONFIG: VERCEL ROUTING & GAS API
     // ==========================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyJHkKQh6s3f7idploBQVw62YzWY3oKV0S3l78JfvrKoyW7OyJJrTrAQt3K6duJBg/exec"; 
+
+    // UPGRADE WEBRTC: STUN Server Google untuk Bypass Firewall & NAT
+    const WEBRTC_CONFIG = {
+        config: {
+            'iceServers': [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' }
+            ]
+        }
+    };
 
     const DEPARTMENTS = [
         "Biologi Oral", "Ilmu Bahan dan Teknologi", "Ilmu Kedokteran Gigi Anak", 
@@ -1127,7 +1167,7 @@
         }, 2000);
 
         const peerId = `axa_cbt_${currentExam.examId}_${currentUser.nim}`;
-        studentPeer = new Peer(peerId);
+        studentPeer = new Peer(peerId, WEBRTC_CONFIG); // UPGRADE: Injeksikan STUN Server
         
         studentPeer.on('open', id => { console.log("Student WebRTC Ready: " + id); });
         
@@ -1139,6 +1179,7 @@
         studentPeer.on('call', call => {
             console.log("Menerima panggilan dari Admin");
             if(localStream) {
+                // Saat menerima panggilan, otomatis dijawab dengan stream lokal
                 call.answer(localStream); 
             }
         });
@@ -1276,32 +1317,34 @@
       switchView('admin-view'); 
       switchAdminTab('admin-stats');
       
-      // Init Admin WebRTC Peer
-      adminPeer = new Peer('axa_cbt_admin_' + Date.now());
+      // Init Admin WebRTC Peer with STUN
+      adminPeer = new Peer('axa_cbt_admin_' + Date.now(), WEBRTC_CONFIG);
       adminPeer.on('open', id => console.log('Admin Proctoring Engine Ready: ' + id));
 
       fetchAdminData();
       adminInterval = setInterval(fetchAdminData, 10000); 
     }
 
-    // --- WEBRTC LIVE PROCTORING CALL LOGIC (FIXED DUMMY STREAM & EXAM ID) ---
+    // --- WEBRTC LIVE PROCTORING CALL LOGIC (FIXED LOGIC & TIMEOUT) ---
     function openLiveCam(examId, nim, name) {
         document.getElementById('cam-target-name').innerText = `Memantau: ${nim} - ${name}`;
-        document.getElementById('cam-loading').style.display = 'block';
-        document.getElementById('cam-loading').innerText = "Menghubungkan ke Kamera Peserta...";
-        document.getElementById('webrtc-modal-video').style.display = 'none';
-        // Pastikan video di-mute saat pertama kali dibuka untuk menghindari pemblokiran autoplay
-        document.getElementById('webrtc-modal-video').muted = true; 
+        const loadingText = document.getElementById('cam-loading');
+        loadingText.style.display = 'block';
+        loadingText.innerText = "Menghubungkan ke Kamera Peserta...";
+        
+        const vid = document.getElementById('webrtc-modal-video');
+        vid.style.display = 'none';
+        vid.muted = true; // Selalu mulai dengan kondisi mute agar tidak dicegat browser
+        
         document.getElementById('live-cam-modal').classList.remove('hidden');
 
         const targetPeerId = `axa_cbt_${examId}_${nim}`;
         console.log("Calling student: " + targetPeerId);
         
-        // UPGRADE WEBRTC: Buat dummy stream (Video Canvas 1x1 Pixel + Audio)
-        // Hal ini sangat penting untuk memastikan browser di pihak peserta mau merespon 'answer' (Handshake Simetris)
+        // UPGRADE WEBRTC: Buat dummy stream (Video Canvas 1x1 Pixel + Audio) untuk Handshake P2P
         const canvas = document.createElement("canvas");
         canvas.width = 1; canvas.height = 1;
-        const videoStream = canvas.captureStream(1); // 1 FPS Stream
+        const videoStream = canvas.captureStream(1); 
         
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const audioStream = audioCtx.createMediaStreamDestination().stream;
@@ -1312,37 +1355,42 @@
         activeCall = adminPeer.call(targetPeerId, dummyStream, callOptions); 
         
         if(!activeCall) {
-            document.getElementById('cam-loading').innerText = "Gagal memanggil. WebRTC Engine sibuk.";
+            loadingText.innerText = "Gagal memanggil. WebRTC Engine sibuk atau Peserta Offline.";
             return;
         }
 
         let callTimeout = setTimeout(() => {
-            if(document.getElementById('webrtc-modal-video').style.display === 'none') {
-                document.getElementById('cam-loading').innerText = "Koneksi Timeout. Peserta mungkin offline atau menolak izin kamera.";
+            if(vid.style.display === 'none') {
+                loadingText.innerText = "Koneksi Timeout. \nSistem Mahasiswa memblokir P2P atau Kamera tertutup.";
                 if(activeCall) activeCall.close();
             }
-        }, 10000);
+        }, 12000); // Tunggu 12 detik
 
         activeCall.on('stream', remoteStream => {
             clearTimeout(callTimeout);
             console.log("Stream diterima!");
-            document.getElementById('cam-loading').style.display = 'none';
-            const vid = document.getElementById('webrtc-modal-video');
+            loadingText.style.display = 'none';
             vid.style.display = 'block';
             vid.srcObject = remoteStream;
         });
 
         activeCall.on('error', err => {
             clearTimeout(callTimeout);
-            document.getElementById('cam-loading').innerText = "Koneksi terputus: " + err;
+            loadingText.innerText = "Koneksi terputus: " + err;
         });
         
         activeCall.on('close', () => {
             clearTimeout(callTimeout);
-            document.getElementById('cam-loading').style.display = 'block';
-            document.getElementById('cam-loading').innerText = "Sesi ditutup oleh peserta.";
-            document.getElementById('webrtc-modal-video').style.display = 'none';
+            loadingText.style.display = 'block';
+            loadingText.innerText = "Sesi ditutup oleh peserta.";
+            vid.style.display = 'none';
         });
+    }
+
+    function toggleAdminAudio() {
+        const vid = document.getElementById('webrtc-modal-video');
+        vid.muted = !vid.muted;
+        showToast(vid.muted ? "Suara Peserta Di-Bisukan" : "Suara Peserta Di-Aktifkan", true);
     }
 
     function closeLiveCam() {
@@ -1515,7 +1563,6 @@
                let h = '';
                if(res.data && res.data.length > 0) {
                    res.data.forEach(q => {
-                      // UPGRADE: Indikator Gambar di Tabel
                       let imgIndicator = (q.img && q.img !== '') ? '<span style="color:var(--neon-blue);">🖼️ Terlampir</span>' : '<span style="color:var(--text-muted);">-</span>';
                       
                       h += `<tr><td><span style="font-family:monospace; color:var(--text-muted); font-weight:600;">${q.id}</span></td><td><b style="color:var(--text-main); font-weight:500;">${q.text.substring(0,80)}...</b></td><td>${imgIndicator}</td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-weight:bold;">${q.correct}</span></td>
@@ -1529,7 +1576,6 @@
     }
 
     function openEditQuestion(q) {
-       // UPGRADE: UI Edit Question dengan File Upload
        let existingImg = (q.img && q.img !== '') ? `<a href="${q.img}" target="_blank" style="color:var(--neon-blue); font-size:0.85rem; display:block; margin-bottom:10px;">Lihat Lampiran Saat Ini</a>` : '';
        
        let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Bank Soal: <span style="color:#fff;">${q.id}</span></h3>
@@ -1557,7 +1603,6 @@
     }
 
     async function saveEditQuestion(id) {
-       // UPGRADE: Handle Base64 file di Edit Modal
        const btn = event.target;
        btn.innerText = "MENYIMPAN...";
        btn.disabled = true;
@@ -1580,7 +1625,7 @@
            a: document.getElementById('ed-q-a').value, b: document.getElementById('ed-q-b').value, 
            c: document.getElementById('ed-q-c').value, d: document.getElementById('ed-q-d').value, e: document.getElementById('ed-q-e').value, 
            correct: document.getElementById('ed-q-cor').value,
-           imgUrl: document.getElementById('ed-q-img-url').value, // URL lama jika ada
+           imgUrl: document.getElementById('ed-q-img-url').value,
            fileBase64: fileBase64, fileName: fileName, fileMimeType: fileMimeType
        };
        runServer('updateAdminQuestion', [p], (res) => { 
@@ -1728,7 +1773,6 @@
     }
 
     async function submitNewQuestion() {
-      // UPGRADE: Pengecekan Input File Base64
       const btn = event.target.querySelector('button[type="submit"]');
       btn.innerText = "MENGUPLOAD...";
       btn.disabled = true;
@@ -1741,7 +1785,7 @@
       
       if(fileInput.files.length > 0) {
           const file = fileInput.files[0];
-          if(file.size > 3 * 1024 * 1024) { // Max 3MB limit
+          if(file.size > 3 * 1024 * 1024) { 
               showToast("Ukuran file gambar maksimal 3MB!", true);
               btn.innerText = "SIMPAN SOAL"; btn.disabled = false;
               return;
