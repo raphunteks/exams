@@ -22,7 +22,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V26 (iPad/Desktop Jitsi Fix & Smart Drive Regex)
+       SUPER BIG UPGRADE CSS3 - V27 (Image Render Proofing & UI Padding Fix)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -126,7 +126,9 @@
 
     /* UI UJIAN CBT PROFESIONAL */
     .cbt-container { display: flex; gap: 30px; align-items: flex-start; }
-    .cbt-main { flex: 3; width: 100%; }
+    
+    /* UPGRADE: Tambahan padding-bottom agar soal/opsi terbawah tidak ditutupi oleh Video Jitsi yang Floating */
+    .cbt-main { flex: 3; width: 100%; padding-bottom: 200px !important; }
     
     .cbt-sidebar { flex: 1; width: 100%; background: rgba(15, 23, 42, 0.85); padding: 25px; border-radius: 16px; border: 1px solid rgba(0, 255, 136, 0.2); position: sticky; top: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
     
@@ -816,7 +818,7 @@
         });
     }
 
-    // UPGRADE V26: Fungsi Regex Universal untuk Google Drive URL
+    // UPGRADE V27: Fungsi Regex Cerdas untuk Google Drive URL agar preview gambar lebih handal
     function getDirectDriveLink(url) {
         if (!url) return '';
         // Ekstrak ID dari link format /d/ID/
@@ -1041,7 +1043,7 @@
              initStudentJitsiGatekeeper();
              
            } else {
-             showToast(res ? res.message : "Gagal memuat ujian.", true);
+             showToast(res ? res.message : "Gagal memuat ujian. Pastikan API Script Anda ter-update.", true);
            }
          });
       };
@@ -1131,7 +1133,7 @@
         });
     }
 
-    // UPGRADE V26: Integrasi getDirectDriveLink untuk render Gambar
+    // UPGRADE V27: Render Image Tahan Banting + Padding Fix
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1139,13 +1141,17 @@
         document.getElementById('student-identity').innerText = `NIM: ${currentUser.nim} | Dept: ${currentUser.dept}`;
         
         let imgHtml = '';
-        if(q.img && q.img.trim() !== '') {
-            let directUrl = getDirectDriveLink(q.img);
+        // UPGRADE: Mendukung q.img atau q.image atau q.imgUrl untuk mencegah error pembacaan API
+        let imgData = q.img || q.image || q.imgUrl || ''; 
+        
+        if(imgData && typeof imgData === 'string' && imgData.trim() !== '') {
+            let directUrl = getDirectDriveLink(imgData);
+            // Memberikan kotak placeholder yang jelas agar link PDF/Image tetap bisa diklik sekalipun gambar gagal render
             imgHtml = `
-            <div style="margin-bottom: 20px; text-align: center;">
-                <img src="${directUrl}" class="q-image-preview" alt="Lampiran Soal" onerror="this.style.display='none'">
-                <div style="margin-top: 10px;">
-                    <a href="${q.img}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none; padding: 8px 15px; font-size: 0.85rem;">📄 BUKA FULL LAMPIRAN (PDF/GAMBAR)</a>
+            <div style="margin-bottom: 25px; text-align: center; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px dashed rgba(0, 255, 136, 0.4);">
+                <img src="${directUrl}" class="q-image-preview" alt="Lampiran Gambar Ujian" onerror="this.onerror=null; this.alt='[Format File Bukan Gambar Langsung. Klik Tombol Di Bawah Untuk Membuka]'; this.style.border='1px solid var(--warning)';">
+                <div style="margin-top: 15px;">
+                    <a href="${imgData}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none; padding: 8px 20px; font-size: 0.85rem; font-weight: 800;">🔍 BUKA FULL LAMPIRAN (PDF/GAMBAR)</a>
                 </div>
             </div>`;
         }
@@ -1440,7 +1446,7 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // UPGRADE V26: Fungsi Load Admin Questions dengan Regex Cerdas untuk Image Preview URL
+    // UPGRADE V27: Fungsi Load Admin Questions Lebih Kuat dalam menampung variabel Image
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
@@ -1450,8 +1456,8 @@
                let h = '';
                if(res.data && res.data.length > 0) {
                    res.data.forEach(q => {
-                      let directLink = getDirectDriveLink(q.img);
-                      let imgIndicator = (q.img && q.img !== '') ? `<a href="${q.img}" target="_blank" style="color:var(--neon-blue); font-weight:bold; text-decoration:none;">🖼️ Preview Link</a>` : '<span style="color:var(--text-muted);">-</span>';
+                      let imgData = q.img || q.image || q.imgUrl || ''; 
+                      let imgIndicator = (imgData && imgData !== '') ? `<a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-weight:bold; text-decoration:none;">🖼️ Preview Link</a>` : '<span style="color:var(--text-muted);">-</span>';
                       
                       h += `<tr><td><span style="font-family:monospace; color:var(--text-muted); font-weight:600;">${q.id}</span></td><td><b style="color:var(--text-main); font-weight:500;">${q.text.substring(0,80)}...</b></td><td>${imgIndicator}</td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-weight:bold;">${q.correct}</span></td>
                             <td><button class="btn-play" onclick='openEditQuestion(${JSON.stringify(q).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
@@ -1464,7 +1470,8 @@
     }
 
     function openEditQuestion(q) {
-       let existingImg = (q.img && q.img !== '') ? `<a href="${q.img}" target="_blank" style="color:var(--neon-blue); font-size:0.85rem; display:block; margin-bottom:10px;">Lihat Lampiran/URL Saat Ini</a>` : '';
+       let imgData = q.img || q.image || q.imgUrl || ''; 
+       let existingImg = (imgData && imgData !== '') ? `<a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-size:0.85rem; display:block; margin-bottom:10px;">Lihat Lampiran/URL Saat Ini</a>` : '';
        
        let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Bank Soal: <span style="color:#fff;">${q.id}</span></h3>
         <div class="input-group"><label>Teks Soal</label><textarea id="ed-q-text" class="input-glass" rows="3" style="font-size:0.95rem;">${q.text}</textarea></div>
@@ -1473,7 +1480,7 @@
            <label style="color: var(--neon-green);">Ganti Lampiran/Gambar Soal</label>
            ${existingImg}
            <input type="file" id="ed-q-file" accept="image/jpeg, image/png, image/jpg, application/pdf" class="input-glass" style="padding: 10px; font-size: 0.85rem;">
-           <input type="hidden" id="ed-q-img-url" value="${q.img || ''}">
+           <input type="hidden" id="ed-q-img-url" value="${imgData}">
         </div>
 
         <div class="dashboard-grid" style="gap:10px;">
