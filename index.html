@@ -10,7 +10,6 @@
   <meta name="author" content="Axa Xyz">
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -21,7 +20,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V37 (Iframe Preview Engine for GDrive)
+       SUPER BIG UPGRADE CSS3 - V34 (Image Fix, Broadcast Fix & Clean UI)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -186,12 +185,6 @@
     .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
     .btn-play:hover { background: var(--neon-green); color: #020617; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
     
-    /* Interactive Star Rating */
-    .star-rating-container { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
-    .star-icon { font-size: 2.8rem; color: rgba(255, 255, 255, 0.1); cursor: pointer; transition: all 0.2s ease-in-out; }
-    .star-icon:hover { transform: scale(1.15); }
-    .star-icon.active { color: #ffb700; text-shadow: 0 0 15px rgba(255, 183, 0, 0.5); }
-
     .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px; }
 
     .app-footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); font-weight: 500; margin-top: auto; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
@@ -259,6 +252,20 @@
         height: 100%;
         border: none;
         border-radius: 10px;
+    }
+
+    /* UPGRADE V34: Desain Image Preview Langsung Tampak Bersih Tanpa Border Bulky */
+    .q-image-preview {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        object-fit: contain;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        background: #fff; /* Memberikan background putih jika gambar transparan PNG */
     }
 
     /* MOBILE RESPONSIVENESS */
@@ -354,21 +361,17 @@
     <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
-  <!-- MODAL JITSI CALL UNTUK ADMIN PENGAWAS -->
   <div id="live-cam-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 800px; text-align: center; border-color: var(--neon-blue);">
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING (ROOM UJIAN)</h3>
       <p id="cam-target-name" style="color: var(--text-muted); margin-bottom: 20px; font-weight:bold;"></p>
-      
       <div id="jitsi-container" class="hidden"></div>
-      
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
           <button class="btn-danger btn-neon" style="width: auto; padding: 12px 20px; flex: 1;" onclick="closeLiveCam()">KELUAR DARI RUANG PENGAWASAN</button>
       </div>
     </div>
   </div>
 
-  <!-- Container Mengambang (Floating) untuk Jitsi Mahasiswa -->
   <div id="student-jitsi-container" class="hidden"></div>
 
   <div class="container">
@@ -452,17 +455,14 @@
       
       <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);">
           <p style="font-size: 0.95rem; margin-bottom: 15px; font-weight: 500;">Bagaimana pengalaman CBT ini?</p>
-          
-          <div class="star-rating-container" id="interactive-stars">
-             <i class="ph-fill ph-star star-icon" data-value="1"></i>
-             <i class="ph-fill ph-star star-icon" data-value="2"></i>
-             <i class="ph-fill ph-star star-icon" data-value="3"></i>
-             <i class="ph-fill ph-star star-icon" data-value="4"></i>
-             <i class="ph-fill ph-star star-icon" data-value="5"></i>
-          </div>
-          <input type="hidden" id="feed-rating-value" value="5">
-
           <form onsubmit="event.preventDefault(); submitFeedback();">
+            <div class="star-rating">
+              <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
+              <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+              <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+              <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+              <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+            </div>
             <textarea id="feed-comment" class="input-glass" rows="3" placeholder="Kritik & saran membangun (opsional)..." style="margin-top: 1rem; resize: none; font-size: 0.9rem;"></textarea>
             <button type="submit" class="btn-start-exam" style="margin-top: 1.5rem; padding: 14px;">KIRIM & KELUAR</button>
           </form>
@@ -800,6 +800,7 @@
         });
     }
 
+    // UPGRADE V34: Regex Pintar Khusus Google Drive Modern (Menangani CORS dan 403 Forbidden)
     function getDirectDriveLink(url) {
         if (!url) return '';
         let fileId = null;
@@ -811,8 +812,8 @@
         }
 
         if (fileId) {
-            // UPGRADE V37: Menggunakan Iframe Google Drive Preview yang kebal CORS dan memunculkan gambar dengan sempurna
-            return `https://drive.google.com/file/d/${fileId}/preview`;
+            // Menggunakan thumbnail endpoint yang secara resmi didukung Google untuk disematkan di <img> tanpa di-blokir cookie
+            return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
         }
         return url; 
     }
@@ -831,29 +832,8 @@
     let currentQIndex = 0;
     let flaggedQuestions = new Set();
 
-    function initStarRating() {
-        const stars = document.querySelectorAll('.star-icon');
-        const ratingInput = document.getElementById('feed-rating-value');
-        
-        stars.forEach(s => s.classList.add('active'));
-
-        stars.forEach((star, index) => {
-            star.addEventListener('click', () => {
-                let value = star.getAttribute('data-value');
-                ratingInput.value = value;
-                
-                stars.forEach((s, i) => {
-                    if (i < value) s.classList.add('active');
-                    else s.classList.remove('active');
-                });
-            });
-        });
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
       loadWebSettings(); 
-      initStarRating(); 
-
       const page = new URLSearchParams(window.location.search).get('page');
       
       const savedUser = Cookies.get('axa_admin_session'); 
@@ -963,7 +943,7 @@
     let touchTimer;
     document.addEventListener('touchstart', (e) => {
         if(!isExamActive) return;
-        if(['BUTTON', 'INPUT', 'LABEL', 'I'].includes(e.target.tagName)) return;
+        if(['BUTTON', 'INPUT', 'LABEL'].includes(e.target.tagName)) return;
         touchTimer = setTimeout(() => {
             showToast("⚠️ Dilarang menahan layar untuk menyeleksi teks soal!", true);
             logViolation("Indikasi Seleksi Teks Mobile (Long Press)");
@@ -1145,7 +1125,7 @@
         });
     }
 
-    // UPGRADE V37: Render Iframe Mutlak untuk mengatasi segala jenis masalah gambar
+    // UPGRADE V34: Render Langsung Gambar (Image Preview) Tanpa Pop-up
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1156,14 +1136,16 @@
         let imgData = q.img || q.image || q.Image_URL || q.imgUrl || ''; 
         
         if(imgData && typeof imgData === 'string' && imgData.trim() !== '') {
-            let previewUrl = getDirectDriveLink(imgData);
+            let directUrl = getDirectDriveLink(imgData);
             
-            // HAPUS tag <img> dan GANTI dengan <iframe> agar semua jenis file (Gambar/PDF) langsung terbuka di dalam soal
+            // Merender gambar langsung, jika link gagal dimuat/diblokir, tombol manual muncul
             imgHtml = `
-            <div style="margin-bottom: 25px; text-align: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; border: 1px solid rgba(0, 255, 136, 0.2);">
-                <iframe src="${previewUrl}" style="width: 100%; height: 400px; border: none; border-radius: 8px; background: #fff;" allow="autoplay"></iframe>
-                <div style="margin-top: 10px;">
-                    <a href="${imgData}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none; padding: 8px 20px; font-size: 0.85rem; font-weight: 800;">🔗 BUKA FULL TAB (JIKA PREVIEW KEKECILAN)</a>
+            <div style="margin-bottom: 25px; text-align: center;">
+                <img src="${directUrl}" class="q-image-preview" alt="Lampiran Gambar Ujian" 
+                     onerror="this.onerror=null; this.src=''; this.alt=''; document.getElementById('fallback-link-${q.id}').style.display='inline-block';">
+                
+                <div id="fallback-link-${q.id}" style="margin-top: 15px; display: none;">
+                    <a href="${imgData}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none; padding: 8px 20px; font-size: 0.85rem; font-weight: 800;">📄 BUKA LAMPIRAN (PDF/GAGAL DIMUAT)</a>
                 </div>
             </div>`;
         }
@@ -1237,9 +1219,11 @@
         }
     }
 
+    // UPGRADE V34: Penangkapan Spam Broadcast
     function pollBroadcast() {
       if(!isSubmitting) {
         runServer('checkBroadcast', [lastBroadcastId], (res) => {
+          // Pencegahan Spam dari redirect otomatis GAS
           if(res && res.status === 'success' && res.msgId && res.message) {
             if (!res.message.includes('Backend API')) { 
                 lastBroadcastId = res.msgId; 
@@ -1333,7 +1317,7 @@
     }
 
     function submitFeedback() {
-      const rating = document.getElementById('feed-rating-value').value;
+      const rating = document.querySelector('input[name="rating"]:checked')?.value || 5;
       const comment = document.getElementById('feed-comment').value.trim();
       runServer('submitFeedback', [{ nim: currentUser.nim, examId: currentExam.examId, rating: rating, comment: comment }], () => { logout(); });
     }
@@ -1404,7 +1388,7 @@
                     window.adminChart = new Chart(ctx, { type: 'bar', data: { labels: cLabels, datasets: [{ label: 'Rata-Rata Nilai', data: cData, backgroundColor: 'rgba(0, 255, 136, 0.4)', borderColor: '#00ff88', borderWidth: 2, borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { labels: { color: '#fff', font: {family: 'Inter'} } } } } });
                  }
               }
-          } catch(e) {}
+          } catch(e) { console.error(e); }
 
           try {
               let logH = ''; 
@@ -1412,7 +1396,7 @@
                  res.recentLogs.forEach(l => { logH += `<div style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);"><span style="color:var(--text-muted); font-size:0.8rem;">[${l.time}]</span> <b style="color:#fff; margin-left:8px;">${l.nim} - ${l.name}</b> <br><span style="color:var(--danger); font-weight:700; display:inline-block; margin-top:5px; font-size:0.85rem;">⚠ ${l.type}</span></div>`; });
                  document.getElementById('admin-logs').innerHTML = logH;
               } else { document.getElementById('admin-logs').innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">Lingkungan ujian kondusif. Tidak ada pelanggaran terdeteksi.</div>'; }
-          } catch(e) {}
+          } catch(e) { console.error(e); }
 
           try {
               let audioHtml = '';
@@ -1432,14 +1416,14 @@
                   });
                   document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml;
               } else { document.getElementById('tbl-audio').querySelector('tbody').innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada sesi aktif terdeteksi.</td></tr>'; }
-          } catch(e) {}
+          } catch(e) { console.error(e); }
         } else {
              let errMsg = res ? res.message : 'Gagal menghubungkan ke Backend API. Lakukan New Deployment.';
              document.getElementById('tbl-audio').querySelector('tbody').innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--danger); font-weight:bold;">Error API: ${errMsg}</td></tr>`;
              document.getElementById('admin-logs').innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${errMsg}</div>`;
         }
       });
-
+      
       runServer('getMonitoringJawaban', [dept], (res) => {
          if (res && res.status === 'success') {
            try {
@@ -1450,7 +1434,7 @@
                    });
                    document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = jwbHtml;
                } else { document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--text-muted);">Belum ada data pengumpulan Lembar Jawaban.</td></tr>'; }
-           } catch(e) {}
+           } catch(e) { console.error(e); }
          } else {
              let errMsg = res ? res.message : 'Error Connection.';
              document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--danger); font-weight:bold;">Error API: ${errMsg}</td></tr>`;
@@ -1556,7 +1540,6 @@
        runServer('updateAdminUser', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
     }
 
-    // UPGRADE V37: Mengganti Preview Gambar Admin Tabel menggunakan Iframe Google Drive
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color: var(--neon-green); font-weight:bold; animation: pulse-neon 1s infinite;">Memuat Bank Soal...</td></tr>';
@@ -1571,11 +1554,10 @@
                       
                       if (imgData && typeof imgData === 'string' && imgData.trim() !== '') {
                           let directLink = getDirectDriveLink(imgData);
-                          // Iframe Table Preview Anti-CORS
+                          // Tampilkan link raw (Fallback aman jika direct view gagal)
                           imgIndicator = `
                           <div style="display:flex; flex-direction:column; align-items:flex-start; gap:5px;">
-                              <iframe src="${directLink}" style="width:100px; height:70px; border-radius:4px; border:1px solid rgba(0, 255, 136, 0.4); pointer-events:none; background:#fff;" scrolling="no"></iframe>
-                              <a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-size:0.75rem; text-decoration:none; font-weight:bold;">🖼️ Buka Link</a>
+                              <a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-size:0.75rem; text-decoration:none; font-weight:bold;">🖼️ Buka Lampiran</a>
                           </div>`;
                       }
                       
