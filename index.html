@@ -20,7 +20,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V32 (Loading States & Contextual Data)
+       SUPER BIG UPGRADE CSS3 - V33 (Jitsi Toggle Dashboard Admin)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -414,12 +414,12 @@
           <p style="color: var(--danger); font-weight: 800; margin-bottom: 12px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">⚠️ Sistem Anti-Nyontek Aktif</p>
           <ul style="margin-left: 20px; color: #e2e8f0; font-size: 0.95rem; line-height: 1.7; font-weight: 400;">
             <li>Layar ujian akan dikunci permanen ke mode <b style="color:#fff;">Full-Screen</b>.</li>
-            <li>Anda akan diwajibkan tergabung ke dalam <b style="color:#fff;">Room Live Camera Pengawas (Jitsi)</b> selama ujian berlangsung.</li>
+            <li>Anda akan diwajibkan tergabung ke dalam <b style="color:#fff;">Room Live Camera Pengawas (Jitsi)</b> selama ujian berlangsung (Jika diaktifkan).</li>
             <li>Aplikasi <b style="color:#fff;">Snipping Tool, Print Screen, Blok Teks & Klik Kanan</b> dimatikan secara paksa.</li>
             <li>Jika ada kendala jaringan/ter-refresh, sistem akan secara otomatis memulihkan sesi (Auto-Resume).</li>
           </ul>
       </div>
-      <button class="btn-start-exam" style="font-size: 1.1rem; padding: 18px;" onclick="startExamSequence()">GABUNG KE RUANG PENGAWAS & MULAI UJIAN</button>
+      <button class="btn-start-exam" style="font-size: 1.1rem; padding: 18px;" onclick="startExamSequence()">MULAI UJIAN</button>
     </div>
 
     <!-- 3. EXAM RUNNING -->
@@ -543,7 +543,8 @@
           <h3>Daftar Konfigurasi Ujian (Exams)</h3>
           <div class="table-wrapper">
              <table id="tbl-exams">
-               <thead><tr><th>ID</th><th>Departemen</th><th>Judul Ujian</th><th>Menit</th><th>Status</th><th>Visibilitas</th><th>Aksi</th></tr></thead>
+               <!-- UPGRADE: Tambahan Kolom Status Jitsi -->
+               <thead><tr><th>ID</th><th>Departemen</th><th>Judul Ujian</th><th>Menit</th><th>Status</th><th>Visibilitas</th><th>Status Jitsi</th><th>Aksi</th></tr></thead>
                <tbody><!-- JS --></tbody>
              </table>
           </div>
@@ -1002,6 +1003,7 @@
     }
     function clearLocalBackup() { localStorage.removeItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`); }
 
+    // UPGRADE: Logic Pengecekan Jitsi Status sebelum Ujian
     function startExamSequence() {
       const proceedExam = () => {
          runServer('getStudentExam', [currentUser.examId, currentUser.nim], (res) => {
@@ -1031,7 +1033,22 @@
              document.getElementById('watermark-layer').innerHTML = Array(80).fill(`${currentUser.nim} - ${currentUser.name}`).join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
              document.getElementById('watermark-layer').classList.remove('hidden');
              
-             initStudentJitsiGatekeeper();
+             // Pengecekan Status Jitsi
+             if (currentExam.jitsiStatus === 'Active') {
+                 initStudentJitsiGatekeeper();
+             } else {
+                 showToast("Ujian dimulai. Fitur Live Proctoring dinonaktifkan.", true);
+                 buildCBTPalette(); 
+                 renderSingleQuestion(); 
+                 startRealTimer(examEndTime); 
+                 
+                 runServer('getInitBroadcast', [], (bRes) => {
+                    if(bRes && bRes.status === 'success') lastBroadcastId = bRes.msgId;
+                    broadcastInterval = setInterval(pollBroadcast, 15000);
+                 });
+                 pingInterval = setInterval(() => sendPing('Online'), 10000);
+                 switchView('exam-view');
+             }
              
            } else {
              showToast(res ? res.message : "Gagal memuat ujian. Pastikan API Script Anda ter-update.", true);
@@ -1349,13 +1366,9 @@
         document.getElementById('live-cam-modal').classList.add('hidden');
     }
 
-    // UPGRADE V32: Tampilan Loading State "Memuat Data Database..." dan Contextual Info
     function fetchAdminData() {
       const dept = document.getElementById('global-dept-filter').value;
       document.querySelectorAll('.lbl-dept').forEach(el => el.innerText = dept);
-      
-      // Inject Loading State ke Tabel Audio
-      document.getElementById('tbl-audio').querySelector('tbody').innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--neon-green); font-weight:bold; animation: pulse-neon 1s infinite;">Memuat Data Database...</td></tr>';
       
       runServer('getAdminDashboardData', [dept], (res) => {
         if (res && res.status === 'success') {
@@ -1391,7 +1404,6 @@
                     let realStatus = s.status;
                     if(s.status && s.status.includes('|')) { realStatus = s.status.split('|')[0]; } 
                     
-                    // UPGRADE: Menyertakan ID Exam & Dept Name di UI agar Admin paham konteksnya
                     audioHtml += `<tr>
                         <td>
                             <div style="font-size:0.75rem; color:var(--neon-blue); margin-bottom:4px; font-weight:bold;">${s.examId} | ${s.deptName || 'Unknown Dept'}</div>
@@ -1410,9 +1422,6 @@
              document.getElementById('admin-logs').innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${errMsg}</div>`;
         }
       });
-
-      // Inject Loading State ke Tabel Jawaban
-      document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--neon-green); font-weight:bold; animation: pulse-neon 1s infinite;">Memuat Data Database...</td></tr>';
       
       runServer('getMonitoringJawaban', [dept], (res) => {
          if (res && res.status === 'success') {
@@ -1446,8 +1455,9 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
+    // UPGRADE: Tambahan Render Kolom Status_Jitsi 
     function loadAdminExams() {
-      document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color: var(--neon-green); font-weight:bold; animation: pulse-neon 1s infinite;">Memuat Data Database...</td></tr>';
+      document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color: var(--neon-green); font-weight:bold; animation: pulse-neon 1s infinite;">Memuat Data Database...</td></tr>';
       runServer('getAdminExams', [], (res) => {
         if(res && res.status === 'success') {
            try {
@@ -1455,14 +1465,16 @@
                if(res.data && res.data.length > 0) {
                    res.data.forEach(ex => {
                       let statColor = ex.status == 'Active' ? 'var(--neon-green)' : 'var(--danger)';
+                      let jitsiColor = ex.jitsi == 'Active' ? 'var(--neon-blue)' : 'var(--text-muted)';
                       h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${ex.id}</b></td><td>${ex.dept}</td><td>${ex.title}</td><td>${ex.duration} Mnt</td><td><span style="color:${statColor}; font-weight:bold; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:4px;">${ex.status}</span></td><td><span style="color:var(--text-muted);">${ex.vis}</span></td>
+                            <td><span style="color:${jitsiColor}; font-weight:bold; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:4px;">${ex.jitsi}</span></td>
                             <td><button class="btn-play" onclick='openEditExam(${JSON.stringify(ex).replace(/'/g, "&apos;")})'>✏️ Konfigurasi</button></td></tr>`;
                    });
                    document.getElementById('tbl-exams').querySelector('tbody').innerHTML = h;
-               } else { document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Data ujian kosong.</td></tr>'; }
+               } else { document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Data ujian kosong.</td></tr>'; }
            } catch(e) {}
         } else {
-            document.getElementById('tbl-exams').querySelector('tbody').innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${res ? res.message : 'Koneksi ke Backend gagal. Pastikan sudah klik New Deployment di Apps Script.'}</td></tr>`;
+            document.getElementById('tbl-exams').querySelector('tbody').innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${res ? res.message : 'Koneksi ke Backend gagal. Pastikan sudah klik New Deployment di Apps Script.'}</td></tr>`;
         }
       });
     }
@@ -1473,6 +1485,7 @@
         <div class="input-group"><label>Alokasi Waktu Ujian (Menit)</label><input type="number" id="ed-ex-dur" class="input-glass" value="${ex.duration}"></div>
         <div class="input-group"><label>Status (Aktif/Nonaktif)</label><select id="ed-ex-stat" class="input-glass" style="background:var(--bg-base);"><option value="Active" ${ex.status=='Active'?'selected':''}>Active</option><option value="Inactive" ${ex.status=='Inactive'?'selected':''}>Inactive</option></select></div>
         <div class="input-group"><label>Visibilitas Nilai Akhir ke Siswa</label><select id="ed-ex-vis" class="input-glass" style="background:var(--bg-base);"><option value="Show" ${ex.vis=='Show'?'selected':''}>Show</option><option value="Hide" ${ex.vis=='Hide'?'selected':''}>Hide</option></select></div>
+        <div class="input-group"><label>Status Jitsi (Wajib On-Cam)</label><select id="ed-ex-jitsi" class="input-glass" style="background:var(--bg-base);"><option value="Active" ${ex.jitsi=='Active'?'selected':''}>Active</option><option value="Inactive" ${ex.jitsi=='Inactive'?'selected':''}>Inactive</option></select></div>
         <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditExam('${ex.id}')">SIMPAN KONFIGURASI</button>
         <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
        document.getElementById('edit-modal-body').innerHTML = h;
@@ -1480,7 +1493,7 @@
     }
 
     function saveEditExam(id) {
-       let p = { id: id, title: document.getElementById('ed-ex-title').value, duration: document.getElementById('ed-ex-dur').value, status: document.getElementById('ed-ex-stat').value, vis: document.getElementById('ed-ex-vis').value };
+       let p = { id: id, title: document.getElementById('ed-ex-title').value, duration: document.getElementById('ed-ex-dur').value, status: document.getElementById('ed-ex-stat').value, vis: document.getElementById('ed-ex-vis').value, jitsi: document.getElementById('ed-ex-jitsi').value };
        runServer('updateAdminExam', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
     }
 
