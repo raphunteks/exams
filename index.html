@@ -21,7 +21,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V19 (WebRTC UI Fix & STUN Servers)
+       SUPER BIG UPGRADE CSS3 - V19.5 (WebRTC UI Fix Flexbox & PeerJS Timeout)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -253,15 +253,15 @@
         z-index: 20;
     }
 
+    /* UPGRADE: Loading Text tidak lagi menggunakan Position Absolute agar tidak tumpang tindih */
     #cam-loading {
-        position: absolute;
-        z-index: 10;
         color: var(--neon-green);
         font-weight: bold;
         text-align: center;
         padding: 20px;
         width: 100%;
         animation: pulse-neon 1s infinite;
+        display: block; /* Menghilangkan behavior overlap */
     }
 
     .q-image-preview {
@@ -370,7 +370,7 @@
       <div class="video-container">
           <div id="cam-loading">Menghubungkan ke Kamera Peserta...</div>
           <!-- Atribut muted penting agar autoplay video tidak diblok browser -->
-          <video id="webrtc-modal-video" autoplay playsinline muted></video>
+          <video id="webrtc-modal-video" autoplay playsinline muted style="display:none;"></video>
       </div>
       
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
