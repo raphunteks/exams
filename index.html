@@ -20,7 +20,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V30 (Table Catcher & Strong Upload UI)
+       SUPER BIG UPGRADE CSS3 - V31 (Strict Error Handlers on Admin Panel)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -182,6 +182,9 @@
     th { background: rgba(0,0,0,0.6); color: var(--neon-green); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem; }
     tr:hover td { background: rgba(255,255,255,0.03); }
     
+    .audio-bar { height: 12px; background: rgba(0,0,0,0.6); border-radius: 6px; overflow: hidden; width: 100px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+    .audio-level { height: 100%; background: linear-gradient(90deg, #00ff88, #ffb700); transition: width 0.5s ease; }
+    .noise-high { background: var(--danger) !important; box-shadow: 0 0 10px var(--danger); }
     .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
     .btn-play:hover { background: var(--neon-green); color: #020617; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
     
@@ -360,17 +363,22 @@
     <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
+  <!-- MODAL JITSI CALL UNTUK ADMIN PENGAWAS -->
   <div id="live-cam-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 800px; text-align: center; border-color: var(--neon-blue);">
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING (ROOM UJIAN)</h3>
       <p id="cam-target-name" style="color: var(--text-muted); margin-bottom: 20px; font-weight:bold;"></p>
+      
+      <!-- Container untuk Iframe Jitsi Meet Admin -->
       <div id="jitsi-container" class="hidden"></div>
+      
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
           <button class="btn-danger btn-neon" style="width: auto; padding: 12px 20px; flex: 1;" onclick="closeLiveCam()">KELUAR DARI RUANG PENGAWASAN</button>
       </div>
     </div>
   </div>
 
+  <!-- Container Mengambang (Floating) untuk Jitsi Mahasiswa -->
   <div id="student-jitsi-container" class="hidden"></div>
 
   <div class="container">
@@ -947,7 +955,6 @@
     document.addEventListener('touchend', () => clearTimeout(touchTimer));
     document.addEventListener('touchmove', () => clearTimeout(touchTimer)); 
 
-    // --- ESC TRAP ---
     document.addEventListener('fullscreenchange', () => {
        if (!document.fullscreenElement && isExamActive && !isSubmitting && !proctorBypass) {
            document.getElementById('force-fs-overlay').classList.remove('hidden');
@@ -1337,6 +1344,7 @@
         document.getElementById('live-cam-modal').classList.add('hidden');
     }
 
+    // UPGRADE V31: Added robust table error catching to inform missing/failing endpoints
     function fetchAdminData() {
       const dept = document.getElementById('global-dept-filter').value;
       document.querySelectorAll('.lbl-dept').forEach(el => el.innerText = dept);
@@ -1384,6 +1392,11 @@
                   document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml;
               } else { document.getElementById('tbl-audio').querySelector('tbody').innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada sesi aktif terdeteksi.</td></tr>'; }
           } catch(e) {}
+        } else {
+             // UPGRADE: Tangkap Error API yang menyebabkan tabel blank
+             let errMsg = res ? res.message : 'Gagal menghubungkan ke Backend API. Lakukan New Deployment.';
+             document.getElementById('tbl-audio').querySelector('tbody').innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--danger); font-weight:bold;">Error API: ${errMsg}</td></tr>`;
+             document.getElementById('admin-logs').innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${errMsg}</div>`;
         }
       });
 
@@ -1416,7 +1429,6 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // UPGRADE V30: Penangkapan Error Tabel jika API Outdated
     function loadAdminExams() {
       document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Memuat Data Database...</td></tr>';
       runServer('getAdminExams', [], (res) => {
@@ -1455,7 +1467,6 @@
        runServer('updateAdminExam', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
     }
 
-    // UPGRADE V30: Penangkapan Error Tabel jika API Outdated
     function loadAdminUsers() {
       document.getElementById('tbl-users').querySelector('tbody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Memuat Database Pengguna...</td></tr>';
       runServer('getAdminUsers', [], (res) => {
@@ -1499,7 +1510,6 @@
        runServer('updateAdminUser', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
     }
 
-    // UPGRADE V30: Menangkap Error API
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
@@ -1731,7 +1741,6 @@
       runServer('addAdminUser', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-users form').reset(); loadAdminUsers(); });
     }
 
-    // UPGRADE V30: Menangkap Silent Error pada fungsi Image Upload
     async function submitNewQuestion() {
       const btn = event.target.querySelector('button[type="submit"]');
       btn.innerText = "MENGUPLOAD...";
@@ -1770,7 +1779,7 @@
       
       runServer('addAdminQuestion', [p], (res) => { 
           if(res && res.status === 'error') {
-              alert(res.message); // Gunakan alert keras karena ini error sistematis
+              alert(res.message); 
           } else {
               showToast(res.message, true); 
               document.querySelector('#admin-questions form').reset(); 
