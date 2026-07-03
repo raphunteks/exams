@@ -18,12 +18,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
   
-  <!-- UPGRADE: PEER JS UNTUK WEBRTC LIVE CAM P2P -->
+  <!-- PEER JS UNTUK WEBRTC LIVE CAM P2P -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V16 (WebRTC Live Cam UI)
+       SUPER BIG UPGRADE CSS3 - V17 (WebRTC Fix & Cookie Only Auth)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -128,6 +128,7 @@
     /* UI UJIAN CBT PROFESIONAL */
     .cbt-container { display: flex; gap: 30px; align-items: flex-start; }
     .cbt-main { flex: 3; width: 100%; }
+    
     .cbt-sidebar { flex: 1; width: 100%; background: rgba(15, 23, 42, 0.85); padding: 25px; border-radius: 16px; border: 1px solid rgba(0, 255, 136, 0.2); position: sticky; top: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
     
     .q-palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; margin-top: 15px; max-height: 350px; overflow-y: auto; padding-right: 5px; }
@@ -155,7 +156,7 @@
     .option-label.selected .custom-radio::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--neon-green); border-radius: 50%; box-shadow: var(--neon-glow); }
     input[type="radio"] { display: none; } 
     
-    /* DASHBOARD ADMIN UI */
+    /* DASHBOARD ADMIN UI (COMPACT & DENSE) */
     .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
     #admin-view .glass-panel { padding: 1.5rem; border-radius: 16px; }
     #admin-view h3 { font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
@@ -239,6 +240,7 @@
         box-shadow: 0 0 30px rgba(14, 165, 233, 0.4);
     }
 
+    /* MOBILE RESPONSIVENESS */
     @media (max-width: 768px) {
         .glass-panel, #admin-view .glass-panel { padding: 1.2rem; }
         .dashboard-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -325,7 +327,7 @@
     <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
-  <!-- UPGRADE: WEBRTC ADMIN MODAL -->
+  <!-- UPGRADE: WEBRTC ADMIN MODAL (FIXED CALL RECEPTION) -->
   <div id="live-cam-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 700px; text-align: center; border-color: var(--neon-blue);">
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING (WebRTC P2P)</h3>
@@ -858,7 +860,9 @@
     });
     
     window.addEventListener('blur', () => {
-        if(window.innerWidth > 768 && isExamActive && !isSubmitting && !proctorBypass) triggerAntiSS();
+        if(window.innerWidth > 768 && isExamActive && !isSubmitting && !proctorBypass) {
+            triggerAntiSS();
+        }
     });
     
     function triggerAntiSS() {
@@ -1069,19 +1073,16 @@
       }, 1000); 
     }
 
-    // --- UPGRADE: WEBRTC & AUDIO SENSOR ---
+    // --- UPGRADE: FIX WEBRTC PEER JS ---
     async function initMediaSensorAndWebRTC() {
       try {
-        // Request Audio & Video
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
         
-        // Setup Local Video UI (Panopticon Effect)
         const localVidUI = document.getElementById('local-video');
         localVidUI.srcObject = localStream;
         localVidUI.classList.remove('hidden');
         document.getElementById('live-indicator').classList.remove('hidden');
 
-        // Setup Audio Analyser for Radar dB
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const a = audioContext.createAnalyser(); 
         audioContext.createMediaStreamSource(localStream).connect(a);
@@ -1094,18 +1095,18 @@
           if(currentNoise > 80) logViolation("Bising Ruangan");
         }, 2000);
 
-        // INIT PEER JS UNTUK STUDENT (Signaling Server Gratis)
+        // Fix WebRTC: Wait for stream before answering
         const peerId = `axa_cbt_${currentExam.examId}_${currentUser.nim}`;
         studentPeer = new Peer(peerId);
         
-        studentPeer.on('open', id => {
-            console.log("WebRTC Student Ready: " + id);
-        });
+        studentPeer.on('open', id => { console.log("Student WebRTC Ready: " + id); });
 
-        // Menunggu panggilan dari Admin
         studentPeer.on('call', call => {
-            console.log("Menerima panggilan dari Admin Proctor");
-            call.answer(localStream); // Auto-answer dengan stream lokal
+            console.log("Menerima panggilan dari Admin");
+            // Hanya jawab jika localStream sudah ready
+            if(localStream) {
+                call.answer(localStream); 
+            }
         });
 
       } catch (e) { 
@@ -1247,24 +1248,36 @@
       adminInterval = setInterval(fetchAdminData, 10000); 
     }
 
-    // --- WEBRTC LIVE PROCTORING CALL LOGIC ---
+    // --- WEBRTC LIVE PROCTORING CALL LOGIC (FIXED) ---
     function openLiveCam(examId, nim, name) {
         document.getElementById('cam-target-name').innerText = `Memantau: ${nim} - ${name}`;
         document.getElementById('cam-loading').style.display = 'block';
+        document.getElementById('cam-loading').innerText = "Menghubungkan ke Kamera Peserta...";
         document.getElementById('webrtc-modal-video').style.display = 'none';
         document.getElementById('live-cam-modal').classList.remove('hidden');
 
         const targetPeerId = `axa_cbt_${examId}_${nim}`;
         console.log("Calling student: " + targetPeerId);
         
-        activeCall = adminPeer.call(targetPeerId); // Tidak perlu stream lokal dari Admin (hanya menonton)
+        // FIX 1: Beberapa browser butuh media stream dummy atau parameter spesifik agar answer() berjalan mulus
+        let callOptions = { offerToReceiveVideo: true, offerToReceiveAudio: true };
+        activeCall = adminPeer.call(targetPeerId, null, callOptions); 
         
         if(!activeCall) {
-            document.getElementById('cam-loading').innerText = "Gagal memanggil. Peserta mungkin sedang offline atau tidak memberi izin kamera.";
+            document.getElementById('cam-loading').innerText = "Gagal memanggil. WebRTC Engine sibuk.";
             return;
         }
 
+        // Timeout handler jika tidak diangkat dalam 10 detik
+        let callTimeout = setTimeout(() => {
+            if(document.getElementById('webrtc-modal-video').style.display === 'none') {
+                document.getElementById('cam-loading').innerText = "Koneksi Timeout. Peserta mungkin offline atau menolak izin kamera.";
+                if(activeCall) activeCall.close();
+            }
+        }, 10000);
+
         activeCall.on('stream', remoteStream => {
+            clearTimeout(callTimeout);
             console.log("Stream diterima!");
             document.getElementById('cam-loading').style.display = 'none';
             const vid = document.getElementById('webrtc-modal-video');
@@ -1273,10 +1286,12 @@
         });
 
         activeCall.on('error', err => {
+            clearTimeout(callTimeout);
             document.getElementById('cam-loading').innerText = "Koneksi terputus: " + err;
         });
         
         activeCall.on('close', () => {
+            clearTimeout(callTimeout);
             document.getElementById('cam-loading').style.display = 'block';
             document.getElementById('cam-loading').innerText = "Sesi ditutup oleh peserta.";
             document.getElementById('webrtc-modal-video').style.display = 'none';
@@ -1321,16 +1336,15 @@
               } else { document.getElementById('admin-logs').innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">Lingkungan ujian kondusif. Tidak ada pelanggaran terdeteksi.</div>'; }
           } catch(e) {}
 
-          // UPGRADE: TABEL RADAR MUNCULKAN TOMBOL LIVE CAM P2P
           try {
               let audioHtml = '';
               if(res.liveSessions && Array.isArray(res.liveSessions) && res.liveSessions.length > 0) {
                   res.liveSessions.forEach(s => {
                     let width = s.noise > 0 ? (s.noise > 100 ? 100 : s.noise) : 0; let c = width > 80 ? 'noise-high' : '';
-                    // Parameter openLiveCam mengambil Exam_ID (Tersimpan di indeks yang tepat atau global, anggap kita kirim dari backend)
-                    // Mengingat arsitektur saat ini s= {nim, name, status, noise, time}, kita anggap exam_id user sudah difilter atau kita bisa memanggil openLiveCam dengan asumsi Exam ID tersinkron
+                    let tempExamId = document.getElementById('global-dept-filter').value === 'ALL' ? 'EXM-007' : 'EXM-006'; // Default fallback until index array is perfect
+                    
                     audioHtml += `<tr><td>${s.nim} - <b style="color:var(--text-main)">${s.name}</b></td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-size:0.8rem;">${s.status}</span></td><td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td>
-                    <td><button class="btn-play" style="background:var(--neon-green); color:#000; border:none; padding:8px 12px; font-weight:bold;" onclick="openLiveCam('${document.getElementById('global-dept-filter').value === 'ALL' ? 'EXM-007' /* Fallback sederhana */ : document.getElementById('global-dept-filter').value}', '${s.nim}', '${s.name}')">🎥 PANTAU LIVE</button></td></tr>`;
+                    <td><button class="btn-play" style="background:var(--neon-green); color:#000; border:none; padding:8px 12px; font-weight:bold;" onclick="openLiveCam('${tempExamId}', '${s.nim}', '${s.name}')">🎥 PANTAU LIVE</button></td></tr>`;
                   });
                   document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml;
               } else { document.getElementById('tbl-audio').querySelector('tbody').innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada sesi aktif terdeteksi.</td></tr>'; }
