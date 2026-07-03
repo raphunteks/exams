@@ -20,7 +20,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V33 (Jitsi Toggle Dashboard Admin)
+       SUPER BIG UPGRADE CSS3 - V34 (Image Fix, Broadcast Fix & Clean UI)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -182,17 +182,9 @@
     th { background: rgba(0,0,0,0.6); color: var(--neon-green); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem; }
     tr:hover td { background: rgba(255,255,255,0.03); }
     
-    .audio-bar { height: 12px; background: rgba(0,0,0,0.6); border-radius: 6px; overflow: hidden; width: 100px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
-    .audio-level { height: 100%; background: linear-gradient(90deg, #00ff88, #ffb700); transition: width 0.5s ease; }
-    .noise-high { background: var(--danger) !important; box-shadow: 0 0 10px var(--danger); }
     .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
     .btn-play:hover { background: var(--neon-green); color: #020617; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
     
-    .star-rating { direction: rtl; display: inline-block; font-size: 2.5rem; margin: 10px 0; }
-    .star-rating input { display: none; }
-    .star-rating label { color: rgba(255,255,255,0.1); cursor: pointer; padding: 0 8px; transition: 0.2s; }
-    .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #ffb700; text-shadow: 0 0 20px rgba(255, 183, 0, 0.6); transform: scale(1.15); }
-
     .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px; }
 
     .app-footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); font-weight: 500; margin-top: auto; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
@@ -262,17 +254,18 @@
         border-radius: 10px;
     }
 
+    /* UPGRADE V34: Desain Image Preview Langsung Tampak Bersih Tanpa Border Bulky */
     .q-image-preview {
         max-width: 100%;
-        max-height: 350px;
-        border-radius: 10px;
-        border: 2px solid rgba(0, 255, 136, 0.3);
+        max-height: 400px;
+        border-radius: 8px;
         margin-bottom: 15px;
         box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         object-fit: contain;
         display: block;
         margin-left: auto;
         margin-right: auto;
+        background: #fff; /* Memberikan background putih jika gambar transparan PNG */
     }
 
     /* MOBILE RESPONSIVENESS */
@@ -368,22 +361,17 @@
     <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
-  <!-- MODAL JITSI CALL UNTUK ADMIN PENGAWAS -->
   <div id="live-cam-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 800px; text-align: center; border-color: var(--neon-blue);">
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING (ROOM UJIAN)</h3>
       <p id="cam-target-name" style="color: var(--text-muted); margin-bottom: 20px; font-weight:bold;"></p>
-      
-      <!-- Container untuk Iframe Jitsi Meet Admin -->
       <div id="jitsi-container" class="hidden"></div>
-      
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
           <button class="btn-danger btn-neon" style="width: auto; padding: 12px 20px; flex: 1;" onclick="closeLiveCam()">KELUAR DARI RUANG PENGAWASAN</button>
       </div>
     </div>
   </div>
 
-  <!-- Container Mengambang (Floating) untuk Jitsi Mahasiswa -->
   <div id="student-jitsi-container" class="hidden"></div>
 
   <div class="container">
@@ -419,7 +407,7 @@
             <li>Jika ada kendala jaringan/ter-refresh, sistem akan secara otomatis memulihkan sesi (Auto-Resume).</li>
           </ul>
       </div>
-      <button class="btn-start-exam" style="font-size: 1.1rem; padding: 18px;" onclick="startExamSequence()">MULAI UJIAN</button>
+      <button class="btn-start-exam" style="font-size: 1.1rem; padding: 18px;" onclick="startExamSequence()">GABUNG KE RUANG PENGAWAS & MULAI UJIAN</button>
     </div>
 
     <!-- 3. EXAM RUNNING -->
@@ -543,7 +531,6 @@
           <h3>Daftar Konfigurasi Ujian (Exams)</h3>
           <div class="table-wrapper">
              <table id="tbl-exams">
-               <!-- UPGRADE: Tambahan Kolom Status Jitsi -->
                <thead><tr><th>ID</th><th>Departemen</th><th>Judul Ujian</th><th>Menit</th><th>Status</th><th>Visibilitas</th><th>Status Jitsi</th><th>Aksi</th></tr></thead>
                <tbody><!-- JS --></tbody>
              </table>
@@ -813,15 +800,20 @@
         });
     }
 
+    // UPGRADE V34: Regex Pintar Khusus Google Drive Modern (Menangani CORS dan 403 Forbidden)
     function getDirectDriveLink(url) {
         if (!url) return '';
+        let fileId = null;
         let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+        if (match && match[1]) fileId = match[1];
+        else {
+            match = url.match(/id=([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) fileId = match[1];
         }
-        match = url.match(/id=([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+
+        if (fileId) {
+            // Menggunakan thumbnail endpoint yang secara resmi didukung Google untuk disematkan di <img> tanpa di-blokir cookie
+            return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
         }
         return url; 
     }
@@ -1003,7 +995,6 @@
     }
     function clearLocalBackup() { localStorage.removeItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`); }
 
-    // UPGRADE: Logic Pengecekan Jitsi Status sebelum Ujian
     function startExamSequence() {
       const proceedExam = () => {
          runServer('getStudentExam', [currentUser.examId, currentUser.nim], (res) => {
@@ -1033,7 +1024,6 @@
              document.getElementById('watermark-layer').innerHTML = Array(80).fill(`${currentUser.nim} - ${currentUser.name}`).join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
              document.getElementById('watermark-layer').classList.remove('hidden');
              
-             // Pengecekan Status Jitsi
              if (currentExam.jitsiStatus === 'Active') {
                  initStudentJitsiGatekeeper();
              } else {
@@ -1135,6 +1125,7 @@
         });
     }
 
+    // UPGRADE V34: Render Langsung Gambar (Image Preview) Tanpa Pop-up
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1146,11 +1137,15 @@
         
         if(imgData && typeof imgData === 'string' && imgData.trim() !== '') {
             let directUrl = getDirectDriveLink(imgData);
+            
+            // Merender gambar langsung, jika link gagal dimuat/diblokir, tombol manual muncul
             imgHtml = `
-            <div style="margin-bottom: 25px; text-align: center; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px dashed rgba(0, 255, 136, 0.4);">
-                <img src="${directUrl}" class="q-image-preview" alt="Lampiran Gambar Ujian" onerror="this.onerror=null; this.alt='[Format File Bukan Gambar Langsung. Klik Tombol Di Bawah Untuk Membuka]'; this.style.border='1px solid var(--warning)';">
-                <div style="margin-top: 15px;">
-                    <a href="${imgData}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none; padding: 8px 20px; font-size: 0.85rem; font-weight: 800;">🔍 BUKA FULL LAMPIRAN (PDF/GAMBAR)</a>
+            <div style="margin-bottom: 25px; text-align: center;">
+                <img src="${directUrl}" class="q-image-preview" alt="Lampiran Gambar Ujian" 
+                     onerror="this.onerror=null; this.src=''; this.alt=''; document.getElementById('fallback-link-${q.id}').style.display='inline-block';">
+                
+                <div id="fallback-link-${q.id}" style="margin-top: 15px; display: none;">
+                    <a href="${imgData}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none; padding: 8px 20px; font-size: 0.85rem; font-weight: 800;">📄 BUKA LAMPIRAN (PDF/GAGAL DIMUAT)</a>
                 </div>
             </div>`;
         }
@@ -1224,11 +1219,17 @@
         }
     }
 
+    // UPGRADE V34: Penangkapan Spam Broadcast
     function pollBroadcast() {
       if(!isSubmitting) {
         runServer('checkBroadcast', [lastBroadcastId], (res) => {
-          if(res && res.status === 'success') {
-            lastBroadcastId = res.msgId; document.getElementById('broadcast-text').innerText = res.message; document.getElementById('broadcast-modal').classList.remove('hidden');
+          // Pencegahan Spam dari redirect otomatis GAS
+          if(res && res.status === 'success' && res.msgId && res.message) {
+            if (!res.message.includes('Backend API')) { 
+                lastBroadcastId = res.msgId; 
+                document.getElementById('broadcast-text').innerText = res.message; 
+                document.getElementById('broadcast-modal').classList.remove('hidden');
+            }
           }
         });
       }
@@ -1455,7 +1456,6 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // UPGRADE: Tambahan Render Kolom Status_Jitsi 
     function loadAdminExams() {
       document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color: var(--neon-green); font-weight:bold; animation: pulse-neon 1s infinite;">Memuat Data Database...</td></tr>';
       runServer('getAdminExams', [], (res) => {
@@ -1554,9 +1554,9 @@
                       
                       if (imgData && typeof imgData === 'string' && imgData.trim() !== '') {
                           let directLink = getDirectDriveLink(imgData);
+                          // Tampilkan link raw (Fallback aman jika direct view gagal)
                           imgIndicator = `
                           <div style="display:flex; flex-direction:column; align-items:flex-start; gap:5px;">
-                              <img src="${directLink}" style="width:60px; height:40px; object-fit:cover; border-radius:4px; border:1px solid rgba(0, 255, 136, 0.4);" onerror="this.style.display='none'">
                               <a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-size:0.75rem; text-decoration:none; font-weight:bold;">🖼️ Buka Lampiran</a>
                           </div>`;
                       }
