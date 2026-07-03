@@ -238,6 +238,15 @@
         box-shadow: 0 0 30px rgba(14, 165, 233, 0.4);
     }
 
+    .q-image-preview {
+        max-width: 100%;
+        max-height: 350px;
+        border-radius: 10px;
+        border: 2px solid rgba(0, 255, 136, 0.3);
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+
     /* MOBILE RESPONSIVENESS */
     @media (max-width: 768px) {
         .glass-panel, #admin-view .glass-panel { padding: 1.2rem; }
@@ -332,11 +341,16 @@
       <p id="cam-target-name" style="color: var(--text-muted); margin-bottom: 20px;"></p>
       
       <div style="position: relative;">
-          <video id="webrtc-modal-video" autoplay playsinline></video>
+          <!-- UPGRADE: Tambahkan atribut 'muted' secara default untuk mem-bypass pemblokiran Autoplay Browser -->
+          <video id="webrtc-modal-video" autoplay playsinline muted></video>
           <div id="cam-loading" style="position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--neon-green); font-weight:bold; animation: pulse-neon 1s infinite;">Menghubungkan ke Kamera Peserta...</div>
       </div>
       
-      <button class="btn-danger btn-neon" style="margin-top: 20px; padding: 12px;" onclick="closeLiveCam()">TUTUP KONEKSI</button>
+      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+          <!-- UPGRADE: Tombol Toggle Suara agar Admin dapat mendengar peserta secara manual -->
+          <button class="btn-neon" style="width: auto; padding: 12px 20px;" onclick="document.getElementById('webrtc-modal-video').muted = !document.getElementById('webrtc-modal-video').muted">🔊 TOGGLE SUARA</button>
+          <button class="btn-danger btn-neon" style="width: auto; padding: 12px 20px;" onclick="closeLiveCam()">TUTUP KONEKSI</button>
+      </div>
     </div>
   </div>
 
@@ -578,6 +592,14 @@
                 <select id="add-q-dept" class="input-glass dept-options" required style="background: var(--bg-base);"></select>
               </div>
               <div class="input-group"><textarea id="add-q-text" class="input-glass" rows="2" required placeholder="Teks Soal..."></textarea></div>
+              
+              <!-- UPGRADE: Input File Gambar/PDF untuk Soal Manual -->
+              <div class="input-group" style="background: rgba(0,255,136,0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(0,255,136,0.2);">
+                <label style="color: var(--neon-green);">Upload Gambar Soal (Opsional)</label>
+                <input type="file" id="add-q-file" accept="image/jpeg, image/png, image/jpg, application/pdf" class="input-glass" style="padding: 10px; font-size: 0.85rem;">
+                <p style="font-size: 0.75rem; margin-top: 5px; color: var(--text-muted);">Max 3MB. Mendukung JPG, PNG, PDF.</p>
+              </div>
+
               <div class="dashboard-grid" style="margin-bottom: 1rem; gap: 0.5rem;">
                 <div class="input-group" style="margin:0;"><input type="text" id="add-q-a" class="input-glass" placeholder="Opsi A" required></div>
                 <div class="input-group" style="margin:0;"><input type="text" id="add-q-b" class="input-glass" placeholder="Opsi B" required></div>
@@ -600,7 +622,7 @@
            </div>
            <div class="table-wrapper">
               <table id="tbl-questions">
-                <thead><tr><th>ID</th><th>Soal</th><th>Kunci</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>ID</th><th>Soal</th><th>Gambar/Lampiran</th><th>Kunci</th><th>Aksi</th></tr></thead>
                 <tbody><!-- JS --></tbody>
               </table>
            </div>
@@ -1013,8 +1035,19 @@
         document.getElementById('exam-title').innerText = currentExam.title;
         document.getElementById('student-identity').innerText = `NIM: ${currentUser.nim} | Dept: ${currentUser.dept}`;
         
+        // UPGRADE: Render Gambar Jika Ada di Database
+        let imgHtml = '';
+        if(q.img && q.img.trim() !== '') {
+            if(q.img.includes('pdf')) {
+               imgHtml = `<div style="margin-bottom:15px;"><a href="${q.img}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none;">📄 BUKA LAMPIRAN PDF SOAL</a></div>`;
+            } else {
+               imgHtml = `<img src="${q.img}" class="q-image-preview" alt="Lampiran Soal">`;
+            }
+        }
+
         let h = `<div class="question-card">
                   <h3 style="color:var(--neon-green); font-size: 1.4rem; margin-bottom: 20px;">Soal No. ${currentQIndex+1} <span style="color:var(--text-muted); font-size:0.9rem; font-weight:normal;">/ ${examQuestions.length}</span></h3>
+                  ${imgHtml}
                   <p style="color:#f8fafc; font-size:1.15rem; line-height:1.7; margin-bottom: 30px; font-weight: 400;">${q.text.replace(/\n/g, '<br>')}</p>
                   <div class="options-grid">`;
         
@@ -1257,14 +1290,23 @@
         document.getElementById('cam-loading').style.display = 'block';
         document.getElementById('cam-loading').innerText = "Menghubungkan ke Kamera Peserta...";
         document.getElementById('webrtc-modal-video').style.display = 'none';
+        // Pastikan video di-mute saat pertama kali dibuka untuk menghindari pemblokiran autoplay
+        document.getElementById('webrtc-modal-video').muted = true; 
         document.getElementById('live-cam-modal').classList.remove('hidden');
 
         const targetPeerId = `axa_cbt_${examId}_${nim}`;
         console.log("Calling student: " + targetPeerId);
         
-        // Buat dummy stream (silent audio) agar WebRTC mau membuka jalur penerimaan video di beberapa browser mobile
+        // UPGRADE WEBRTC: Buat dummy stream (Video Canvas 1x1 Pixel + Audio)
+        // Hal ini sangat penting untuk memastikan browser di pihak peserta mau merespon 'answer' (Handshake Simetris)
+        const canvas = document.createElement("canvas");
+        canvas.width = 1; canvas.height = 1;
+        const videoStream = canvas.captureStream(1); // 1 FPS Stream
+        
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const dummyStream = audioCtx.createMediaStreamDestination().stream;
+        const audioStream = audioCtx.createMediaStreamDestination().stream;
+        
+        const dummyStream = new MediaStream([...videoStream.getTracks(), ...audioStream.getTracks()]);
         
         let callOptions = { offerToReceiveVideo: true, offerToReceiveAudio: true };
         activeCall = adminPeer.call(targetPeerId, dummyStream, callOptions); 
@@ -1466,26 +1508,40 @@
 
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
-      document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
+      document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
       runServer('getAdminQuestions', [dept], (res) => {
         if(res && res.status === 'success') {
            try {
                let h = '';
                if(res.data && res.data.length > 0) {
                    res.data.forEach(q => {
-                      h += `<tr><td><span style="font-family:monospace; color:var(--text-muted); font-weight:600;">${q.id}</span></td><td><b style="color:var(--text-main); font-weight:500;">${q.text.substring(0,80)}...</b></td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-weight:bold;">${q.correct}</span></td>
+                      // UPGRADE: Indikator Gambar di Tabel
+                      let imgIndicator = (q.img && q.img !== '') ? '<span style="color:var(--neon-blue);">🖼️ Terlampir</span>' : '<span style="color:var(--text-muted);">-</span>';
+                      
+                      h += `<tr><td><span style="font-family:monospace; color:var(--text-muted); font-weight:600;">${q.id}</span></td><td><b style="color:var(--text-main); font-weight:500;">${q.text.substring(0,80)}...</b></td><td>${imgIndicator}</td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-weight:bold;">${q.correct}</span></td>
                             <td><button class="btn-play" onclick='openEditQuestion(${JSON.stringify(q).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
                    });
                }
-               document.getElementById('tbl-questions').querySelector('tbody').innerHTML = h || '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada soal.</td></tr>';
+               document.getElementById('tbl-questions').querySelector('tbody').innerHTML = h || '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada soal.</td></tr>';
            } catch(e) {}
         }
       });
     }
 
     function openEditQuestion(q) {
+       // UPGRADE: UI Edit Question dengan File Upload
+       let existingImg = (q.img && q.img !== '') ? `<a href="${q.img}" target="_blank" style="color:var(--neon-blue); font-size:0.85rem; display:block; margin-bottom:10px;">Lihat Lampiran Saat Ini</a>` : '';
+       
        let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Bank Soal: <span style="color:#fff;">${q.id}</span></h3>
         <div class="input-group"><label>Teks Soal</label><textarea id="ed-q-text" class="input-glass" rows="3" style="font-size:0.95rem;">${q.text}</textarea></div>
+        
+        <div class="input-group" style="background: rgba(0,255,136,0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(0,255,136,0.2);">
+           <label style="color: var(--neon-green);">Ganti Lampiran/Gambar Soal</label>
+           ${existingImg}
+           <input type="file" id="ed-q-file" accept="image/jpeg, image/png, image/jpg, application/pdf" class="input-glass" style="padding: 10px; font-size: 0.85rem;">
+           <input type="hidden" id="ed-q-img-url" value="${q.img || ''}">
+        </div>
+
         <div class="dashboard-grid" style="gap:10px;">
            <div class="input-group" style="margin:0;"><label>Opsi A</label><input type="text" id="ed-q-a" class="input-glass" value="${q.a}"></div>
            <div class="input-group" style="margin:0;"><label>Opsi B</label><input type="text" id="ed-q-b" class="input-glass" value="${q.b}"></div>
@@ -1500,9 +1556,38 @@
        document.getElementById('edit-modal').classList.remove('hidden');
     }
 
-    function saveEditQuestion(id) {
-       let p = { id: id, text: document.getElementById('ed-q-text').value, a: document.getElementById('ed-q-a').value, b: document.getElementById('ed-q-b').value, c: document.getElementById('ed-q-c').value, d: document.getElementById('ed-q-d').value, e: document.getElementById('ed-q-e').value, correct: document.getElementById('ed-q-cor').value };
-       runServer('updateAdminQuestion', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminQuestions(); });
+    async function saveEditQuestion(id) {
+       // UPGRADE: Handle Base64 file di Edit Modal
+       const btn = event.target;
+       btn.innerText = "MENYIMPAN...";
+       btn.disabled = true;
+
+       const fileInput = document.getElementById('ed-q-file');
+       let fileBase64 = null, fileName = null, fileMimeType = null;
+       
+       if(fileInput.files.length > 0) {
+           const file = fileInput.files[0];
+           fileName = file.name; fileMimeType = file.type;
+           fileBase64 = await new Promise((resolve) => {
+               const reader = new FileReader();
+               reader.onloadend = () => resolve(reader.result.split(',')[1]);
+               reader.readAsDataURL(file);
+           });
+       }
+
+       let p = { 
+           id: id, text: document.getElementById('ed-q-text').value, 
+           a: document.getElementById('ed-q-a').value, b: document.getElementById('ed-q-b').value, 
+           c: document.getElementById('ed-q-c').value, d: document.getElementById('ed-q-d').value, e: document.getElementById('ed-q-e').value, 
+           correct: document.getElementById('ed-q-cor').value,
+           imgUrl: document.getElementById('ed-q-img-url').value, // URL lama jika ada
+           fileBase64: fileBase64, fileName: fileName, fileMimeType: fileMimeType
+       };
+       runServer('updateAdminQuestion', [p], (res) => { 
+           showToast(res.message, true); 
+           document.getElementById('edit-modal').classList.add('hidden'); 
+           loadAdminQuestions(); 
+       });
     }
 
     async function extractTextFromFile(file, stElement) {
@@ -1642,12 +1727,49 @@
       runServer('addAdminUser', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-users form').reset(); loadAdminUsers(); });
     }
 
-    function submitNewQuestion() {
+    async function submitNewQuestion() {
+      // UPGRADE: Pengecekan Input File Base64
+      const btn = event.target.querySelector('button[type="submit"]');
+      btn.innerText = "MENGUPLOAD...";
+      btn.disabled = true;
+
       let keyInput = document.getElementById('add-q-correct').value;
       let realCorrect = mapKeyToText(keyInput, document.getElementById('add-q-a').value, document.getElementById('add-q-b').value, document.getElementById('add-q-c').value, document.getElementById('add-q-d').value, document.getElementById('add-q-e').value);
       
-      const p = { dept: document.getElementById('add-q-dept').value, text: document.getElementById('add-q-text').value, optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, correct: realCorrect };
-      runServer('addAdminQuestion', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-questions form').reset(); loadAdminQuestions(); });
+      const fileInput = document.getElementById('add-q-file');
+      let fileBase64 = null, fileName = null, fileMimeType = null;
+      
+      if(fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          if(file.size > 3 * 1024 * 1024) { // Max 3MB limit
+              showToast("Ukuran file gambar maksimal 3MB!", true);
+              btn.innerText = "SIMPAN SOAL"; btn.disabled = false;
+              return;
+          }
+          fileName = file.name;
+          fileMimeType = file.type;
+          fileBase64 = await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result.split(',')[1]);
+              reader.readAsDataURL(file);
+          });
+      }
+
+      const p = { 
+          dept: document.getElementById('add-q-dept').value, 
+          text: document.getElementById('add-q-text').value, 
+          optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, 
+          optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, 
+          correct: realCorrect,
+          fileBase64: fileBase64, fileName: fileName, fileMimeType: fileMimeType
+      };
+      
+      runServer('addAdminQuestion', [p], (res) => { 
+          showToast(res.message, true); 
+          document.querySelector('#admin-questions form').reset(); 
+          btn.innerText = "SIMPAN SOAL"; btn.disabled = false;
+          loadAdminQuestions(); 
+      });
     }
 
     function showToast(msg, isCritical = false) {
