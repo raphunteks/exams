@@ -11,18 +11,16 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Dependensi Modul via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-  <!-- Jitsi Meet External API untuk stabilitas 100% -->
   <script src="https://meet.jit.si/external_api.js"></script>
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V27 (Image Render Proofing & UI Padding Fix)
+       SUPER BIG UPGRADE CSS3 - V28 (Smart Drive Regex & Absolute Fix Jitsi UI)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -127,8 +125,8 @@
     /* UI UJIAN CBT PROFESIONAL */
     .cbt-container { display: flex; gap: 30px; align-items: flex-start; }
     
-    /* UPGRADE: Tambahan padding-bottom agar soal/opsi terbawah tidak ditutupi oleh Video Jitsi yang Floating */
-    .cbt-main { flex: 3; width: 100%; padding-bottom: 200px !important; }
+    /* UPGRADE: Tambahan padding-bottom yang cukup lebar untuk memastikan scrolling sampai ke opsi terbawah */
+    .cbt-main { flex: 3; width: 100%; padding-bottom: 250px !important; }
     
     .cbt-sidebar { flex: 1; width: 100%; background: rgba(15, 23, 42, 0.85); padding: 25px; border-radius: 16px; border: 1px solid rgba(0, 255, 136, 0.2); position: sticky; top: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
     
@@ -186,9 +184,6 @@
     th { background: rgba(0,0,0,0.6); color: var(--neon-green); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem; }
     tr:hover td { background: rgba(255,255,255,0.03); }
     
-    .audio-bar { height: 12px; background: rgba(0,0,0,0.6); border-radius: 6px; overflow: hidden; width: 100px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
-    .audio-level { height: 100%; background: linear-gradient(90deg, #00ff88, #ffb700); transition: width 0.5s ease; }
-    .noise-high { background: var(--danger) !important; box-shadow: 0 0 10px var(--danger); }
     .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
     .btn-play:hover { background: var(--neon-green); color: #020617; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
     
@@ -197,18 +192,18 @@
     .star-rating label { color: rgba(255,255,255,0.1); cursor: pointer; padding: 0 8px; transition: 0.2s; }
     .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #ffb700; text-shadow: 0 0 20px rgba(255, 183, 0, 0.6); transform: scale(1.15); }
 
-    .chart-container { relative; height: 300px; width: 100%; margin-top: 15px; }
+    .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px; }
 
     .app-footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); font-weight: 500; margin-top: auto; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
     .app-footer span.brand { color: var(--neon-green); font-weight: 700; letter-spacing: 1px; }
 
-    /* UPGRADE V26: CSS STUDENT JITSI GATEKEEPER & MINIMIZER UNTUK IPAD/DESKTOP */
+    /* UPGRADE V26/V27: CSS STUDENT JITSI GATEKEEPER (Desktop & iPad Fix) */
     .jitsi-fullscreen {
         position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
         z-index: 99999;
-        background: #020617; /* Memastikan background tidak putih saat proses load */
-        display: block; /* Menghapus Flexbox yang mencekik Iframe di layar besar */
+        background: #020617; 
+        display: block; /* Mencegah flexbox mencekik iframe di Desktop/iPad */
     }
     .jitsi-fullscreen::before {
         content: 'MENGHUBUNGKAN KE RUANG PENGAWAS JITSI...';
@@ -219,7 +214,7 @@
         color: var(--neon-green);
         font-weight: 800;
         font-size: 1.2rem;
-        z-index: -1; /* Berada di lapisan belakang Iframe agar otomatis tertutup jika video siap */
+        z-index: -1; /* Z-Index negatif agar teks ini otomatis tertutup oleh video Iframe saat selesai dimuat */
         animation: pulse-neon 1s infinite;
         background: rgba(0,0,0,0.8);
         padding: 10px 20px;
@@ -302,6 +297,7 @@
         .exam-header > div:last-child { width: 100%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap:10px; }
 
         #jitsi-container { height: 60vh; }
+        
         /* Pengecilan Jitsi saat Ujian di Layar HP */
         .jitsi-minimized {
             width: 120px;
@@ -374,7 +370,7 @@
     <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
-  <!-- MODAL JITSI CALL PENGGANTI WEBRTC & CCTV -->
+  <!-- MODAL JITSI CALL UNTUK ADMIN PENGAWAS -->
   <div id="live-cam-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 800px; text-align: center; border-color: var(--neon-blue);">
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING (ROOM UJIAN)</h3>
@@ -389,7 +385,7 @@
     </div>
   </div>
 
-  <!-- UPGRADE V26: Container Mengambang (Floating) untuk Jitsi Mahasiswa -->
+  <!-- Container Mengambang (Floating) untuk Jitsi Mahasiswa -->
   <div id="student-jitsi-container" class="hidden"></div>
 
   <div class="container">
@@ -818,10 +814,10 @@
         });
     }
 
-    // UPGRADE V27: Fungsi Regex Cerdas untuk Google Drive URL agar preview gambar lebih handal
+    // UPGRADE V27: Fungsi Regex Cerdas untuk Google Drive URL
     function getDirectDriveLink(url) {
         if (!url) return '';
-        // Ekstrak ID dari link format /d/ID/
+        // Ekstrak ID dari link format /d/ID/ (Mengcover format /file/d/ atau format apapun dengan /d/)
         let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
             return `https://drive.google.com/uc?export=view&id=${match[1]}`;
@@ -1133,7 +1129,7 @@
         });
     }
 
-    // UPGRADE V27: Render Image Tahan Banting + Padding Fix
+    // UPGRADE V27: Render Image Lebih Kuat
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1141,12 +1137,11 @@
         document.getElementById('student-identity').innerText = `NIM: ${currentUser.nim} | Dept: ${currentUser.dept}`;
         
         let imgHtml = '';
-        // UPGRADE: Mendukung q.img atau q.image atau q.imgUrl untuk mencegah error pembacaan API
+        // Ekstrak URL gambar yang diterima dari backend (jika undefined, jadikan string kosong)
         let imgData = q.img || q.image || q.imgUrl || ''; 
         
         if(imgData && typeof imgData === 'string' && imgData.trim() !== '') {
             let directUrl = getDirectDriveLink(imgData);
-            // Memberikan kotak placeholder yang jelas agar link PDF/Image tetap bisa diklik sekalipun gambar gagal render
             imgHtml = `
             <div style="margin-bottom: 25px; text-align: center; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px dashed rgba(0, 255, 136, 0.4);">
                 <img src="${directUrl}" class="q-image-preview" alt="Lampiran Gambar Ujian" onerror="this.onerror=null; this.alt='[Format File Bukan Gambar Langsung. Klik Tombol Di Bawah Untuk Membuka]'; this.style.border='1px solid var(--warning)';">
@@ -1446,7 +1441,7 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // UPGRADE V27: Fungsi Load Admin Questions Lebih Kuat dalam menampung variabel Image
+    // UPGRADE V27: Render URL Google Drive Smart Preview di Daftar Bank Soal Admin
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
@@ -1456,7 +1451,9 @@
                let h = '';
                if(res.data && res.data.length > 0) {
                    res.data.forEach(q => {
+                      // Gunakan getDirectDriveLink untuk memungkinkan admin melakukan preview gambar yang disisipkan
                       let imgData = q.img || q.image || q.imgUrl || ''; 
+                      let directLink = getDirectDriveLink(imgData);
                       let imgIndicator = (imgData && imgData !== '') ? `<a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-weight:bold; text-decoration:none;">🖼️ Preview Link</a>` : '<span style="color:var(--text-muted);">-</span>';
                       
                       h += `<tr><td><span style="font-family:monospace; color:var(--text-muted); font-weight:600;">${q.id}</span></td><td><b style="color:var(--text-main); font-weight:500;">${q.text.substring(0,80)}...</b></td><td>${imgIndicator}</td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-weight:bold;">${q.correct}</span></td>
