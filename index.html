@@ -21,7 +21,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V19.5 (WebRTC UI Fix Flexbox & PeerJS Timeout)
+       SUPER BIG UPGRADE CSS3 - V20 (WebRTC Aggressive Reconnect Fix)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -1166,20 +1166,26 @@
           if(currentNoise > 80) logViolation("Bising Ruangan");
         }, 2000);
 
+        // UPGRADE: Pastikan Peer terputus dulu sebelum konek ulang untuk menghindari bentrok ID
+        if(studentPeer) { studentPeer.destroy(); }
+
         const peerId = `axa_cbt_${currentExam.examId}_${currentUser.nim}`;
         studentPeer = new Peer(peerId, WEBRTC_CONFIG); // UPGRADE: Injeksikan STUN Server
         
         studentPeer.on('open', id => { console.log("Student WebRTC Ready: " + id); });
         
         studentPeer.on('disconnected', () => {
-            console.log("WebRTC Disconnected, reconnecting...");
-            studentPeer.reconnect();
+            console.warn("WebRTC Disconnected, memaksakan reconnect...");
+            // UPGRADE: Polling reconnect otomatis setiap 5 detik jika server putus
+            setTimeout(() => {
+                if(!studentPeer.destroyed && !isSubmitting) studentPeer.reconnect();
+            }, 5000);
         });
 
         studentPeer.on('call', call => {
-            console.log("Menerima panggilan dari Admin");
+            console.log("Menerima panggilan masuk dari Admin...");
             if(localStream) {
-                // Saat menerima panggilan, otomatis dijawab dengan stream lokal
+                // UPGRADE: Pastikan Stream Audio+Video benar-benar dikirim
                 call.answer(localStream); 
             }
         });
@@ -1339,7 +1345,7 @@
         document.getElementById('live-cam-modal').classList.remove('hidden');
 
         const targetPeerId = `axa_cbt_${examId}_${nim}`;
-        console.log("Calling student: " + targetPeerId);
+        console.log("Memanggil peserta: " + targetPeerId);
         
         // UPGRADE WEBRTC: Buat dummy stream (Video Canvas 1x1 Pixel + Audio) untuk Handshake P2P
         const canvas = document.createElement("canvas");
@@ -1359,16 +1365,17 @@
             return;
         }
 
+        // UPGRADE: Timeout diperpendek menjadi 10 detik dengan notifikasi yang lebih informatif
         let callTimeout = setTimeout(() => {
             if(vid.style.display === 'none') {
-                loadingText.innerText = "Koneksi Timeout. \nSistem Mahasiswa memblokir P2P atau Kamera tertutup.";
+                loadingText.innerText = "Koneksi Timeout (Terblokir Firewall). \nSistem Mahasiswa memblokir koneksi P2P atau tab browser peserta tidak aktif.";
                 if(activeCall) activeCall.close();
             }
-        }, 12000); // Tunggu 12 detik
+        }, 10000); 
 
         activeCall.on('stream', remoteStream => {
             clearTimeout(callTimeout);
-            console.log("Stream diterima!");
+            console.log("Stream diterima dari peserta!");
             loadingText.style.display = 'none';
             vid.style.display = 'block';
             vid.srcObject = remoteStream;
@@ -1376,13 +1383,13 @@
 
         activeCall.on('error', err => {
             clearTimeout(callTimeout);
-            loadingText.innerText = "Koneksi terputus: " + err;
+            loadingText.innerText = "Koneksi P2P terputus: " + err;
         });
         
         activeCall.on('close', () => {
             clearTimeout(callTimeout);
             loadingText.style.display = 'block';
-            loadingText.innerText = "Sesi ditutup oleh peserta.";
+            loadingText.innerText = "Sesi ditutup / Peserta terputus.";
             vid.style.display = 'none';
         });
     }
