@@ -22,7 +22,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V23 (Jitsi UI Overlap Fix & Camera Handoff)
+       SUPER BIG UPGRADE CSS3 - V24 (Admin CCTV Live Grid Added)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -248,15 +248,15 @@
 
     /* UPGRADE: Container Khusus Jitsi Agar Tidak Terpotong (Overlap Fix) */
     #jitsi-container {
-        display: block; /* Override flex properties yang memotong UI */
+        display: block; 
         width: 100%;
-        height: 500px; /* Memberikan ruang napas vertikal untuk Jitsi */
+        height: 500px; 
         background: #020617;
         border-radius: 12px;
         border: 2px solid var(--neon-blue);
         box-shadow: 0 0 30px rgba(14, 165, 233, 0.4);
         margin-bottom: 20px;
-        overflow: visible !important; /* Mengizinkan dropdown Jitsi keluar dari kotak */
+        overflow: visible !important; 
     }
 
     #jitsi-container > iframe {
@@ -282,7 +282,45 @@
         box-shadow: 0 5px 15px rgba(0, 255, 136, 0.5);
     }
 
-    /* UPGRADE: Mempercantik Image Preview Soal */
+    /* UPGRADE: CCTV Grid System Styles */
+    .cctv-grid-layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+        margin-top: 15px;
+    }
+    .cctv-card {
+        background: #000;
+        border: 2px solid rgba(0, 255, 136, 0.3);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        transition: transform 0.3s;
+    }
+    .cctv-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--neon-green);
+        box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+    }
+    .cctv-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        display: block;
+    }
+    .cctv-info {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        padding: 8px;
+        font-size: 0.8rem;
+        text-align: center;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Mempercantik Image Preview Soal */
     .q-image-preview {
         max-width: 100%;
         max-height: 350px;
@@ -319,6 +357,8 @@
         #local-video { width: 100px; height: 80px; bottom: 10px; left: 10px; }
         #live-indicator { bottom: 95px; left: 15px; font-size: 0.6rem; }
         #jitsi-container { height: 60vh; }
+        .cctv-grid-layout { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        .cctv-card img { height: 110px; }
     }
   </style>
 </head>
@@ -384,7 +424,7 @@
     <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
-  <!-- UPGRADE: LIVE PROCTORING MODAL (CCTV & JITSI DUAL MODE) -->
+  <!-- MODAL JITSI CALL / CCTV ENLARGER -->
   <div id="live-cam-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 700px; text-align: center; border-color: var(--neon-blue);">
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING</h3>
@@ -399,9 +439,7 @@
       </div>
 
       <!-- Container untuk Iframe Jitsi Meet -->
-      <div id="jitsi-container" class="hidden">
-          <!-- Jitsi Iframe will be generated here -->
-      </div>
+      <div id="jitsi-container" class="hidden"></div>
       
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
           <button class="btn-danger btn-neon" style="width: auto; padding: 12px 20px; flex: 1;" onclick="closeLiveCam()">TUTUP KONEKSI / JENDELA</button>
@@ -447,7 +485,7 @@
 
     <!-- 3. EXAM RUNNING -->
     <div id="exam-view" class="hidden">
-      <!-- STUDENT LOCAL WEBCAM PREVIEW -->
+      <!-- STUDENT LOCAL WEBCAM PREVIEW (Kotak REC Kecil di Sudut Layar) -->
       <video id="local-video" autoplay muted playsinline class="hidden"></video>
       <div id="live-indicator" class="hidden">🔴 REC</div>
 
@@ -457,7 +495,6 @@
            <p style="margin:6px 0 0 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500;" id="student-identity"></p>
         </div>
         <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-           <!-- UPGRADE: Tombol Jitsi untuk Mahasiswa jika diperlukan -->
            <button class="btn-nav-toggle btn-warning" style="display:block; padding:8px 12px; border-color:var(--warning); color:var(--warning);" onclick="openStudentJitsi()">💬 PANGGILAN JITSI</button>
            <button class="btn-nav-toggle" style="display:block; padding:8px 12px;" onclick="toggleSidebar()">📑 NAVIGASI</button>
            <div class="timer-box" id="timer-display">00:00:00</div>
@@ -522,13 +559,15 @@
         </div>
       </div>
       
+      <!-- UPGRADE: Tambahan Tab LIVE CAM GRID -->
       <div class="admin-tabs">
         <button class="tab-btn active" onclick="switchAdminTab('admin-stats')">Analytics</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-cctv-grid')">🔴 LIVE CAM (Grid)</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-exams')">Exams</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-users')">Users</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-questions')">Soal</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-jawaban')">Koreksi</button>
-        <button class="tab-btn" onclick="switchAdminTab('admin-audio')">Live Proctoring (Dual Mode)</button>
+        <button class="tab-btn" onclick="switchAdminTab('admin-audio')">Log Panggilan (Jitsi)</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-web')">⚙️ Settings</button>
       </div>
 
@@ -563,6 +602,22 @@
              <div class="chart-container">
                 <canvas id="myChart"></canvas>
              </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPGRADE: UI CCTV LIVE GRID -->
+      <div id="admin-cctv-grid" class="hidden">
+        <div class="glass-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px;">
+              <h3 style="margin:0; color:var(--neon-green);">Pantauan Keamanan CCTV Massal</h3>
+              <span style="background: rgba(255,42,95,0.2); color: var(--danger); padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid var(--danger); animation: pulse-neon 2s infinite;">
+                  ● Auto-Refresh 10s
+              </span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Sistem menarik foto terbaru wajah peserta setiap 10 detik. Fitur ini sangat ringan dan 100% menembus semua pemblokiran Firewall/ISP Mahasiswa.</p>
+          <div id="cctv-grid-layout" class="cctv-grid-layout">
+              <!-- Grid CCTV Inject By JS -->
           </div>
         </div>
       </div>
@@ -650,7 +705,6 @@
               </div>
               <div class="input-group"><textarea id="add-q-text" class="input-glass" rows="2" required placeholder="Teks Soal..."></textarea></div>
               
-              <!-- Input File Gambar/PDF untuk Soal Manual -->
               <div class="input-group" style="background: rgba(0,255,136,0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(0,255,136,0.2);">
                 <label style="color: var(--neon-green);">Upload Gambar Soal (Opsional)</label>
                 <input type="file" id="add-q-file" accept="image/jpeg, image/png, image/jpg, application/pdf" class="input-glass" style="padding: 10px; font-size: 0.85rem;">
@@ -698,14 +752,14 @@
         </div>
       </div>
 
+      <!-- UPGRADE: Mengganti nama tab untuk mengelola Panggilan Jitsi Spesifik Saja -->
       <div id="admin-audio" class="hidden">
         <div class="glass-panel">
-          <h3>Live Proctoring (Dual Mode) - <span class="lbl-dept">ALL</span></h3>
-          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Memiliki 2 lapisan pengawasan: <b>CCTV Snapshot</b> (Otomatis & Tahan Banting di semua jaringan) dan <b>Jitsi Meet</b> (Untuk interaksi Video Call pengawas).</p>
+          <h3>Log Peserta Aktif & Panggilan Teguran Jitsi - <span class="lbl-dept">ALL</span></h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Gunakan tabel ini untuk melihat Radar Bising peserta atau melakukan Panggilan Video secara manual (Teguran Jitsi).</p>
           <div class="table-wrapper">
               <table id="tbl-audio">
-                <!-- UPGRADE: Tambahan Kolom CCTV Snapshot yang diambil dari string payload Google Sheets -->
-                <thead><tr><th>Peserta</th><th>Status</th><th>Bising (dB)</th><th>CCTV Snapshot (Auto)</th><th>Pantau Live (Jitsi)</th></tr></thead>
+                <thead><tr><th>Peserta</th><th>Status</th><th>Bising (dB)</th><th>Opsi Lanjutan</th></tr></thead>
                 <tbody><!-- Diisi JS --></tbody>
               </table>
           </div>
@@ -774,7 +828,6 @@
     // ==========================================
     // CONFIG: VERCEL ROUTING & GAS API
     // ==========================================
-    // UPGRADE: Update URL GAS API terbaru
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbypG1ceID0dXpoa1A3lyGqtjdpKY7_ownFGoA_wt4p46D3uG_npc1RrP9_QBr_kR8o/exec"; 
 
     const DEPARTMENTS = [
@@ -844,10 +897,8 @@
         });
     }
 
-    // UPGRADE: Fungsi Konversi Link Google Drive "View" menjadi "Direct Image"
     function getDirectDriveLink(url) {
         if (!url) return '';
-        // Cari ID File dari format link Google Drive umum
         if (url.includes('drive.google.com/file/d/')) {
             const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
             if (match && match[1]) {
@@ -859,7 +910,7 @@
                 return `https://drive.google.com/uc?export=view&id=${match[1]}`;
             }
         }
-        return url; // Kembalikan original URL jika bukan Google Drive
+        return url; 
     }
 
     let currentUser = null, currentExam = null, examQuestions = [];
@@ -1112,7 +1163,6 @@
         });
     }
 
-    // UPGRADE: Render Single Question dengan Google Drive Smart Preview
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1121,11 +1171,7 @@
         
         let imgHtml = '';
         if(q.img && q.img.trim() !== '') {
-            // Konversi link ke bentuk Direct Link Image
             let directUrl = getDirectDriveLink(q.img);
-            
-            // Render gambar dan link akses penuh 
-            // Jika directUrl ternyata bukan gambar (misal pdf murni), kita tambahkan attribut onerror agar disembunyikan
             imgHtml = `
             <div style="margin-bottom: 20px; text-align: center;">
                 <img src="${directUrl}" class="q-image-preview" alt="Lampiran Soal" onerror="this.style.display='none'">
@@ -1194,7 +1240,6 @@
       }, 1000); 
     }
 
-    // --- UPGRADE: BASE64 IMAGE POLLING & JITSI INTEGRATION ---
     async function initMediaSensorAndWebRTC() {
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
@@ -1209,7 +1254,6 @@
         audioContext.createMediaStreamSource(localStream).connect(a);
         const data = new Uint8Array(a.frequencyBinCount);
         
-        // Polling Audio Bising
         setInterval(() => {
           if(isSubmitting) return;
           a.getByteFrequencyData(data);
@@ -1217,19 +1261,16 @@
           if(currentNoise > 80) logViolation("Bising Ruangan");
         }, 2000);
 
-        // UPGRADE: Snapshot Polling Base64 (CCTV System)
-        // Mengekstrak frame video menjadi Base64 string setiap 10 detik dengan kompresi tinggi
         setInterval(() => {
             if(isSubmitting || !isExamActive) return;
             try {
                 const vid = document.getElementById('local-video');
                 if(vid.videoWidth > 0) {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 160;  // Resolusi super kecil (160x120) agar Payload sangat ringan
+                    canvas.width = 160;  
                     canvas.height = 120;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(vid, 0, 0, 160, 120);
-                    // Kompresi kualitas JPEG 0.3 untuk menghemat bandwidth
                     latestSnapshot = canvas.toDataURL('image/jpeg', 0.3);
                 }
             } catch(e) {}
@@ -1244,8 +1285,6 @@
 
     function sendPing(status) { 
         if(!isSubmitting) {
-            // UPGRADE: Payload Status String Manipulation
-            // Sisipkan Base64 Snapshot di dalam parameter Status ke Google Sheets
             let payloadStatus = status;
             if(latestSnapshot && latestSnapshot !== "") {
                 payloadStatus = status + "|" + latestSnapshot;
@@ -1259,9 +1298,7 @@
         }
     }
 
-    // UPGRADE: Fungsi Panggilan Jitsi Mahasiswa & Smart Camera Handoff
     function openStudentJitsi() {
-        // Hentikan penggunaan hardware kamera lokal sementara agar Jitsi bisa menggunakannya
         if(localStream) {
             localStream.getTracks().forEach(t => t.stop());
             localStream = null;
@@ -1281,7 +1318,6 @@
             height: '100%',
             parentNode: jitsiContainer,
             userInfo: { displayName: currentUser.name },
-            // UPGRADE: Video diaktifkan karena CCTV background sudah dimatikan
             configOverwrite: { startWithAudioMuted: false, startWithVideoMuted: false }
         };
         
@@ -1390,7 +1426,7 @@
 
     // --- ADMIN LOGIC ---
     function switchAdminTab(t) {
-      ['admin-stats', 'admin-exams', 'admin-users', 'admin-questions', 'admin-jawaban', 'admin-audio', 'admin-web'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['admin-stats', 'admin-cctv-grid', 'admin-exams', 'admin-users', 'admin-questions', 'admin-jawaban', 'admin-audio', 'admin-web'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(t).classList.remove('hidden');
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active');
 
@@ -1402,14 +1438,10 @@
     function initAdminDashboard() {
       switchView('admin-view'); 
       switchAdminTab('admin-stats');
-
       fetchAdminData();
       adminInterval = setInterval(fetchAdminData, 10000); 
     }
 
-    // --- ADMIN LIVE PROCTORING MODALS (JITSI & CCTV) ---
-
-    // Membuka Jitsi Meet untuk Interaksi Langsung (Fallback WebRTC)
     function openAdminJitsi(examId, nim, name) {
         document.getElementById('cam-target-name').innerText = `Video Call Aktif: ${nim} - ${name}`;
         document.getElementById('cctv-container').classList.add('hidden');
@@ -1433,7 +1465,6 @@
         document.getElementById('live-cam-modal').classList.remove('hidden');
     }
 
-    // Membuka CCTV Snapshot Enlarger
     function openCCTVModal(nim, name, snapBase64) {
         document.getElementById('cam-target-name').innerText = `Memantau CCTV: ${nim} - ${name}`;
         document.getElementById('jitsi-container').classList.add('hidden');
@@ -1442,18 +1473,15 @@
         cctvContainer.classList.remove('hidden');
         document.getElementById('cctv-enlarged-img').src = snapBase64;
         
-        // Simpan NIM yang sedang diawasi untuk auto-refresh di fetchAdminData
         activeCCTVNim = nim; 
         document.getElementById('live-cam-modal').classList.remove('hidden');
     }
 
-    // UPGRADE: Re-start Camera setelah menutup Modal Live Cam
     function closeLiveCam() {
         if(jitsiApi) { jitsiApi.dispose(); jitsiApi = null; }
         activeCCTVNim = null;
         document.getElementById('live-cam-modal').classList.add('hidden');
 
-        // Jika user adalah student dan sedang ujian, nyalakan kembali CCTV Base64
         if(currentUser && currentUser.role === 'Student' && isExamActive && !isSubmitting) {
             initMediaSensorAndWebRTC();
         }
@@ -1492,11 +1520,12 @@
 
           try {
               let audioHtml = '';
+              let cctvGridHtml = ''; // UPGRADE: Variabel Penampung HTML CCTV Grid
+              
               if(res.liveSessions && Array.isArray(res.liveSessions) && res.liveSessions.length > 0) {
                   res.liveSessions.forEach(s => {
                     let width = s.noise > 0 ? (s.noise > 100 ? 100 : s.noise) : 0; let c = width > 80 ? 'noise-high' : '';
                     
-                    // UPGRADE: Parsing Payload Status yang menyatu dengan Base64 Image
                     let realStatus = s.status;
                     let snapBase64 = "";
                     if(s.status && s.status.includes('|')) {
@@ -1505,24 +1534,39 @@
                         snapBase64 = parts[1];
                     }
                     
-                    // Jika admin sedang membuka Modal CCTV mahasiswa ini, auto-refresh gambar tanpa tutup modal
                     if(activeCCTVNim === s.nim && !document.getElementById('cctv-container').classList.contains('hidden')) {
                         document.getElementById('cctv-enlarged-img').src = snapBase64;
                     }
 
-                    // Render Tabel
+                    // Render Tabel Log Panggilan
                     let thumbHtml = snapBase64 ? `<img src="${snapBase64}" class="cctv-thumb" onclick="openCCTVModal('${s.nim}', '${s.name}', '${snapBase64}')">` : `<span style="font-size:0.7rem;color:var(--text-muted);">No Feed</span>`;
-
                     audioHtml += `<tr>
                         <td>${s.nim} - <b style="color:var(--text-main)">${s.name}</b></td>
                         <td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-size:0.8rem;">${realStatus}</span></td>
                         <td><div class="audio-bar"><div class="audio-level ${c}" style="width:${width}%"></div></div></td>
-                        <td>${thumbHtml}</td>
                         <td><button class="btn-play" style="background:var(--neon-blue); color:#fff; border:none; padding:8px 12px; font-weight:bold;" onclick="openAdminJitsi('${s.examId}', '${s.nim}', '${s.name}')">🌐 BUKA JITSI</button></td>
                     </tr>`;
+
+                    // UPGRADE: Render ke Tab CCTV GRID Baru
+                    if(snapBase64) {
+                        cctvGridHtml += `
+                        <div class="cctv-card" onclick="openCCTVModal('${s.nim}', '${s.name}', '${snapBase64}')" style="cursor:pointer;">
+                            <img src="${snapBase64}" alt="CCTV">
+                            <div class="cctv-info">
+                                <span style="font-family:monospace; color:var(--text-muted);">${s.nim}</span><br>
+                                <b style="color:var(--neon-green)">${s.name}</b>
+                            </div>
+                        </div>`;
+                    }
                   });
                   document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml;
-              } else { document.getElementById('tbl-audio').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada sesi aktif terdeteksi.</td></tr>'; }
+                  // Injeksi HTML ke Grid Layout
+                  document.getElementById('cctv-grid-layout').innerHTML = cctvGridHtml || '<p style="color:var(--text-muted); padding:20px; grid-column: 1 / -1; text-align:center;">Peserta aktif, namun transmisi kamera ditolak oleh browser/perangkat peserta.</p>';
+
+              } else { 
+                  document.getElementById('tbl-audio').querySelector('tbody').innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada sesi aktif terdeteksi.</td></tr>'; 
+                  document.getElementById('cctv-grid-layout').innerHTML = '<p style="color:var(--text-muted); padding:20px; grid-column: 1 / -1; text-align:center;">Belum ada sesi ujian yang berjalan di departemen ini.</p>';
+              }
           } catch(e) {}
         }
       });
@@ -1558,7 +1602,6 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // UPGRADE: Render URL Google Drive Smart Preview di Daftar Bank Soal Admin
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
@@ -1568,7 +1611,6 @@
                let h = '';
                if(res.data && res.data.length > 0) {
                    res.data.forEach(q => {
-                      // Gunakan getDirectDriveLink untuk memungkinkan admin melakukan preview gambar yang disisipkan
                       let directLink = getDirectDriveLink(q.img);
                       let imgIndicator = (q.img && q.img !== '') ? `<a href="${q.img}" target="_blank" style="color:var(--neon-blue); font-weight:bold; text-decoration:none;">🖼️ Preview Link</a>` : '<span style="color:var(--text-muted);">-</span>';
                       
@@ -1663,6 +1705,83 @@
              return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
         }
         throw new Error("Format tidak didukung");
+    }
+
+    function loadAdminExams() {
+      document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Memuat Data Database...</td></tr>';
+      runServer('getAdminExams', [], (res) => {
+        if(res && res.status === 'success') {
+           try {
+               let h = '';
+               if(res.data && res.data.length > 0) {
+                   res.data.forEach(ex => {
+                      let statColor = ex.status == 'Active' ? 'var(--neon-green)' : 'var(--danger)';
+                      h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${ex.id}</b></td><td>${ex.dept}</td><td>${ex.title}</td><td>${ex.duration} Mnt</td><td><span style="color:${statColor}; font-weight:bold; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:4px;">${ex.status}</span></td><td><span style="color:var(--text-muted);">${ex.vis}</span></td>
+                            <td><button class="btn-play" onclick='openEditExam(${JSON.stringify(ex).replace(/'/g, "&apos;")})'>✏️ Konfigurasi</button></td></tr>`;
+                   });
+                   document.getElementById('tbl-exams').querySelector('tbody').innerHTML = h;
+               } else { document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Data ujian kosong.</td></tr>'; }
+           } catch(e) {}
+        }
+      });
+    }
+
+    function openEditExam(ex) {
+       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Konfigurasi Ujian: <span style="color:#fff;">${ex.id}</span></h3>
+        <div class="input-group"><label>Judul Ujian CBT</label><input type="text" id="ed-ex-title" class="input-glass" value="${ex.title}"></div>
+        <div class="input-group"><label>Alokasi Waktu Ujian (Menit)</label><input type="number" id="ed-ex-dur" class="input-glass" value="${ex.duration}"></div>
+        <div class="input-group"><label>Status (Aktif/Nonaktif)</label><select id="ed-ex-stat" class="input-glass" style="background:var(--bg-base);"><option value="Active" ${ex.status=='Active'?'selected':''}>Active</option><option value="Inactive" ${ex.status=='Inactive'?'selected':''}>Inactive</option></select></div>
+        <div class="input-group"><label>Visibilitas Nilai Akhir ke Siswa</label><select id="ed-ex-vis" class="input-glass" style="background:var(--bg-base);"><option value="Show" ${ex.vis=='Show'?'selected':''}>Show</option><option value="Hide" ${ex.vis=='Hide'?'selected':''}>Hide</option></select></div>
+        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditExam('${ex.id}')">SIMPAN KONFIGURASI</button>
+        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
+       document.getElementById('edit-modal-body').innerHTML = h;
+       document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function saveEditExam(id) {
+       let p = { id: id, title: document.getElementById('ed-ex-title').value, duration: document.getElementById('ed-ex-dur').value, status: document.getElementById('ed-ex-stat').value, vis: document.getElementById('ed-ex-vis').value };
+       runServer('updateAdminExam', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
+    }
+
+    function loadAdminUsers() {
+      document.getElementById('tbl-users').querySelector('tbody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Memuat Database Pengguna...</td></tr>';
+      runServer('getAdminUsers', [], (res) => {
+        if(res && res.status === 'success') {
+           try {
+               let h = '';
+               let filterDept = document.getElementById('filter-u-dept').value;
+               if(res.data && res.data.length > 0) {
+                   res.data.forEach(u => {
+                      if (filterDept === 'ALL' || u.dept === filterDept) {
+                          let roleColor = u.role === 'Admin' ? 'var(--warning)' : 'var(--neon-green)';
+                          h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${u.nim}</b></td><td>${u.name}</td><td style="color:var(--text-muted); font-family:monospace;">${u.password}</td><td><span style="color:${roleColor}; font-weight:600;">${u.role}</span></td><td><span style="color:var(--text-muted);">${u.dept}</span></td>
+                                <td><button class="btn-play" onclick='openEditUser(${JSON.stringify(u).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
+                      }
+                   });
+               }
+               document.getElementById('tbl-users').querySelector('tbody').innerHTML = h || '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada user.</td></tr>';
+           } catch(e) {}
+        }
+      });
+    }
+
+    function openEditUser(u) {
+       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Identitas: <span style="color:#fff;">${u.nim}</span></h3>
+        <div class="input-group"><label>Nama Lengkap</label><input type="text" id="ed-u-name" class="input-glass" value="${u.name}"></div>
+        <div class="input-group"><label>Password</label><input type="text" id="ed-u-pass" class="input-glass" value="${u.password}"></div>
+        <div class="input-group"><label>Role</label><select id="ed-u-role" class="input-glass" style="background:var(--bg-base);"><option value="Student" ${u.role=='Student'?'selected':''}>Student</option><option value="Admin" ${u.role=='Admin'?'selected':''}>Admin</option></select></div>
+        <div class="input-group"><label>Departemen</label><select id="ed-u-dept" class="input-glass dept-options" style="background:var(--bg-base);"></select></div>
+        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditUser('${u.nim}')">SIMPAN PERUBAHAN</button>
+        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
+       document.getElementById('edit-modal-body').innerHTML = h;
+       let deptSelect = document.getElementById('ed-u-dept');
+       DEPARTMENTS.forEach(d => { let sel = (u.dept === d) ? 'selected' : ''; deptSelect.innerHTML += `<option value="${d}" ${sel}>${d}</option>`; });
+       document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function saveEditUser(nim) {
+       let p = { nim: nim, name: document.getElementById('ed-u-name').value, password: document.getElementById('ed-u-pass').value, role: document.getElementById('ed-u-role').value, dept: document.getElementById('ed-u-dept').value };
+       runServer('updateAdminUser', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
     }
 
     async function processBulkUsers() {
@@ -1777,50 +1896,6 @@
     function submitNewUser() {
       const p = { nim: document.getElementById('add-nim').value, name: document.getElementById('add-name').value, password: document.getElementById('add-pass').value, role: document.getElementById('add-role').value, dept: document.getElementById('add-dept').value };
       runServer('addAdminUser', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-users form').reset(); loadAdminUsers(); });
-    }
-
-    async function submitNewQuestion() {
-      const btn = event.target.querySelector('button[type="submit"]');
-      btn.innerText = "MENGUPLOAD...";
-      btn.disabled = true;
-
-      let keyInput = document.getElementById('add-q-correct').value;
-      let realCorrect = mapKeyToText(keyInput, document.getElementById('add-q-a').value, document.getElementById('add-q-b').value, document.getElementById('add-q-c').value, document.getElementById('add-q-d').value, document.getElementById('add-q-e').value);
-      
-      const fileInput = document.getElementById('add-q-file');
-      let fileBase64 = null, fileName = null, fileMimeType = null;
-      
-      if(fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          if(file.size > 3 * 1024 * 1024) { 
-              showToast("Ukuran file gambar maksimal 3MB!", true);
-              btn.innerText = "SIMPAN SOAL"; btn.disabled = false;
-              return;
-          }
-          fileName = file.name;
-          fileMimeType = file.type;
-          fileBase64 = await new Promise((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result.split(',')[1]);
-              reader.readAsDataURL(file);
-          });
-      }
-
-      const p = { 
-          dept: document.getElementById('add-q-dept').value, 
-          text: document.getElementById('add-q-text').value, 
-          optA: document.getElementById('add-q-a').value, optB: document.getElementById('add-q-b').value, 
-          optC: document.getElementById('add-q-c').value, optD: document.getElementById('add-q-d').value, optE: document.getElementById('add-q-e').value, 
-          correct: realCorrect,
-          fileBase64: fileBase64, fileName: fileName, fileMimeType: fileMimeType
-      };
-      
-      runServer('addAdminQuestion', [p], (res) => { 
-          showToast(res.message, true); 
-          document.querySelector('#admin-questions form').reset(); 
-          btn.innerText = "SIMPAN SOAL"; btn.disabled = false;
-          loadAdminQuestions(); 
-      });
     }
 
     function showToast(msg, isCritical = false) {
