@@ -1,6 +1,6 @@
 {
   "name": "axa-dental-exam",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Axa Dental Exam Headless Portal by Axa Xyz",
   "main": "index.html",
   "scripts": {
@@ -10,6 +10,7 @@
     "js-cookie": "^3.0.5",
     "mammoth": "^1.6.0",
     "pdfjs-dist": "^3.11.174",
+    "peerjs": "^1.5.2",
     "xlsx": "^0.18.5"
   },
   "author": "Axa Xyz",
