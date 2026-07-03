@@ -20,7 +20,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V28 (Smart Drive Regex & Absolute Fix Jitsi UI)
+       SUPER BIG UPGRADE CSS3 - V29 (Smart Drive Regex & Absolute Fix Jitsi UI)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -187,11 +187,6 @@
     .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
     .btn-play:hover { background: var(--neon-green); color: #020617; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
     
-    .star-rating { direction: rtl; display: inline-block; font-size: 2.5rem; margin: 10px 0; }
-    .star-rating input { display: none; }
-    .star-rating label { color: rgba(255,255,255,0.1); cursor: pointer; padding: 0 8px; transition: 0.2s; }
-    .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #ffb700; text-shadow: 0 0 20px rgba(255, 183, 0, 0.6); transform: scale(1.15); }
-
     .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px; }
 
     .app-footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); font-weight: 500; margin-top: auto; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
@@ -745,7 +740,7 @@
     // ==========================================
     // CONFIG: VERCEL ROUTING & GAS API
     // ==========================================
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbypG1ceID0dXpoa1A3lyGqtjdpKY7_ownFGoA_wt4p46D3uG_npc1RrP9_QBr_kR8o/exec"; 
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzUdtt_J2fBHqrv6yV8rC6cfJgTKb-KpOQnaOibl8wvJOb0ACknAhByiFIj2gR8UyU/exec"; 
 
     const DEPARTMENTS = [
         "Biologi Oral", "Ilmu Bahan dan Teknologi", "Ilmu Kedokteran Gigi Anak", 
@@ -814,15 +809,13 @@
         });
     }
 
-    // UPGRADE V27: Fungsi Regex Cerdas untuk Google Drive URL
+    // UPGRADE V29: Regex Universal Extra Kuat untuk Ekstrak ID Drive
     function getDirectDriveLink(url) {
         if (!url) return '';
-        // Ekstrak ID dari link format /d/ID/ (Mengcover format /file/d/ atau format apapun dengan /d/)
         let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
             return `https://drive.google.com/uc?export=view&id=${match[1]}`;
         }
-        // Ekstrak ID dari link format ?id=ID
         match = url.match(/id=([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
             return `https://drive.google.com/uc?export=view&id=${match[1]}`;
@@ -1129,7 +1122,7 @@
         });
     }
 
-    // UPGRADE V27: Render Image Lebih Kuat
+    // UPGRADE V29: Render Image Lebih Kuat dengan Fallback Property Ekstrem
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1137,8 +1130,8 @@
         document.getElementById('student-identity').innerText = `NIM: ${currentUser.nim} | Dept: ${currentUser.dept}`;
         
         let imgHtml = '';
-        // Ekstrak URL gambar yang diterima dari backend (jika undefined, jadikan string kosong)
-        let imgData = q.img || q.image || q.imgUrl || ''; 
+        // UPGRADE Ekstrem Fallback Property (Memastikan sekecil apapun data link, pasti tertangkap)
+        let imgData = q.img || q.image || q.Image_URL || q.imgUrl || ''; 
         
         if(imgData && typeof imgData === 'string' && imgData.trim() !== '') {
             let directUrl = getDirectDriveLink(imgData);
@@ -1441,7 +1434,7 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // UPGRADE V27: Render URL Google Drive Smart Preview di Daftar Bank Soal Admin
+    // UPGRADE V29: Render Thumbnail Table & Tahan Banting Parameter
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
@@ -1451,10 +1444,18 @@
                let h = '';
                if(res.data && res.data.length > 0) {
                    res.data.forEach(q => {
-                      // Gunakan getDirectDriveLink untuk memungkinkan admin melakukan preview gambar yang disisipkan
-                      let imgData = q.img || q.image || q.imgUrl || ''; 
-                      let directLink = getDirectDriveLink(imgData);
-                      let imgIndicator = (imgData && imgData !== '') ? `<a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-weight:bold; text-decoration:none;">🖼️ Preview Link</a>` : '<span style="color:var(--text-muted);">-</span>';
+                      let imgData = q.img || q.image || q.Image_URL || q.imgUrl || ''; 
+                      let imgIndicator = '<span style="color:var(--text-muted);">-</span>';
+                      
+                      // Smart Thumbnail: Memunculkan preview gambar di dalam Tabel Daftar Soal
+                      if (imgData && typeof imgData === 'string' && imgData.trim() !== '') {
+                          let directLink = getDirectDriveLink(imgData);
+                          imgIndicator = `
+                          <div style="display:flex; flex-direction:column; align-items:flex-start; gap:5px;">
+                              <img src="${directLink}" style="width:60px; height:40px; object-fit:cover; border-radius:4px; border:1px solid rgba(0, 255, 136, 0.4);" onerror="this.style.display='none'">
+                              <a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-size:0.75rem; text-decoration:none; font-weight:bold;">🖼️ Buka Lampiran</a>
+                          </div>`;
+                      }
                       
                       h += `<tr><td><span style="font-family:monospace; color:var(--text-muted); font-weight:600;">${q.id}</span></td><td><b style="color:var(--text-main); font-weight:500;">${q.text.substring(0,80)}...</b></td><td>${imgIndicator}</td><td><span style="background:rgba(0,255,136,0.1); color:var(--neon-green); padding:4px 8px; border-radius:4px; font-weight:bold;">${q.correct}</span></td>
                             <td><button class="btn-play" onclick='openEditQuestion(${JSON.stringify(q).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
@@ -1467,7 +1468,7 @@
     }
 
     function openEditQuestion(q) {
-       let imgData = q.img || q.image || q.imgUrl || ''; 
+       let imgData = q.img || q.image || q.Image_URL || q.imgUrl || ''; 
        let existingImg = (imgData && imgData !== '') ? `<a href="${imgData}" target="_blank" style="color:var(--neon-blue); font-size:0.85rem; display:block; margin-bottom:10px;">Lihat Lampiran/URL Saat Ini</a>` : '';
        
        let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Bank Soal: <span style="color:#fff;">${q.id}</span></h3>
