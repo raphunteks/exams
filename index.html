@@ -22,7 +22,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V22 (Jitsi, Base64 CCTV & Smart Image Drive Preview)
+       SUPER BIG UPGRADE CSS3 - V23 (Jitsi UI Overlap Fix & Camera Handoff)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -230,7 +230,7 @@
         border: 1px solid var(--danger);
     }
 
-    /* UPGRADE: Video Container CSS for Admin CCTV/Jitsi Fix to avoid overlap */
+    /* UPGRADE: Video Container CSS for Admin CCTV */
     .video-container {
         position: relative;
         width: 100%;
@@ -244,6 +244,26 @@
         justify-content: center;
         overflow: hidden;
         margin-bottom: 20px;
+    }
+
+    /* UPGRADE: Container Khusus Jitsi Agar Tidak Terpotong (Overlap Fix) */
+    #jitsi-container {
+        display: block; /* Override flex properties yang memotong UI */
+        width: 100%;
+        height: 500px; /* Memberikan ruang napas vertikal untuk Jitsi */
+        background: #020617;
+        border-radius: 12px;
+        border: 2px solid var(--neon-blue);
+        box-shadow: 0 0 30px rgba(14, 165, 233, 0.4);
+        margin-bottom: 20px;
+        overflow: visible !important; /* Mengizinkan dropdown Jitsi keluar dari kotak */
+    }
+
+    #jitsi-container > iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 10px;
     }
 
     /* CCTV Thumbnail on Table */
@@ -298,6 +318,7 @@
 
         #local-video { width: 100px; height: 80px; bottom: 10px; left: 10px; }
         #live-indicator { bottom: 95px; left: 15px; font-size: 0.6rem; }
+        #jitsi-container { height: 60vh; }
     }
   </style>
 </head>
@@ -378,7 +399,7 @@
       </div>
 
       <!-- Container untuk Iframe Jitsi Meet -->
-      <div id="jitsi-container" class="video-container hidden" style="min-height: 450px;">
+      <div id="jitsi-container" class="hidden">
           <!-- Jitsi Iframe will be generated here -->
       </div>
       
@@ -753,7 +774,8 @@
     // ==========================================
     // CONFIG: VERCEL ROUTING & GAS API
     // ==========================================
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyJHkKQh6s3f7idploBQVw62YzWY3oKV0S3l78JfvrKoyW7OyJJrTrAQt3K6duJBg/exec"; 
+    // UPGRADE: Update URL GAS API terbaru
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbypG1ceID0dXpoa1A3lyGqtjdpKY7_ownFGoA_wt4p46D3uG_npc1RrP9_QBr_kR8o/exec"; 
 
     const DEPARTMENTS = [
         "Biologi Oral", "Ilmu Bahan dan Teknologi", "Ilmu Kedokteran Gigi Anak", 
@@ -1237,8 +1259,14 @@
         }
     }
 
-    // Fungsi bagi Mahasiswa jika ingin menelepon Pengawas via Jitsi Meet
+    // UPGRADE: Fungsi Panggilan Jitsi Mahasiswa & Smart Camera Handoff
     function openStudentJitsi() {
+        // Hentikan penggunaan hardware kamera lokal sementara agar Jitsi bisa menggunakannya
+        if(localStream) {
+            localStream.getTracks().forEach(t => t.stop());
+            localStream = null;
+        }
+
         document.getElementById('cam-target-name').innerText = `Ruang Panggilan Pengawas`;
         document.getElementById('cctv-container').classList.add('hidden');
         
@@ -1253,8 +1281,8 @@
             height: '100%',
             parentNode: jitsiContainer,
             userInfo: { displayName: currentUser.name },
-            // Video dimatikan dari awal agar tidak berbenturan dengan getUserMedia CCTV 
-            configOverwrite: { startWithAudioMuted: false, startWithVideoMuted: true }
+            // UPGRADE: Video diaktifkan karena CCTV background sudah dimatikan
+            configOverwrite: { startWithAudioMuted: false, startWithVideoMuted: false }
         };
         
         jitsiApi = new JitsiMeetExternalAPI(domain, options);
@@ -1419,10 +1447,16 @@
         document.getElementById('live-cam-modal').classList.remove('hidden');
     }
 
+    // UPGRADE: Re-start Camera setelah menutup Modal Live Cam
     function closeLiveCam() {
         if(jitsiApi) { jitsiApi.dispose(); jitsiApi = null; }
         activeCCTVNim = null;
         document.getElementById('live-cam-modal').classList.add('hidden');
+
+        // Jika user adalah student dan sedang ujian, nyalakan kembali CCTV Base64
+        if(currentUser && currentUser.role === 'Student' && isExamActive && !isSubmitting) {
+            initMediaSensorAndWebRTC();
+        }
     }
 
     function fetchAdminData() {
