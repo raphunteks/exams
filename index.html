@@ -22,7 +22,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V25 (Jitsi Gatekeeper & Minimizer)
+       SUPER BIG UPGRADE CSS3 - V26 (iPad/Desktop Jitsi Fix & Smart Drive Regex)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -184,6 +184,9 @@
     th { background: rgba(0,0,0,0.6); color: var(--neon-green); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.8rem; }
     tr:hover td { background: rgba(255,255,255,0.03); }
     
+    .audio-bar { height: 12px; background: rgba(0,0,0,0.6); border-radius: 6px; overflow: hidden; width: 100px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+    .audio-level { height: 100%; background: linear-gradient(90deg, #00ff88, #ffb700); transition: width 0.5s ease; }
+    .noise-high { background: var(--danger) !important; box-shadow: 0 0 10px var(--danger); }
     .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
     .btn-play:hover { background: var(--neon-green); color: #020617; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
     
@@ -192,30 +195,29 @@
     .star-rating label { color: rgba(255,255,255,0.1); cursor: pointer; padding: 0 8px; transition: 0.2s; }
     .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input:checked ~ label { color: #ffb700; text-shadow: 0 0 20px rgba(255, 183, 0, 0.6); transform: scale(1.15); }
 
-    .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px; }
+    .chart-container { relative; height: 300px; width: 100%; margin-top: 15px; }
 
     .app-footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); font-weight: 500; margin-top: auto; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
     .app-footer span.brand { color: var(--neon-green); font-weight: 700; letter-spacing: 1px; }
 
-    /* UPGRADE V25: CSS STUDENT JITSI GATEKEEPER & MINIMIZER */
+    /* UPGRADE V26: CSS STUDENT JITSI GATEKEEPER & MINIMIZER UNTUK IPAD/DESKTOP */
     .jitsi-fullscreen {
         position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
         z-index: 99999;
-        background: #020617;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        background: #020617; /* Memastikan background tidak putih saat proses load */
+        display: block; /* Menghapus Flexbox yang mencekik Iframe di layar besar */
     }
     .jitsi-fullscreen::before {
         content: 'MENGHUBUNGKAN KE RUANG PENGAWAS JITSI...';
         position: absolute;
-        top: 30px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         color: var(--neon-green);
         font-weight: 800;
         font-size: 1.2rem;
-        z-index: 10;
+        z-index: -1; /* Berada di lapisan belakang Iframe agar otomatis tertutup jika video siap */
         animation: pulse-neon 1s infinite;
         background: rgba(0,0,0,0.8);
         padding: 10px 20px;
@@ -225,8 +227,8 @@
         position: fixed;
         bottom: 20px;
         left: 20px;
-        width: 250px;
-        height: 180px;
+        width: 280px;
+        height: 200px;
         border-radius: 12px;
         border: 2px solid var(--neon-green);
         box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
@@ -234,6 +236,13 @@
         overflow: hidden;
         transition: all 0.5s ease-in-out;
         background: #000;
+        display: block;
+    }
+    #student-jitsi-container iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+        display: block;
     }
 
     /* Container Khusus Jitsi Admin Agar Tidak Terpotong (Overlap Fix) */
@@ -378,7 +387,7 @@
     </div>
   </div>
 
-  <!-- UPGRADE V25: Container Mengambang (Floating) untuk Jitsi Mahasiswa -->
+  <!-- UPGRADE V26: Container Mengambang (Floating) untuk Jitsi Mahasiswa -->
   <div id="student-jitsi-container" class="hidden"></div>
 
   <div class="container">
@@ -488,7 +497,6 @@
         </div>
       </div>
       
-      <!-- UPGRADE V25: Tab Menu Disederhanakan -->
       <div class="admin-tabs">
         <button class="tab-btn active" onclick="switchAdminTab('admin-stats')">Analytics</button>
         <button class="tab-btn" onclick="switchAdminTab('admin-exams')">Exams</button>
@@ -670,7 +678,6 @@
           <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 20px;">Daftar ini memuat seluruh peserta aktif yang sedang ujian. Admin dapat menekan tombol di bawah untuk bergabung ke Room Jitsi ujian spesifik dan memantau seluruh peserta di dalamnya secara bersamaan.</p>
           <div class="table-wrapper">
               <table id="tbl-audio">
-                <!-- UPGRADE V25: Menghapus Kolom Bising dan Base64 karena Fitur Lokal Dihapus -->
                 <thead><tr><th>Peserta</th><th>Status Sistem</th><th>Pantau Ruang Ujian (Jitsi)</th></tr></thead>
                 <tbody><!-- Diisi JS --></tbody>
               </table>
@@ -809,18 +816,18 @@
         });
     }
 
+    // UPGRADE V26: Fungsi Regex Universal untuk Google Drive URL
     function getDirectDriveLink(url) {
         if (!url) return '';
-        if (url.includes('drive.google.com/file/d/')) {
-            const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//);
-            if (match && match[1]) {
-                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-            }
-        } else if (url.includes('drive.google.com/open?id=')) {
-            const match = url.match(/id=([a-zA-Z0-9_-]+)/);
-            if (match && match[1]) {
-                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-            }
+        // Ekstrak ID dari link format /d/ID/
+        let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+        }
+        // Ekstrak ID dari link format ?id=ID
+        match = url.match(/id=([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
         }
         return url; 
     }
@@ -829,7 +836,6 @@
     let studentAnswers = {}, violationCount = 0, timeRemaining = 0;
     let timerInterval, adminInterval, pingInterval, broadcastInterval;
     
-    // UPGRADE V25: Menghapus Variabel Native Camera, Sisakan Jitsi
     let jitsiApi = null;     
 
     let lastBroadcastId = "0";
@@ -1001,7 +1007,7 @@
     }
     function clearLocalBackup() { localStorage.removeItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`); }
 
-    // UPGRADE V25: GATEKEEPER JITSI
+    // UPGRADE V25/26: GATEKEEPER JITSI
     function startExamSequence() {
       const proceedExam = () => {
          runServer('getStudentExam', [currentUser.examId, currentUser.nim], (res) => {
@@ -1048,11 +1054,11 @@
       } else { proceedExam(); }
     }
 
-    // UPGRADE V25: Memanggil & Mengunci Jitsi Sebagai Syarat Masuk Exam
+    // UPGRADE V25/26: Memanggil & Mengunci Jitsi Sebagai Syarat Masuk Exam
     function initStudentJitsiGatekeeper() {
         const jitsiContainer = document.getElementById('student-jitsi-container');
         jitsiContainer.classList.remove('hidden');
-        jitsiContainer.className = 'jitsi-fullscreen'; // Fullscreen Mode saat pertama masuk
+        jitsiContainer.className = 'jitsi-fullscreen'; 
         
         const domain = 'meet.jit.si';
         const options = {
@@ -1064,11 +1070,10 @@
             configOverwrite: { 
                 startWithAudioMuted: false, 
                 startWithVideoMuted: false,
-                prejoinPageEnabled: false, // Lewati halaman konfirmasi agar langsung masuk
+                prejoinPageEnabled: false, 
                 disableDeepLinking: true
             },
             interfaceConfigOverwrite: {
-                // Hapus tombol agar Mahasiswa tidak bisa mematikan kamera/suara & kabur dari room
                 TOOLBAR_BUTTONS: ['raisehand', 'tileview', 'fullscreen'],
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_WATERMARK_FOR_GUESTS: false
@@ -1126,6 +1131,7 @@
         });
     }
 
+    // UPGRADE V26: Integrasi getDirectDriveLink untuk render Gambar
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1207,7 +1213,7 @@
         if(!isSubmitting) {
             runServer('pingSession', [{ 
                 nim: currentUser.nim, name: currentUser.name, examId: currentExam.examId, deptName: currentUser.dept, 
-                status: status, noiseLevel: 0, // Dikosongkan karena fitur mic local dimatikan
+                status: status, noiseLevel: 0,
                 endTime: examEndTime, answersBackup: JSON.stringify(studentAnswers), violations: violationCount
             }], ()=>{}); 
         }
@@ -1324,11 +1330,11 @@
     function initAdminDashboard() {
       switchView('admin-view'); 
       switchAdminTab('admin-stats');
+
       fetchAdminData();
       adminInterval = setInterval(fetchAdminData, 10000); 
     }
 
-    // UPGRADE V25: Buka Global Room Jitsi Berdasarkan ID Ujian
     function openAdminJitsi(examId) {
         document.getElementById('cam-target-name').innerText = `Memantau Global Room Jitsi: ${examId}`;
         
@@ -1388,11 +1394,10 @@
 
           try {
               let audioHtml = '';
-              // UPGRADE V25: Membersihkan Logika Kamera Tabel. Tabel ini murni menampilkan list Status Siswa
               if(res.liveSessions && Array.isArray(res.liveSessions) && res.liveSessions.length > 0) {
                   res.liveSessions.forEach(s => {
                     let realStatus = s.status;
-                    if(s.status && s.status.includes('|')) { realStatus = s.status.split('|')[0]; } // Antisipasi payload base64 usang jika masih ada
+                    if(s.status && s.status.includes('|')) { realStatus = s.status.split('|')[0]; } 
                     
                     audioHtml += `<tr>
                         <td>${s.nim} - <b style="color:var(--text-main)">${s.name}</b></td>
@@ -1435,6 +1440,7 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
+    // UPGRADE V26: Fungsi Load Admin Questions dengan Regex Cerdas untuk Image Preview URL
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
@@ -1538,83 +1544,6 @@
              return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1}); 
         }
         throw new Error("Format tidak didukung");
-    }
-
-    function loadAdminExams() {
-      document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Memuat Data Database...</td></tr>';
-      runServer('getAdminExams', [], (res) => {
-        if(res && res.status === 'success') {
-           try {
-               let h = '';
-               if(res.data && res.data.length > 0) {
-                   res.data.forEach(ex => {
-                      let statColor = ex.status == 'Active' ? 'var(--neon-green)' : 'var(--danger)';
-                      h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${ex.id}</b></td><td>${ex.dept}</td><td>${ex.title}</td><td>${ex.duration} Mnt</td><td><span style="color:${statColor}; font-weight:bold; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:4px;">${ex.status}</span></td><td><span style="color:var(--text-muted);">${ex.vis}</span></td>
-                            <td><button class="btn-play" onclick='openEditExam(${JSON.stringify(ex).replace(/'/g, "&apos;")})'>✏️ Konfigurasi</button></td></tr>`;
-                   });
-                   document.getElementById('tbl-exams').querySelector('tbody').innerHTML = h;
-               } else { document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Data ujian kosong.</td></tr>'; }
-           } catch(e) {}
-        }
-      });
-    }
-
-    function openEditExam(ex) {
-       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Konfigurasi Ujian: <span style="color:#fff;">${ex.id}</span></h3>
-        <div class="input-group"><label>Judul Ujian CBT</label><input type="text" id="ed-ex-title" class="input-glass" value="${ex.title}"></div>
-        <div class="input-group"><label>Alokasi Waktu Ujian (Menit)</label><input type="number" id="ed-ex-dur" class="input-glass" value="${ex.duration}"></div>
-        <div class="input-group"><label>Status (Aktif/Nonaktif)</label><select id="ed-ex-stat" class="input-glass" style="background:var(--bg-base);"><option value="Active" ${ex.status=='Active'?'selected':''}>Active</option><option value="Inactive" ${ex.status=='Inactive'?'selected':''}>Inactive</option></select></div>
-        <div class="input-group"><label>Visibilitas Nilai Akhir ke Siswa</label><select id="ed-ex-vis" class="input-glass" style="background:var(--bg-base);"><option value="Show" ${ex.vis=='Show'?'selected':''}>Show</option><option value="Hide" ${ex.vis=='Hide'?'selected':''}>Hide</option></select></div>
-        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditExam('${ex.id}')">SIMPAN KONFIGURASI</button>
-        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
-       document.getElementById('edit-modal-body').innerHTML = h;
-       document.getElementById('edit-modal').classList.remove('hidden');
-    }
-
-    function saveEditExam(id) {
-       let p = { id: id, title: document.getElementById('ed-ex-title').value, duration: document.getElementById('ed-ex-dur').value, status: document.getElementById('ed-ex-stat').value, vis: document.getElementById('ed-ex-vis').value };
-       runServer('updateAdminExam', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
-    }
-
-    function loadAdminUsers() {
-      document.getElementById('tbl-users').querySelector('tbody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Memuat Database Pengguna...</td></tr>';
-      runServer('getAdminUsers', [], (res) => {
-        if(res && res.status === 'success') {
-           try {
-               let h = '';
-               let filterDept = document.getElementById('filter-u-dept').value;
-               if(res.data && res.data.length > 0) {
-                   res.data.forEach(u => {
-                      if (filterDept === 'ALL' || u.dept === filterDept) {
-                          let roleColor = u.role === 'Admin' ? 'var(--warning)' : 'var(--neon-green)';
-                          h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${u.nim}</b></td><td>${u.name}</td><td style="color:var(--text-muted); font-family:monospace;">${u.password}</td><td><span style="color:${roleColor}; font-weight:600;">${u.role}</span></td><td><span style="color:var(--text-muted);">${u.dept}</span></td>
-                                <td><button class="btn-play" onclick='openEditUser(${JSON.stringify(u).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
-                      }
-                   });
-               }
-               document.getElementById('tbl-users').querySelector('tbody').innerHTML = h || '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada user.</td></tr>';
-           } catch(e) {}
-        }
-      });
-    }
-
-    function openEditUser(u) {
-       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Identitas: <span style="color:#fff;">${u.nim}</span></h3>
-        <div class="input-group"><label>Nama Lengkap</label><input type="text" id="ed-u-name" class="input-glass" value="${u.name}"></div>
-        <div class="input-group"><label>Password</label><input type="text" id="ed-u-pass" class="input-glass" value="${u.password}"></div>
-        <div class="input-group"><label>Role</label><select id="ed-u-role" class="input-glass" style="background:var(--bg-base);"><option value="Student" ${u.role=='Student'?'selected':''}>Student</option><option value="Admin" ${u.role=='Admin'?'selected':''}>Admin</option></select></div>
-        <div class="input-group"><label>Departemen</label><select id="ed-u-dept" class="input-glass dept-options" style="background:var(--bg-base);"></select></div>
-        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditUser('${u.nim}')">SIMPAN PERUBAHAN</button>
-        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
-       document.getElementById('edit-modal-body').innerHTML = h;
-       let deptSelect = document.getElementById('ed-u-dept');
-       DEPARTMENTS.forEach(d => { let sel = (u.dept === d) ? 'selected' : ''; deptSelect.innerHTML += `<option value="${d}" ${sel}>${d}</option>`; });
-       document.getElementById('edit-modal').classList.remove('hidden');
-    }
-
-    function saveEditUser(nim) {
-       let p = { nim: nim, name: document.getElementById('ed-u-name').value, password: document.getElementById('ed-u-pass').value, role: document.getElementById('ed-u-role').value, dept: document.getElementById('ed-u-dept').value };
-       runServer('updateAdminUser', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
     }
 
     async function processBulkUsers() {
