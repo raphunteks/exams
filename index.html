@@ -20,7 +20,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V29 (Smart Drive Regex & Absolute Fix Jitsi UI)
+       SUPER BIG UPGRADE CSS3 - V30 (Table Catcher & Strong Upload UI)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -124,8 +124,6 @@
 
     /* UI UJIAN CBT PROFESIONAL */
     .cbt-container { display: flex; gap: 30px; align-items: flex-start; }
-    
-    /* UPGRADE: Tambahan padding-bottom yang cukup lebar untuk memastikan scrolling sampai ke opsi terbawah */
     .cbt-main { flex: 3; width: 100%; padding-bottom: 250px !important; }
     
     .cbt-sidebar { flex: 1; width: 100%; background: rgba(15, 23, 42, 0.85); padding: 25px; border-radius: 16px; border: 1px solid rgba(0, 255, 136, 0.2); position: sticky; top: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
@@ -192,13 +190,13 @@
     .app-footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); font-weight: 500; margin-top: auto; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
     .app-footer span.brand { color: var(--neon-green); font-weight: 700; letter-spacing: 1px; }
 
-    /* UPGRADE V26/V27: CSS STUDENT JITSI GATEKEEPER (Desktop & iPad Fix) */
+    /* JITSI GATEKEEPER CSS */
     .jitsi-fullscreen {
         position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
         z-index: 99999;
         background: #020617; 
-        display: block; /* Mencegah flexbox mencekik iframe di Desktop/iPad */
+        display: block; 
     }
     .jitsi-fullscreen::before {
         content: 'MENGHUBUNGKAN KE RUANG PENGAWAS JITSI...';
@@ -209,7 +207,7 @@
         color: var(--neon-green);
         font-weight: 800;
         font-size: 1.2rem;
-        z-index: -1; /* Z-Index negatif agar teks ini otomatis tertutup oleh video Iframe saat selesai dimuat */
+        z-index: -1; 
         animation: pulse-neon 1s infinite;
         background: rgba(0,0,0,0.8);
         padding: 10px 20px;
@@ -237,7 +235,6 @@
         display: block;
     }
 
-    /* Container Khusus Jitsi Admin Agar Tidak Terpotong (Overlap Fix) */
     #jitsi-container {
         display: block; 
         width: 100%;
@@ -257,7 +254,6 @@
         border-radius: 10px;
     }
 
-    /* Mempercantik Image Preview Soal */
     .q-image-preview {
         max-width: 100%;
         max-height: 350px;
@@ -293,7 +289,6 @@
 
         #jitsi-container { height: 60vh; }
         
-        /* Pengecilan Jitsi saat Ujian di Layar HP */
         .jitsi-minimized {
             width: 120px;
             height: 160px;
@@ -365,22 +360,17 @@
     <div class="modal-content" id="edit-modal-body"></div>
   </div>
 
-  <!-- MODAL JITSI CALL UNTUK ADMIN PENGAWAS -->
   <div id="live-cam-modal" class="fullscreen-modal hidden" style="z-index: 12000;">
     <div class="modal-content" style="max-width: 800px; text-align: center; border-color: var(--neon-blue);">
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING (ROOM UJIAN)</h3>
       <p id="cam-target-name" style="color: var(--text-muted); margin-bottom: 20px; font-weight:bold;"></p>
-      
-      <!-- Container untuk Iframe Jitsi Meet Admin -->
       <div id="jitsi-container" class="hidden"></div>
-      
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
           <button class="btn-danger btn-neon" style="width: auto; padding: 12px 20px; flex: 1;" onclick="closeLiveCam()">KELUAR DARI RUANG PENGAWASAN</button>
       </div>
     </div>
   </div>
 
-  <!-- Container Mengambang (Floating) untuk Jitsi Mahasiswa -->
   <div id="student-jitsi-container" class="hidden"></div>
 
   <div class="container">
@@ -809,7 +799,6 @@
         });
     }
 
-    // UPGRADE V29: Regex Universal Extra Kuat untuk Ekstrak ID Drive
     function getDirectDriveLink(url) {
         if (!url) return '';
         let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -869,8 +858,12 @@
           method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ action: funcName, args: argsArray })
         });
-        onSuccess(await response.json());
-      } catch (err) { console.error("API Error: ", err); }
+        const data = await response.json();
+        onSuccess(data);
+      } catch (err) { 
+        console.error("API Error: ", err); 
+        onSuccess({ status: 'error', message: 'Koneksi ke Server Google gagal. Pastikan URL API benar & di-Deploy.' });
+      }
     }
 
     // --- DRM ANTI INSPECT ELEMENT & CONTINUOUS KEY HOLD ---
@@ -934,7 +927,6 @@
        drmTimeout = setTimeout(() => { drm.classList.add('hidden'); }, 3500); 
     }
 
-    // --- MOBILE TEXT SELECTION PROTECTION ---
     document.addEventListener('selectstart', (e) => {
         if(isExamActive) { e.preventDefault(); showToast("⚠️ Tindakan memblok teks soal tidak diizinkan!", true); }
     });
@@ -998,7 +990,6 @@
     }
     function clearLocalBackup() { localStorage.removeItem(`axa_exam_${currentUser.nim}_${currentExam.examId}`); }
 
-    // UPGRADE V25/26: GATEKEEPER JITSI
     function startExamSequence() {
       const proceedExam = () => {
          runServer('getStudentExam', [currentUser.examId, currentUser.nim], (res) => {
@@ -1028,7 +1019,6 @@
              document.getElementById('watermark-layer').innerHTML = Array(80).fill(`${currentUser.nim} - ${currentUser.name}`).join(' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
              document.getElementById('watermark-layer').classList.remove('hidden');
              
-             // Panggil inisialisasi Jitsi API secara Paksa sebelum merender UI Soal (Gatekeeper)
              initStudentJitsiGatekeeper();
              
            } else {
@@ -1045,7 +1035,6 @@
       } else { proceedExam(); }
     }
 
-    // UPGRADE V25/26: Memanggil & Mengunci Jitsi Sebagai Syarat Masuk Exam
     function initStudentJitsiGatekeeper() {
         const jitsiContainer = document.getElementById('student-jitsi-container');
         jitsiContainer.classList.remove('hidden');
@@ -1073,14 +1062,10 @@
         
         jitsiApi = new JitsiMeetExternalAPI(domain, options);
         
-        // Listener Kritis: Baru boleh mulai ujian dan me-minimize jika sudah berstatus "Joined"
         jitsiApi.addEventListener('videoConferenceJoined', () => {
             showToast("Sukses terhubung ke Pengawas! Ujian dimulai.", true);
-            
-            // Ubah class agar Jitsi menjadi floating mini-widget di sudut layar
             jitsiContainer.className = 'jitsi-minimized';
             
-            // Render UI Soal & Timer sekarang
             buildCBTPalette(); 
             renderSingleQuestion(); 
             startRealTimer(examEndTime); 
@@ -1093,7 +1078,6 @@
             switchView('exam-view');
         });
 
-        // Hukuman / Force Re-join jika mahasiswa iseng klik close di Jitsi API
         jitsiApi.addEventListener('videoConferenceLeft', () => {
             if(isExamActive && !isSubmitting) {
                 showToast("Koneksi Pengawas Terputus! Ujian terkunci sampai Anda merefresh halaman.", true);
@@ -1122,7 +1106,6 @@
         });
     }
 
-    // UPGRADE V29: Render Image Lebih Kuat dengan Fallback Property Ekstrem
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1130,7 +1113,6 @@
         document.getElementById('student-identity').innerText = `NIM: ${currentUser.nim} | Dept: ${currentUser.dept}`;
         
         let imgHtml = '';
-        // UPGRADE Ekstrem Fallback Property (Memastikan sekecil apapun data link, pasti tertangkap)
         let imgData = q.img || q.image || q.Image_URL || q.imgUrl || ''; 
         
         if(imgData && typeof imgData === 'string' && imgData.trim() !== '') {
@@ -1434,7 +1416,90 @@
       document.getElementById('det-list').innerHTML = h;
     }
 
-    // UPGRADE V29: Render Thumbnail Table & Tahan Banting Parameter
+    // UPGRADE V30: Penangkapan Error Tabel jika API Outdated
+    function loadAdminExams() {
+      document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Memuat Data Database...</td></tr>';
+      runServer('getAdminExams', [], (res) => {
+        if(res && res.status === 'success') {
+           try {
+               let h = '';
+               if(res.data && res.data.length > 0) {
+                   res.data.forEach(ex => {
+                      let statColor = ex.status == 'Active' ? 'var(--neon-green)' : 'var(--danger)';
+                      h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${ex.id}</b></td><td>${ex.dept}</td><td>${ex.title}</td><td>${ex.duration} Mnt</td><td><span style="color:${statColor}; font-weight:bold; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:4px;">${ex.status}</span></td><td><span style="color:var(--text-muted);">${ex.vis}</span></td>
+                            <td><button class="btn-play" onclick='openEditExam(${JSON.stringify(ex).replace(/'/g, "&apos;")})'>✏️ Konfigurasi</button></td></tr>`;
+                   });
+                   document.getElementById('tbl-exams').querySelector('tbody').innerHTML = h;
+               } else { document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Data ujian kosong.</td></tr>'; }
+           } catch(e) {}
+        } else {
+            document.getElementById('tbl-exams').querySelector('tbody').innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${res ? res.message : 'Koneksi ke Backend gagal. Pastikan sudah klik New Deployment di Apps Script.'}</td></tr>`;
+        }
+      });
+    }
+
+    function openEditExam(ex) {
+       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Konfigurasi Ujian: <span style="color:#fff;">${ex.id}</span></h3>
+        <div class="input-group"><label>Judul Ujian CBT</label><input type="text" id="ed-ex-title" class="input-glass" value="${ex.title}"></div>
+        <div class="input-group"><label>Alokasi Waktu Ujian (Menit)</label><input type="number" id="ed-ex-dur" class="input-glass" value="${ex.duration}"></div>
+        <div class="input-group"><label>Status (Aktif/Nonaktif)</label><select id="ed-ex-stat" class="input-glass" style="background:var(--bg-base);"><option value="Active" ${ex.status=='Active'?'selected':''}>Active</option><option value="Inactive" ${ex.status=='Inactive'?'selected':''}>Inactive</option></select></div>
+        <div class="input-group"><label>Visibilitas Nilai Akhir ke Siswa</label><select id="ed-ex-vis" class="input-glass" style="background:var(--bg-base);"><option value="Show" ${ex.vis=='Show'?'selected':''}>Show</option><option value="Hide" ${ex.vis=='Hide'?'selected':''}>Hide</option></select></div>
+        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditExam('${ex.id}')">SIMPAN KONFIGURASI</button>
+        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
+       document.getElementById('edit-modal-body').innerHTML = h;
+       document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function saveEditExam(id) {
+       let p = { id: id, title: document.getElementById('ed-ex-title').value, duration: document.getElementById('ed-ex-dur').value, status: document.getElementById('ed-ex-stat').value, vis: document.getElementById('ed-ex-vis').value };
+       runServer('updateAdminExam', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminExams(); });
+    }
+
+    // UPGRADE V30: Penangkapan Error Tabel jika API Outdated
+    function loadAdminUsers() {
+      document.getElementById('tbl-users').querySelector('tbody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Memuat Database Pengguna...</td></tr>';
+      runServer('getAdminUsers', [], (res) => {
+        if(res && res.status === 'success') {
+           try {
+               let h = '';
+               let filterDept = document.getElementById('filter-u-dept').value;
+               if(res.data && res.data.length > 0) {
+                   res.data.forEach(u => {
+                      if (filterDept === 'ALL' || u.dept === filterDept) {
+                          let roleColor = u.role === 'Admin' ? 'var(--warning)' : 'var(--neon-green)';
+                          h += `<tr><td><b style="color:var(--text-main); font-family:monospace;">${u.nim}</b></td><td>${u.name}</td><td style="color:var(--text-muted); font-family:monospace;">${u.password}</td><td><span style="color:${roleColor}; font-weight:600;">${u.role}</span></td><td><span style="color:var(--text-muted);">${u.dept}</span></td>
+                                <td><button class="btn-play" onclick='openEditUser(${JSON.stringify(u).replace(/'/g, "&apos;")})'>✏️ Edit</button></td></tr>`;
+                      }
+                   });
+               }
+               document.getElementById('tbl-users').querySelector('tbody').innerHTML = h || '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada user.</td></tr>';
+           } catch(e) {}
+        } else {
+             document.getElementById('tbl-users').querySelector('tbody').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${res ? res.message : 'Koneksi ke Backend gagal. Pastikan sudah klik New Deployment di Apps Script.'}</td></tr>`;
+        }
+      });
+    }
+
+    function openEditUser(u) {
+       let h = `<h3 style="font-size:1.4rem; color:var(--neon-green); margin-bottom:20px;">Edit Identitas: <span style="color:#fff;">${u.nim}</span></h3>
+        <div class="input-group"><label>Nama Lengkap</label><input type="text" id="ed-u-name" class="input-glass" value="${u.name}"></div>
+        <div class="input-group"><label>Password</label><input type="text" id="ed-u-pass" class="input-glass" value="${u.password}"></div>
+        <div class="input-group"><label>Role</label><select id="ed-u-role" class="input-glass" style="background:var(--bg-base);"><option value="Student" ${u.role=='Student'?'selected':''}>Student</option><option value="Admin" ${u.role=='Admin'?'selected':''}>Admin</option></select></div>
+        <div class="input-group"><label>Departemen</label><select id="ed-u-dept" class="input-glass dept-options" style="background:var(--bg-base);"></select></div>
+        <button class="btn-start-exam" style="padding:12px; font-size:0.95rem;" onclick="saveEditUser('${u.nim}')">SIMPAN PERUBAHAN</button>
+        <button class="btn-neon" style="margin-top:10px; padding:12px; font-size:0.95rem; border-color:rgba(255,255,255,0.2); color:#fff;" onclick="document.getElementById('edit-modal').classList.add('hidden')">BATAL</button>`;
+       document.getElementById('edit-modal-body').innerHTML = h;
+       let deptSelect = document.getElementById('ed-u-dept');
+       DEPARTMENTS.forEach(d => { let sel = (u.dept === d) ? 'selected' : ''; deptSelect.innerHTML += `<option value="${d}" ${sel}>${d}</option>`; });
+       document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function saveEditUser(nim) {
+       let p = { nim: nim, name: document.getElementById('ed-u-name').value, password: document.getElementById('ed-u-pass').value, role: document.getElementById('ed-u-role').value, dept: document.getElementById('ed-u-dept').value };
+       runServer('updateAdminUser', [p], (res) => { showToast(res.message, true); document.getElementById('edit-modal').classList.add('hidden'); loadAdminUsers(); });
+    }
+
+    // UPGRADE V30: Menangkap Error API
     function loadAdminQuestions() {
       let dept = document.getElementById('filter-q-dept').value;
       document.getElementById('tbl-questions').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Memuat Bank Soal...</td></tr>';
@@ -1447,7 +1512,6 @@
                       let imgData = q.img || q.image || q.Image_URL || q.imgUrl || ''; 
                       let imgIndicator = '<span style="color:var(--text-muted);">-</span>';
                       
-                      // Smart Thumbnail: Memunculkan preview gambar di dalam Tabel Daftar Soal
                       if (imgData && typeof imgData === 'string' && imgData.trim() !== '') {
                           let directLink = getDirectDriveLink(imgData);
                           imgIndicator = `
@@ -1463,6 +1527,8 @@
                }
                document.getElementById('tbl-questions').querySelector('tbody').innerHTML = h || '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada soal.</td></tr>';
            } catch(e) {}
+        } else {
+             document.getElementById('tbl-questions').querySelector('tbody').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${res ? res.message : 'Koneksi gagal. Lakukan New Deployment.'}</td></tr>`;
         }
       });
     }
@@ -1665,6 +1731,7 @@
       runServer('addAdminUser', [p], (res) => { showToast(res.message, true); document.querySelector('#admin-users form').reset(); loadAdminUsers(); });
     }
 
+    // UPGRADE V30: Menangkap Silent Error pada fungsi Image Upload
     async function submitNewQuestion() {
       const btn = event.target.querySelector('button[type="submit"]');
       btn.innerText = "MENGUPLOAD...";
@@ -1702,10 +1769,14 @@
       };
       
       runServer('addAdminQuestion', [p], (res) => { 
-          showToast(res.message, true); 
-          document.querySelector('#admin-questions form').reset(); 
+          if(res && res.status === 'error') {
+              alert(res.message); // Gunakan alert keras karena ini error sistematis
+          } else {
+              showToast(res.message, true); 
+              document.querySelector('#admin-questions form').reset(); 
+              loadAdminQuestions(); 
+          }
           btn.innerText = "SIMPAN SOAL"; btn.disabled = false;
-          loadAdminQuestions(); 
       });
     }
 
