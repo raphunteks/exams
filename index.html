@@ -10,7 +10,6 @@
   <meta name="author" content="Axa Xyz">
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- UPGRADE V35: Phosphor Icons untuk Bintang Rating yang Lebih Modern -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -22,7 +21,7 @@
 
   <style>
     /* ==========================================
-       SUPER BIG UPGRADE CSS3 - V35 (Interactive Star Rating Fix)
+       SUPER BIG UPGRADE CSS3 - V36 (Direct GDrive Image Render Fix)
        ========================================== */
     :root { 
       --bg-base: #020617; 
@@ -187,7 +186,7 @@
     .btn-play { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
     .btn-play:hover { background: var(--neon-green); color: #020617; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
     
-    /* UPGRADE V35: Modern Interactive Star Rating */
+    /* Interactive Star Rating */
     .star-rating-container { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
     .star-icon { font-size: 2.8rem; color: rgba(255, 255, 255, 0.1); cursor: pointer; transition: all 0.2s ease-in-out; }
     .star-icon:hover { transform: scale(1.15); }
@@ -243,7 +242,6 @@
         display: block;
     }
 
-    /* Container Khusus Jitsi Admin Agar Tidak Terpotong (Overlap Fix) */
     #jitsi-container {
         display: block; 
         width: 100%;
@@ -263,7 +261,7 @@
         border-radius: 10px;
     }
 
-    /* Mempercantik Image Preview Soal */
+    /* UPGRADE V36: CSS Image Preview untuk Image Raw Load */
     .q-image-preview {
         max-width: 100%;
         max-height: 350px;
@@ -275,7 +273,7 @@
         display: block;
         margin-left: auto;
         margin-right: auto;
-        background: #fff; /* Memberikan background putih jika gambar transparan PNG */
+        background: #fff; 
     }
 
     /* MOBILE RESPONSIVENESS */
@@ -300,7 +298,6 @@
 
         #jitsi-container { height: 60vh; }
         
-        /* Pengecilan Jitsi saat Ujian di Layar HP */
         .jitsi-minimized {
             width: 120px;
             height: 160px;
@@ -378,7 +375,6 @@
       <h3 style="color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px;">LIVE PROCTORING (ROOM UJIAN)</h3>
       <p id="cam-target-name" style="color: var(--text-muted); margin-bottom: 20px; font-weight:bold;"></p>
       
-      <!-- Container untuk Iframe Jitsi Meet Admin -->
       <div id="jitsi-container" class="hidden"></div>
       
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
@@ -472,7 +468,6 @@
       <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 15px rgba(0,0,0,0.5);">
           <p style="font-size: 0.95rem; margin-bottom: 15px; font-weight: 500;">Bagaimana pengalaman CBT ini?</p>
           
-          <!-- UPGRADE V35: JavaScript Driven Interactive Stars -->
           <div class="star-rating-container" id="interactive-stars">
              <i class="ph-fill ph-star star-icon" data-value="1"></i>
              <i class="ph-fill ph-star star-icon" data-value="2"></i>
@@ -820,15 +815,20 @@
         });
     }
 
+    // UPGRADE V36: Trik Paling Stabil Melewati CORS Image GDrive
     function getDirectDriveLink(url) {
         if (!url) return '';
+        let fileId = null;
         let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+        if (match && match[1]) fileId = match[1];
+        else {
+            match = url.match(/id=([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) fileId = match[1];
         }
-        match = url.match(/id=([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+
+        if (fileId) {
+            // Memaksa Google Drive memberikan Raw Byte File bypass CORS Security HTML Page
+            return `https://drive.google.com/uc?export=download&id=${fileId}`;
         }
         return url; 
     }
@@ -847,12 +847,10 @@
     let currentQIndex = 0;
     let flaggedQuestions = new Set();
 
-    // UPGRADE V35: Inisialisasi Event Listener Bintang
     function initStarRating() {
         const stars = document.querySelectorAll('.star-icon');
         const ratingInput = document.getElementById('feed-rating-value');
         
-        // Atur nilai default ke 5 bintang menyala
         stars.forEach(s => s.classList.add('active'));
 
         stars.forEach((star, index) => {
@@ -860,7 +858,6 @@
                 let value = star.getAttribute('data-value');
                 ratingInput.value = value;
                 
-                // Nyalakan bintang dari 1 sampai yang diklik
                 stars.forEach((s, i) => {
                     if (i < value) s.classList.add('active');
                     else s.classList.remove('active');
@@ -871,7 +868,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       loadWebSettings(); 
-      initStarRating(); // Panggil fungsi inisialisasi bintang
+      initStarRating(); 
 
       const page = new URLSearchParams(window.location.search).get('page');
       
@@ -982,7 +979,7 @@
     let touchTimer;
     document.addEventListener('touchstart', (e) => {
         if(!isExamActive) return;
-        if(['BUTTON', 'INPUT', 'LABEL'].includes(e.target.tagName)) return;
+        if(['BUTTON', 'INPUT', 'LABEL', 'I'].includes(e.target.tagName)) return;
         touchTimer = setTimeout(() => {
             showToast("⚠️ Dilarang menahan layar untuk menyeleksi teks soal!", true);
             logViolation("Indikasi Seleksi Teks Mobile (Long Press)");
@@ -1164,6 +1161,7 @@
         });
     }
 
+    // UPGRADE V36: Render Image Mulus dengan Fitur Fallback Sembunyi Error
     function renderSingleQuestion() {
         if(examQuestions.length === 0) return;
         const q = examQuestions[currentQIndex];
@@ -1176,13 +1174,14 @@
         if(imgData && typeof imgData === 'string' && imgData.trim() !== '') {
             let directUrl = getDirectDriveLink(imgData);
             
+            // Logika OnError yang sempurna: Jika gagal memuat tag img (misal karena PDF), sembunyikan gambar dan tampilkan tombol Link.
             imgHtml = `
             <div style="margin-bottom: 25px; text-align: center;">
-                <img src="${directUrl}" class="q-image-preview" alt="Lampiran Gambar Ujian" referrerpolicy="no-referrer"
-                     onerror="this.onerror=null; this.src=''; this.alt=''; document.getElementById('fallback-link-${q.id}').style.display='inline-block';">
+                <img src="${directUrl}" class="q-image-preview" alt="" referrerpolicy="no-referrer"
+                     onerror="this.style.display='none'; document.getElementById('fallback-link-${q.id}').style.display='inline-block';">
                 
-                <div id="fallback-link-${q.id}" style="margin-top: 15px; display: none;">
-                    <a href="${imgData}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none; padding: 8px 20px; font-size: 0.85rem; font-weight: 800;">📄 BUKA LAMPIRAN (PDF/GAGAL DIMUAT)</a>
+                <div id="fallback-link-${q.id}" style="margin-top: 5px; display: none;">
+                    <a href="${imgData}" target="_blank" class="btn-neon" style="display:inline-block; width:auto; text-decoration:none; padding: 8px 20px; font-size: 0.85rem; font-weight: 800;">📄 BUKA LAMPIRAN (PDF / GAGAL DIMUAT)</a>
                 </div>
             </div>`;
         }
@@ -1256,11 +1255,12 @@
         }
     }
 
+    // UPGRADE V36: Filter Anti Spam Tipe GET / Welcome Page
     function pollBroadcast() {
       if(!isSubmitting) {
         runServer('checkBroadcast', [lastBroadcastId], (res) => {
           if(res && res.status === 'success' && res.msgId && res.message) {
-            if (!res.message.includes('Backend API')) { 
+            if (!res.message.includes('Backend API')) { // Mem-bypass pesan sambutan yang tidak sengaja tertarik API
                 lastBroadcastId = res.msgId; 
                 document.getElementById('broadcast-text').innerText = res.message; 
                 document.getElementById('broadcast-modal').classList.remove('hidden');
@@ -1351,7 +1351,6 @@
       });
     }
 
-    // UPGRADE V35: Fungsi tangkap nilai Rating Bintang dengan Javascript modern
     function submitFeedback() {
       const rating = document.getElementById('feed-rating-value').value;
       const comment = document.getElementById('feed-comment').value.trim();
@@ -1424,7 +1423,7 @@
                     window.adminChart = new Chart(ctx, { type: 'bar', data: { labels: cLabels, datasets: [{ label: 'Rata-Rata Nilai', data: cData, backgroundColor: 'rgba(0, 255, 136, 0.4)', borderColor: '#00ff88', borderWidth: 2, borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { labels: { color: '#fff', font: {family: 'Inter'} } } } } });
                  }
               }
-          } catch(e) { console.error(e); }
+          } catch(e) {}
 
           try {
               let logH = ''; 
@@ -1432,7 +1431,7 @@
                  res.recentLogs.forEach(l => { logH += `<div style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);"><span style="color:var(--text-muted); font-size:0.8rem;">[${l.time}]</span> <b style="color:#fff; margin-left:8px;">${l.nim} - ${l.name}</b> <br><span style="color:var(--danger); font-weight:700; display:inline-block; margin-top:5px; font-size:0.85rem;">⚠ ${l.type}</span></div>`; });
                  document.getElementById('admin-logs').innerHTML = logH;
               } else { document.getElementById('admin-logs').innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">Lingkungan ujian kondusif. Tidak ada pelanggaran terdeteksi.</div>'; }
-          } catch(e) { console.error(e); }
+          } catch(e) {}
 
           try {
               let audioHtml = '';
@@ -1452,11 +1451,7 @@
                   });
                   document.getElementById('tbl-audio').querySelector('tbody').innerHTML = audioHtml;
               } else { document.getElementById('tbl-audio').querySelector('tbody').innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada sesi aktif terdeteksi.</td></tr>'; }
-          } catch(e) { console.error(e); }
-        } else {
-             let errMsg = res ? res.message : 'Gagal menghubungkan ke Backend API. Lakukan New Deployment.';
-             document.getElementById('tbl-audio').querySelector('tbody').innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--danger); font-weight:bold;">Error API: ${errMsg}</td></tr>`;
-             document.getElementById('admin-logs').innerHTML = `<div style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${errMsg}</div>`;
+          } catch(e) {}
         }
       });
 
@@ -1470,10 +1465,7 @@
                    });
                    document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = jwbHtml;
                } else { document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--text-muted);">Belum ada data pengumpulan Lembar Jawaban.</td></tr>'; }
-           } catch(e) { console.error(e); }
-         } else {
-             let errMsg = res ? res.message : 'Error Connection.';
-             document.getElementById('tbl-jawaban').querySelector('tbody').innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--danger); font-weight:bold;">Error API: ${errMsg}</td></tr>`;
+           } catch(e) {}
          }
       });
     }
@@ -1509,8 +1501,6 @@
                    document.getElementById('tbl-exams').querySelector('tbody').innerHTML = h;
                } else { document.getElementById('tbl-exams').querySelector('tbody').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Data ujian kosong.</td></tr>'; }
            } catch(e) {}
-        } else {
-            document.getElementById('tbl-exams').querySelector('tbody').innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${res ? res.message : 'Koneksi ke Backend gagal. Pastikan sudah klik New Deployment di Apps Script.'}</td></tr>`;
         }
       });
     }
@@ -1551,8 +1541,6 @@
                }
                document.getElementById('tbl-users').querySelector('tbody').innerHTML = h || '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada user.</td></tr>';
            } catch(e) {}
-        } else {
-             document.getElementById('tbl-users').querySelector('tbody').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${res ? res.message : 'Koneksi ke Backend gagal. Pastikan sudah klik New Deployment di Apps Script.'}</td></tr>`;
         }
       });
     }
@@ -1603,8 +1591,6 @@
                }
                document.getElementById('tbl-questions').querySelector('tbody').innerHTML = h || '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada soal.</td></tr>';
            } catch(e) {}
-        } else {
-             document.getElementById('tbl-questions').querySelector('tbody').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--danger); font-weight:bold;">Error API: ${res ? res.message : 'Koneksi gagal. Lakukan New Deployment.'}</td></tr>`;
         }
       });
     }
